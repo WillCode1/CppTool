@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="SystemApi.cpp">
+      <Filter>SystemApi</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="SystemApi">
+      <UniqueIdentifier>{0f7478b9-5872-4030-8820-aa3e3524a000}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SystemApi.h">
+      <Filter>SystemApi</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

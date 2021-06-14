@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Singleton">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Adaptor">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Template">
+      <UniqueIdentifier>{5b5bbd64-31bd-4fe4-a0ae-6df0e8fcded1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Observer">
+      <UniqueIdentifier>{29f1f5e0-76f4-426f-bebd-160c69bdf160}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ProduceConsume">
+      <UniqueIdentifier>{97061818-1894-4939-b9d6-9428070c4e5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strategy">
+      <UniqueIdentifier>{467314ad-738c-474d-89bf-7702e3f4dbd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Factory">
+      <UniqueIdentifier>{4d4bee96-19a1-4713-9ef6-cf5407db1a95}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Singleton.h">
+      <Filter>Singleton</Filter>
+    </ClInclude>
+    <ClInclude Include="AdaptorInherit .h">
+      <Filter>Adaptor</Filter>
+    </ClInclude>
+    <ClInclude Include="Template.h">
+      <Filter>Template</Filter>
+    </ClInclude>
+    <ClInclude Include="Observer.h">
+      <Filter>Observer</Filter>
+    </ClInclude>
+    <ClInclude Include="Strategy.h">
+      <Filter>Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="StrategyAnother.hpp">
+      <Filter>Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleFactory.h">
+      <Filter>Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="FactoryMethod.h">
+      <Filter>Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Tank.h">
+      <Filter>Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Consume.h">
+      <Filter>ProduceConsume</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractFactory.hpp">
+      <Filter>Factory</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Singleton.cpp">
+      <Filter>Singleton</Filter>
+    </ClCompile>
+    <ClCompile Include="AdaptorComb.h">
+      <Filter>Adaptor</Filter>
+    </ClCompile>
+    <ClCompile Include="Observer.cpp">
+      <Filter>Observer</Filter>
+    </ClCompile>
+    <ClCompile Include="Template.cpp">
+      <Filter>Template</Filter>
+    </ClCompile>
+    <ClCompile Include="Consume.cpp">
+      <Filter>ProduceConsume</Filter>
+    </ClCompile>
+    <ClCompile Include="Strategy.cpp">
+      <Filter>Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleFactory.cpp">
+      <Filter>Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="FactoryMethod.cpp">
+      <Filter>Factory</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
