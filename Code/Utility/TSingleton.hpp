@@ -2,8 +2,7 @@
 #pragma once
 #include <mutex>
 
-template <class T>
-class TSingleton
+template <class T> class TSingleton
 {
 public:
 	virtual ~TSingleton() {}
@@ -46,7 +45,5 @@ private:
 	static std::mutex	s_mutex;
 };
 
-template <class T>
-T* TSingleton<T>::s_pInsatcne = nullptr;
-template <class T>
-std::mutex TSingleton<T>::s_mutex;
+template <class T> T* TSingleton<T>::s_pInsatcne = nullptr;
+template <class T> std::mutex TSingleton<T>::s_mutex;

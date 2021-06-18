@@ -8,6 +8,8 @@
 #define EXPORTGEOALGOAPI __declspec(dllimport)
 #endif
 
+extern const double M_PI;
+
 class EXPORTGEOALGOCLASS GeoAlgoTool
 {
 public:
@@ -29,6 +31,8 @@ public:
 	static double TransRadianToAngle(const double& dRadian);
 	/// @brief 角度转弧度
 	static double TransAngleToRadian(const double& dAngle);
+	/// @brief 标准化角度
+	static double NormalizeAngle(double& theta, double min = 0, double max = 2 * M_PI);
 
 	/// @brief 计算凸度(弧度)
 	static double CalBulge(const double& dStartAngle, const double& dEndAngle);

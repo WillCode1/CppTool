@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="JsonSerialize.cpp">
+      <Filter>Json</Filter>
+    </ClCompile>
+    <ClCompile Include="TestJson.cpp">
+      <Filter>Json</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ConfigBase.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="json.hpp">
+      <Filter>Json</Filter>
+    </ClInclude>
+    <ClInclude Include="fifo_map.hpp">
+      <Filter>Json</Filter>
+    </ClInclude>
+    <ClInclude Include="JsonSerialize.h">
+      <Filter>Json</Filter>
+    </ClInclude>
+    <ClInclude Include="TestJson.h">
+      <Filter>Json</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Base">
+      <UniqueIdentifier>{8e5f591d-2013-4c94-b791-ab2584d649d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Json">
+      <UniqueIdentifier>{083d4839-1d7b-439e-9d1a-ffe33b86e669}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

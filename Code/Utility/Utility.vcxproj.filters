@@ -13,17 +13,8 @@
     <Filter Include="Base64">
       <UniqueIdentifier>{44efb787-92cf-44a1-a4a1-1c6c1b3a5374}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Json">
-      <UniqueIdentifier>{0d0d5de3-d13d-4708-b1aa-ec86b4a9e458}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="json.hpp">
-      <Filter>Json</Filter>
-    </ClInclude>
-    <ClInclude Include="TestJson.h">
-      <Filter>Json</Filter>
-    </ClInclude>
     <ClInclude Include="Base64.h">
       <Filter>Base64</Filter>
     </ClInclude>
@@ -50,9 +41,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TestJson.cpp">
-      <Filter>Json</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Base64.cpp">
       <Filter>Base64</Filter>

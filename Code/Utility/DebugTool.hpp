@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <shlobj.h>
+#include <assert.h>
 using namespace std;
 
 
