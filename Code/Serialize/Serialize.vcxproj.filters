@@ -3,24 +3,30 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TestJson.cpp">
-      <Filter>Json</Filter>
+      <Filter>Json\Test</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConfigBase.h">
       <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="TestJson.h">
-      <Filter>Json</Filter>
-    </ClInclude>
     <ClInclude Include="JsonSerialize.hpp">
       <Filter>Json</Filter>
     </ClInclude>
+    <ClInclude Include="json.hpp">
+      <Filter>Json\nlohmann</Filter>
+    </ClInclude>
     <ClInclude Include="fifo_map.hpp">
+      <Filter>Json\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="TestJson.h">
+      <Filter>Json\Test</Filter>
+    </ClInclude>
+    <ClInclude Include="JsonSerializeUnstable.hpp">
       <Filter>Json</Filter>
     </ClInclude>
-    <ClInclude Include="json.hpp">
-      <Filter>Json</Filter>
+    <ClInclude Include="TestPersonConfig.h">
+      <Filter>Json\Test</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -29,6 +35,12 @@
     </Filter>
     <Filter Include="Json">
       <UniqueIdentifier>{083d4839-1d7b-439e-9d1a-ffe33b86e669}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Json\nlohmann">
+      <UniqueIdentifier>{8263d006-76b5-4f78-9018-e013daa07539}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Json\Test">
+      <UniqueIdentifier>{dda6524c-b745-4010-84d5-a0320db80230}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

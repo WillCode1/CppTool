@@ -31,7 +31,8 @@ public:
 
 	virtual bool LoadCfg() = 0;
 	virtual bool SaveCfg() const = 0;
-	virtual void ConsolePrint() const {}
+	virtual void ClearCfg() const = 0;
+	virtual void ConsolePrint() const = 0;
 
 protected:
 	std::wstring m_cfgPath;

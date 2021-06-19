@@ -1,8 +1,9 @@
 #pragma once
 #include "ConfigBase.h"
 #include <vector>
-//#include <map>
+#include <map>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include "json.hpp"
 #include "fifo_map.hpp"
@@ -47,6 +48,7 @@ public:
 
 	bool LoadCfg() override;
 	bool SaveCfg() const override;
+	void ClearCfg() const override;
 	void ConsolePrint() const override;
 
 protected:
@@ -122,31 +124,19 @@ template<class JsonType> bool JsonSerialize<JsonType>::SetParam(const std::strin
 
 template<class JsonType> bool JsonSerialize<JsonType>::SetParam(const std::string & strKey, const std::vector<int>& data)
 {
-	m_jsonData[strKey] = nlohmann::json::array();
-	for (auto& i : data)
-	{
-		m_jsonData[strKey].emplace_back(i);
-	}
+	m_jsonData[strKey] = nlohmann::json(data);
 	return true;
 }
 
 template<class JsonType> bool JsonSerialize<JsonType>::SetParam(const std::string & strKey, const std::vector<double>& data)
 {
-	m_jsonData[strKey] = nlohmann::json::array();
-	for (auto& i : data)
-	{
-		m_jsonData[strKey].emplace_back(i);
-	}
+	m_jsonData[strKey] = nlohmann::json(data);
 	return true;
 }
 
 template<class JsonType> bool JsonSerialize<JsonType>::SetParam(const std::string& strKey, const std::vector<std::string>& data)
 {
-	m_jsonData[strKey] = nlohmann::json::array();
-	for (auto& i : data)
-	{
-		m_jsonData[strKey].emplace_back(i);
-	}
+	m_jsonData[strKey] = nlohmann::json(data);
 	return true;
 }
 
@@ -271,6 +261,7 @@ template<class JsonType> bool JsonSerialize<JsonType>::LoadCfg()
 	}
 
 	ifs >> m_jsonData;
+
 	ifs.close();
 	return true;
 }
@@ -283,9 +274,15 @@ template<class JsonType> bool JsonSerialize<JsonType>::SaveCfg() const
 		return false;
 	}
 
-	ofs << m_jsonData;
+	ofs << std::setw(4) << m_jsonData << std::endl;
 	ofs.close();
 	return true;
+}
+
+template<class JsonType>
+void JsonSerialize<JsonType>::ClearCfg() const
+{
+	m_jsonData.clear();
 }
 
 template<class JsonType> void JsonSerialize<JsonType>::ConsolePrint() const

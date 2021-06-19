@@ -161,6 +161,8 @@
     <ClInclude Include="fifo_map.hpp" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="JsonSerialize.hpp" />
+    <ClInclude Include="JsonSerializeUnstable.hpp" />
+    <ClInclude Include="TestPersonConfig.h" />
     <ClInclude Include="TestJson.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
