@@ -48,7 +48,7 @@ public:
 
 	bool LoadCfg() override;
 	bool SaveCfg() const override;
-	void ClearCfg() const override;
+	void ClearCfg() override;
 	void ConsolePrint() const override;
 
 protected:
@@ -279,8 +279,7 @@ template<class JsonType> bool JsonSerialize<JsonType>::SaveCfg() const
 	return true;
 }
 
-template<class JsonType>
-void JsonSerialize<JsonType>::ClearCfg() const
+template<class JsonType> void JsonSerialize<JsonType>::ClearCfg()
 {
 	m_jsonData.clear();
 }

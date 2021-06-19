@@ -5,7 +5,7 @@
 template <class T> class TSingleton
 {
 public:
-	virtual ~TSingleton() {}
+	virtual ~TSingleton() = default;
 
 	static T& GetInstance()
 	{
