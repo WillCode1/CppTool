@@ -2,9 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="JsonSerialize.cpp">
-      <Filter>Json</Filter>
-    </ClCompile>
     <ClCompile Include="TestJson.cpp">
       <Filter>Json</Filter>
     </ClCompile>
@@ -13,16 +10,16 @@
     <ClInclude Include="ConfigBase.h">
       <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="json.hpp">
+    <ClInclude Include="TestJson.h">
+      <Filter>Json</Filter>
+    </ClInclude>
+    <ClInclude Include="JsonSerialize.hpp">
       <Filter>Json</Filter>
     </ClInclude>
     <ClInclude Include="fifo_map.hpp">
       <Filter>Json</Filter>
     </ClInclude>
-    <ClInclude Include="JsonSerialize.h">
-      <Filter>Json</Filter>
-    </ClInclude>
-    <ClInclude Include="TestJson.h">
+    <ClInclude Include="json.hpp">
       <Filter>Json</Filter>
     </ClInclude>
   </ItemGroup>

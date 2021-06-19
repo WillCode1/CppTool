@@ -153,7 +153,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="JsonSerialize.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TestJson.cpp" />
   </ItemGroup>
@@ -161,7 +160,7 @@
     <ClInclude Include="ConfigBase.h" />
     <ClInclude Include="fifo_map.hpp" />
     <ClInclude Include="json.hpp" />
-    <ClInclude Include="JsonSerialize.h" />
+    <ClInclude Include="JsonSerialize.hpp" />
     <ClInclude Include="TestJson.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

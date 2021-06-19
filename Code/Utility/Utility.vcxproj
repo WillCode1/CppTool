@@ -160,6 +160,7 @@
     <ClInclude Include="MathTool.h" />
     <ClInclude Include="Random.hpp" />
     <ClInclude Include="StringTool.h" />
+    <ClInclude Include="SystemDetection.hpp" />
     <ClInclude Include="TestTSingleton.h" />
     <ClInclude Include="TSingleton.hpp" />
     <ClInclude Include="DebugTool.hpp" />

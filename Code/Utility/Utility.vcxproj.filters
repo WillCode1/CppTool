@@ -39,6 +39,9 @@
     <ClInclude Include="Random.hpp">
       <Filter>CommonTool</Filter>
     </ClInclude>
+    <ClInclude Include="SystemDetection.hpp">
+      <Filter>CommonTool</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
