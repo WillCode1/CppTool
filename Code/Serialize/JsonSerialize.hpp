@@ -17,13 +17,13 @@ using unordered_json = nlohmann::basic_json<fifo_map>;
 template <class JsonType = nlohmann::json> class JsonSerialize: public ConfigBase, SerializeBase
 {
 public:
-	JsonSerialize(const std::wstring& cfg_path) :ConfigBase(cfg_path)
+	JsonSerialize(const std::wstring& cfg_path) :SerializeBase(cfg_path)
 	{
-		LoadCfg();
+		Deserialize();
 	}
 	~JsonSerialize() override
 	{
-		SaveCfg();
+		Serialize();
 	}
 
 	/// @brief …Ë÷√≤Œ ˝
@@ -46,8 +46,8 @@ public:
 	bool GetParam(const std::string& strKey, std::vector<double>& data);
 	bool GetParam(const std::string& strKey, std::vector<std::string>& data);
 
-	bool LoadCfg() override;
-	bool SaveCfg() const override;
+	bool Deserialize() override;
+	bool Serialize() const override;
 	void ClearCfg() override;
 	void ConsolePrint() const override;
 
@@ -252,7 +252,7 @@ template<class JsonType> bool JsonSerialize<JsonType>::GetParam(const std::strin
 	return true;
 }
 
-template<class JsonType> bool JsonSerialize<JsonType>::LoadCfg()
+template<class JsonType> bool JsonSerialize<JsonType>::Deserialize()
 {
 	std::ifstream ifs(m_cfgPath, std::fstream::in);
 	if (!ifs.is_open())
@@ -266,7 +266,7 @@ template<class JsonType> bool JsonSerialize<JsonType>::LoadCfg()
 	return true;
 }
 
-template<class JsonType> bool JsonSerialize<JsonType>::SaveCfg() const
+template<class JsonType> bool JsonSerialize<JsonType>::Serialize() const
 {
 	std::ofstream ofs(m_cfgPath, std::fstream::out);
 	if (!ofs.is_open())
