@@ -42,6 +42,9 @@
     <ClInclude Include="SystemDetection.hpp">
       <Filter>CommonTool</Filter>
     </ClInclude>
+    <ClInclude Include="singletonBase.hpp">
+      <Filter>TSingleton</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
