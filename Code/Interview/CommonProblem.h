@@ -4,6 +4,58 @@
 #include <memory>
 using namespace std;
 
+class VectorMoveCopy
+{
+public:
+	VectorMoveCopy(const std::vector<int>& vec)
+	{
+		int_vec = vec;
+	}
+	VectorMoveCopy(const VectorMoveCopy& other) = default;
+	VectorMoveCopy(VectorMoveCopy&& other)
+	{
+		if (&other == this)
+		{
+			return;
+		}
+
+		int_vec = std::move(other.int_vec);
+		std::cout << "Move Copy" << std::endl;
+	}
+private:
+	std::vector<int> int_vec;
+};
+
+struct TPose2D
+{
+	double  x;
+	double  y;
+	double  phi;
+
+	TPose2D(double px = 0, double py = 0, double pp = 0) {
+		x = px;
+		y = py;
+		phi = pp;
+	}
+
+	TPose2D& operator= (const double& value) {
+		x = y = phi = value;
+		return *this;
+	}
+	bool operator== (const TPose2D& p3f) {
+		return x == p3f.x && y == p3f.y && phi == p3f.phi;
+	}
+	TPose2D operator+ (const TPose2D& p3f) {
+		return TPose2D(x + p3f.x, y + p3f.y, phi + p3f.phi);
+	}
+	TPose2D operator- (const TPose2D& p3f) {
+		return TPose2D(x - p3f.x, y - p3f.y, phi - p3f.phi);
+	}
+	TPose2D operator* (const double& scale) {
+		return TPose2D(x * scale, y * scale, phi * scale);
+	}
+};
+
 class CommonProblem
 {
 public:
