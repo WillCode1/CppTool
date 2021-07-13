@@ -140,3 +140,44 @@ private:
 		tool.DebugLog(", Line: ");		tool.DebugLog(__LINE__);	\
 		tool.DebugLog(", Content: ");	tool.DebugLog(data, 2);	\
 	} while(0)
+
+char *getTime();
+
+#define LU_DEBUG_CMD 0x01
+#define LU_DEBUG_DATA 0x02
+#define LU_DEBUG_ERROR 0x04
+
+int g_lu_debugs_level = LU_DEBUG_ERROR;
+#define LU_PRINTF_cmd(...)             \
+  do                                      \
+  {                                       \
+    if (g_lu_debugs_level & LU_DEBUG_CMD) \
+    {                                     \
+      printf("%s", getTime());            \
+      printf(__VA_ARGS__);                        \
+    }                                     \
+  } while (0)
+#define LU_PRINTF_data(...)             \
+  do                                       \
+  {                                        \
+    if (g_lu_debugs_level & LU_DEBUG_DATA) \
+    {                                      \
+      printf("%s", getTime());             \
+      printf(__VA_ARGS__);                         \
+    }                                      \
+  } while (0)
+#define LU_PRINTF_error(...)             \
+  do                                        \
+  {                                         \
+    if (g_lu_debugs_level & LU_DEBUG_ERROR) \
+    {                                       \
+      printf("%s", getTime());              \
+      printf(__VA_ARGS__);                          \
+    }                                       \
+  } while (0)
+//#define LU_PRINTF_cmd(msg...)  ;
+//#define LU_PRINTF_data(msg...)  ;
+//#define LU_PRINTF_error(msg...)  ;
+
+
+#define lu_printf(level, ...) LU_PRINTF_##level(__VA_ARGS__)

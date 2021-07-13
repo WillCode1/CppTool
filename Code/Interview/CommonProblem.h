@@ -42,16 +42,16 @@ struct TPose2D
 		x = y = phi = value;
 		return *this;
 	}
-	bool operator== (const TPose2D& p3f) {
+	bool operator== (const TPose2D& p3f) const {
 		return x == p3f.x && y == p3f.y && phi == p3f.phi;
 	}
-	TPose2D operator+ (const TPose2D& p3f) {
+	TPose2D operator+ (const TPose2D& p3f) const {
 		return TPose2D(x + p3f.x, y + p3f.y, phi + p3f.phi);
 	}
-	TPose2D operator- (const TPose2D& p3f) {
+	TPose2D operator- (const TPose2D& p3f) const {
 		return TPose2D(x - p3f.x, y - p3f.y, phi - p3f.phi);
 	}
-	TPose2D operator* (const double& scale) {
+	TPose2D operator* (const double& scale) const {
 		return TPose2D(x * scale, y * scale, phi * scale);
 	}
 };
