@@ -61,7 +61,8 @@ bool FileTool::ReadFileByChar(const std::string & filePath, std::vector<char>& a
 		return false;
 	}
 	// 忽略空格与回车
-	if (filter_space)
+	// 操作符noskipws会令输入运算符读取空白符，而不是跳过它们。为了恢复默认行为，可以使用skipws操作符。
+	if (!filter_space)
 	{
 		infile >> std::noskipws;
 	}
