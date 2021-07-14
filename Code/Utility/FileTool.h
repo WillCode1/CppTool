@@ -1,12 +1,15 @@
 #pragma once
 #include <string>
 #include <list>
+#include <vector>
 
 class FileTool
 {
 public:
 	static std::string GetCurDirectory();	// 获取当前模块全路径
 	static std::wstring GetDesktopDirectory();
+	static bool ReadFileByLine(const std::string& filePath, std::vector<std::string>& all_line);
+	static bool ReadFileByChar(const std::string& filePath, std::vector<char>& all_char, bool filter_space = true);
 
 	static std::wstring GetFileNameNotPath(const std::wstring& filePath);//获取文件名，不包含路径
 	static std::wstring GetFileExtension(const std::wstring & strPath);//获取文件的扩展名

@@ -13,6 +13,12 @@
     <Filter Include="Base64">
       <UniqueIdentifier>{44efb787-92cf-44a1-a4a1-1c6c1b3a5374}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Time">
+      <UniqueIdentifier>{569b60ec-7776-475b-b256-834db9f99861}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DebugTool">
+      <UniqueIdentifier>{631df775-444f-4c78-bf1a-4d3c8dca7004}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Base64.h">
@@ -33,9 +39,6 @@
     <ClInclude Include="FileTool.h">
       <Filter>CommonTool</Filter>
     </ClInclude>
-    <ClInclude Include="DebugTool.hpp">
-      <Filter>CommonTool</Filter>
-    </ClInclude>
     <ClInclude Include="Random.hpp">
       <Filter>CommonTool</Filter>
     </ClInclude>
@@ -44,6 +47,15 @@
     </ClInclude>
     <ClInclude Include="singletonBase.hpp">
       <Filter>TSingleton</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeTool.h">
+      <Filter>Time</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugTool.hpp">
+      <Filter>DebugTool</Filter>
+    </ClInclude>
+    <ClInclude Include="LogTool.h">
+      <Filter>DebugTool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -62,6 +74,12 @@
     </ClCompile>
     <ClCompile Include="FileTool.cpp">
       <Filter>CommonTool</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeTool.cpp">
+      <Filter>Time</Filter>
+    </ClCompile>
+    <ClCompile Include="LogTool.cpp">
+      <Filter>DebugTool</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <io.h>
 #include <algorithm>
+#include <iostream>
 
 
 std::string FileTool::GetCurDirectory()
@@ -29,6 +30,50 @@ std::wstring FileTool::GetDesktopDirectory()
 	//获取当前用户的桌面路径
 	SHGetSpecialFolderPath(0, path, CSIDL_DESKTOPDIRECTORY, 0);
 	return path;
+}
+
+bool FileTool::ReadFileByLine(const std::string & filePath, std::vector<std::string>& all_line)
+{
+	std::ifstream infile(filePath);
+
+	if (!infile.is_open())
+	{
+		std::cout << "can not open log file!" << std::endl;
+		return false;
+	}
+	std::string line;
+	while (std::getline(infile, line))
+	{
+		all_line.emplace_back(line);
+		//cout << line << endl;
+	}
+	infile.close();
+	return true;
+}
+
+bool FileTool::ReadFileByChar(const std::string & filePath, std::vector<char>& all_char, bool filter_space)
+{
+	std::ifstream infile(filePath);
+
+	if (!infile.is_open())
+	{
+		std::cout << "can not open log file!" << std::endl;
+		return false;
+	}
+	// 忽略空格与回车
+	if (filter_space)
+	{
+		infile >> std::noskipws;
+	}
+	char c;
+	while (!infile.eof())
+	{
+		infile >> c;
+		all_char.emplace_back(c);
+		//cout << c << endl;
+	}
+	infile.close();
+	return true;
 }
 
 std::wstring FileTool::GetFileNameNotPath(const std::wstring & filePath)

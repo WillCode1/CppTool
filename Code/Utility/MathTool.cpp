@@ -50,10 +50,8 @@ double GeoAlgoTool::TransAngleToRadian(const double& dAngle)
 	return (dAngle * M_PI / 180);
 }
 
-double GeoAlgoTool::NormalizeAngle(double & theta, double min, double max)
+double& GeoAlgoTool::NormalizeAngle(double& theta, double min, double max)
 {
-	if (theta >= min && theta < max)
-		return theta;
 	while (theta >= max)
 		theta -= 2 * M_PI;
 	while (theta < min)
