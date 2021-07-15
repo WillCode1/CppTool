@@ -158,7 +158,9 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="C++11.h" />
     <ClInclude Include="CommonProblem.h" />
+    <ClInclude Include="OperatorOverload.h" />
     <ClInclude Include="shared_ptr.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
