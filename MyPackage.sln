@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Astar", "Code\Astar\Astar.v
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Serialize", "Code\Serialize\Serialize.vcxproj", "{B07D445F-91CC-4B52-8F2F-1DE52ED1A886}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HelloGtest", "Code\HelloGtest\HelloGtest.vcxproj", "{D33BC121-3DC7-4F33-B216-558911C75416}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -91,6 +93,14 @@ Global
 		{B07D445F-91CC-4B52-8F2F-1DE52ED1A886}.Release|x64.Build.0 = Release|x64
 		{B07D445F-91CC-4B52-8F2F-1DE52ED1A886}.Release|x86.ActiveCfg = Release|Win32
 		{B07D445F-91CC-4B52-8F2F-1DE52ED1A886}.Release|x86.Build.0 = Release|Win32
+		{D33BC121-3DC7-4F33-B216-558911C75416}.Debug|x64.ActiveCfg = Debug|x64
+		{D33BC121-3DC7-4F33-B216-558911C75416}.Debug|x64.Build.0 = Debug|x64
+		{D33BC121-3DC7-4F33-B216-558911C75416}.Debug|x86.ActiveCfg = Debug|Win32
+		{D33BC121-3DC7-4F33-B216-558911C75416}.Debug|x86.Build.0 = Debug|Win32
+		{D33BC121-3DC7-4F33-B216-558911C75416}.Release|x64.ActiveCfg = Release|x64
+		{D33BC121-3DC7-4F33-B216-558911C75416}.Release|x64.Build.0 = Release|x64
+		{D33BC121-3DC7-4F33-B216-558911C75416}.Release|x86.ActiveCfg = Release|Win32
+		{D33BC121-3DC7-4F33-B216-558911C75416}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
