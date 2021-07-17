@@ -9,19 +9,31 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
+    <Filter Include="Mock">
+      <UniqueIdentifier>{094f7c5e-a382-47e4-8a55-18feff0a8c01}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="TestEKF.cpp">
+    <ClCompile Include="ExtendedKalmanFilter_Mock.cpp">
+      <Filter>Mock</Filter>
+    </ClCompile>
+    <ClCompile Include="ExtendedKalmanFilter_Test.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\googletest\include\gtest\stub_shadow.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TestEKF.h">
+    <ClInclude Include="ExtendedKalmanFilter.h">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="ExtendedKalmanFilter_Test.h">
       <Filter>UnitTest</Filter>
     </ClInclude>
-    <ClInclude Include="MyEKF.h">
-      <Filter>Code</Filter>
+    <ClInclude Include="ExtendedKalmanFilter_Mock.h">
+      <Filter>Mock</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

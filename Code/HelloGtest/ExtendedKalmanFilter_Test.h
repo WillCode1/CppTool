@@ -1,9 +1,10 @@
 #pragma once
 #include "gtest/gtest.h"
 #include <iostream>
+#include "ExtendedKalmanFilter.h"
 
 
-class TestEKF: public testing::Test
+class ExtendedKalmanFilter_Test: public testing::Test
 {
 protected:
 	// 整组测试用例调用前后执行
@@ -29,3 +30,5 @@ protected:
 private:
 
 };
+
+bool test_Function(ExtendedKalmanFilter& ekf, int& add, int& NoChange);

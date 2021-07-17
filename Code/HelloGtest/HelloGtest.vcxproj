@@ -93,12 +93,12 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>D:\Box\Code Note\MyPackage\googletest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\googletest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\Box\Code Note\MyPackage\googletest\lib\x64-Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\googletest\lib\x64-Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>gtestd.lib;gtest_maind.lib;gmock.lib;gmock_main.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -156,12 +156,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\googletest\include\gtest\stub_shadow.cpp" />
+    <ClCompile Include="ExtendedKalmanFilter_Test.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="TestEKF.cpp" />
+    <ClCompile Include="ExtendedKalmanFilter_Mock.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MyEKF.h" />
-    <ClInclude Include="TestEKF.h" />
+    <ClInclude Include="ExtendedKalmanFilter.h" />
+    <ClInclude Include="ExtendedKalmanFilter_Mock.h" />
+    <ClInclude Include="ExtendedKalmanFilter_Test.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
