@@ -35,5 +35,8 @@
     <ClInclude Include="ExtendedKalmanFilter_Mock.h">
       <Filter>Mock</Filter>
     </ClInclude>
+    <ClInclude Include="Stub_Test.h">
+      <Filter>Code</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

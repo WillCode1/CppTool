@@ -42,6 +42,23 @@ using namespace testing;
 	EXPECT_CALL(#1, #2(#3)).Times(AtLeast(1));
  */
 
+ // Code
+bool test_Function(ExtendedKalmanFilter& ekf, int& add, int& NoChange)
+{
+	add = ekf.Add(1, 2);
+	add += ekf.Add(1, 2);
+	add += ekf.Add(1, 2);
+	add += ekf.Add(1, 2);
+
+	NoChange = ekf.NoChange(10);
+
+	if (ekf.Pass())
+	{
+		return true;
+	}
+	return false;
+}
+
 
 TEST_F(ExtendedKalmanFilter_Test, mock2)
 {

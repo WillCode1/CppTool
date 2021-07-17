@@ -1,7 +1,6 @@
 #pragma once
 #include "gtest/gtest.h"
 #include <iostream>
-#include "ExtendedKalmanFilter.h"
 
 
 class ExtendedKalmanFilter_Test: public testing::Test
@@ -30,5 +29,3 @@ protected:
 private:
 
 };
-
-bool test_Function(ExtendedKalmanFilter& ekf, int& add, int& NoChange);

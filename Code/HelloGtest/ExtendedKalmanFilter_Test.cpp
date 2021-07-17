@@ -1,6 +1,6 @@
 #include "ExtendedKalmanFilter_Test.h"
-#include "ExtendedKalmanFilter.h"
 #include "ExtendedKalmanFilter_Mock.h"
+#include "Stub_Test.h"
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "gtest/stubext.h"
@@ -12,21 +12,9 @@ using namespace stub_ext;
 // EXPECT_EQ，断言条件不成立，会继续执行当前的用例
 
 
- // Code
-bool test_Function(ExtendedKalmanFilter& ekf, int& add, int& NoChange)
+int func()
 {
-	add = ekf.Add(1, 2);
-	add += ekf.Add(1, 2);
-	add += ekf.Add(1, 2);
-	add += ekf.Add(1, 2);
-
-	NoChange = ekf.NoChange(10);
-
-	if (ekf.Pass())
-	{
-		return true;
-	}
-	return false;
+	return 1;
 }
 
 
@@ -39,17 +27,18 @@ TEST_F(ExtendedKalmanFilter_Test, stub1)
 	std::cout << "执行结束......" << std::endl;
 }
 
+// 使用VADDR()便捷地获取虚函数地址。 由于功能实现采用的gcc/g++的转换方法，目前应该只支持gcc/g++编译器
 TEST_F(ExtendedKalmanFilter_Test, stub2)
 {
-	ExtendedKalmanFilter ekf;
 	StubExt st;
-	st.set_lamda(&test_Function, [](ExtendedKalmanFilter& filter, int& a, int& b) { return 100; });
-	auto func = &ExtendedKalmanFilter::Add;
-	st.set_lamda(&func, [](int a, int b) { return 100; });
-	//st.set(ADDR(ExtendedKalmanFilter, NoChange), [](ExtendedKalmanFilter* filter, int a) { return 100; });
+	st.set_lamda(&func, []() { return 100; });
+	//st.set_lamda(VADDR(StubTest, Add), [](StubTest* filter, int a) { return 100; });
+	st.set_lamda(ADDR(StubTest, NoChange), [](StubTest* filter, int a) { return 100; });
+	st.set_lamda(ADDR(StubTest, Pass), [](StubTest* filter) { return true; });
 
-	int add, noChange;
-	EXPECT_EQ(true, test_Function(ekf, add, noChange));
-	EXPECT_EQ(211, add);
-	EXPECT_EQ(100, noChange);
+	StubTest sb;
+	EXPECT_EQ(100, func());
+	EXPECT_EQ(true, sb.Pass());
+	EXPECT_EQ(100, sb.NoChange(1));
+	EXPECT_EQ(3, sb.Add(1, 2));
 }
