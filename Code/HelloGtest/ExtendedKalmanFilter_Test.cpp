@@ -27,7 +27,7 @@ TEST_F(ExtendedKalmanFilter_Test, stub1)
 	std::cout << "执行结束......" << std::endl;
 }
 
-// 使用VADDR()便捷地获取虚函数地址。 由于功能实现采用的gcc/g++的转换方法，目前应该只支持gcc/g++编译器
+// 使用VADDR()便捷地获取虚函数地址。由于功能实现采用的gcc/g++的转换方法，目前应该只支持gcc/g++编译器
 TEST_F(ExtendedKalmanFilter_Test, stub2)
 {
 	StubExt st;
