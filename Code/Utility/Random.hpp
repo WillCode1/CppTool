@@ -28,4 +28,11 @@ public:
 		static std::uniform_real_distribution<double> uniform(min, max);
 		return uniform(engine);
 	}
+
+	static double RandNormal(double mu = 0.0, double sigma = 1.0)
+	{
+		static std::default_random_engine engine(time(nullptr));
+		static std::normal_distribution<double> uniform(mu, sigma);
+		return uniform(engine);
+	}
 };
