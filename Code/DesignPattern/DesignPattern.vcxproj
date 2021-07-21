@@ -169,6 +169,7 @@
     <ClInclude Include="AbstractFactory.hpp" />
     <ClInclude Include="AdaptorInherit .h" />
     <ClInclude Include="Consume.h" />
+    <ClInclude Include="EKF.hpp" />
     <ClInclude Include="FactoryMethod.h" />
     <ClInclude Include="Observer.h" />
     <ClInclude Include="SimpleFactory.h" />
