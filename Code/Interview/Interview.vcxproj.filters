@@ -10,10 +10,10 @@
     <ClInclude Include="shared_ptr.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="CommonProblem.h">
+    <ClInclude Include="OperatorOverload.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="OperatorOverload.h">
+    <ClInclude Include="Base.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="C++11.h">

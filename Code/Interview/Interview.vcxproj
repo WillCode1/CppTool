@@ -159,7 +159,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C++11.h" />
-    <ClInclude Include="CommonProblem.h" />
+    <ClInclude Include="Base.h" />
     <ClInclude Include="OperatorOverload.h" />
     <ClInclude Include="shared_ptr.h" />
   </ItemGroup>

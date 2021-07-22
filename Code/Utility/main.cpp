@@ -15,6 +15,8 @@
 
 using namespace std;
 
+#define NDEBUG
+
 int main()
 {
 	RunTimeTool test;
@@ -46,9 +48,10 @@ int main()
 #endif
 
 	test.ElapsedTime();
-	assert(true);
 
 	log_print(error, "asd %d", 1);
+	
+	assert(false);
 
 	return 0;
 }

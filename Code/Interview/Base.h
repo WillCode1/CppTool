@@ -4,7 +4,7 @@
 #include <memory>
 using namespace std;
 
-class CommonProblem
+class Base
 {
 public:
 	void VectorUnique()
@@ -13,15 +13,6 @@ public:
 		std::sort(ivec.begin(), ivec.end());
 		auto unique_end = std::unique(ivec.begin(), ivec.end());
 		ivec.erase(unique_end, ivec.end());
-	}
-
-	void UseWeakPtr()
-	{
-		auto sp = make_shared<int>(42);
-		weak_ptr<int> wp(sp);
-		if (auto spt = wp.lock()) {
-			// 只有lock()之后，才有后续操作
-		}
 	}
 };
 
