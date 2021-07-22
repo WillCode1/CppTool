@@ -5,21 +5,21 @@ extern int g_lu_debugs_level;
 
 // https://blog.csdn.net/q343509740/article/details/79726708
 /*
-	All:��͵ȼ��ģ����ڴ�������־��¼.
+	All:最低等级的，用于打开所有日志记录.
 
-	Trace:��׷�٣����ǳ����ƽ�һ��.
+	Trace:是追踪，就是程序推进一下.
 
-	Debug:ָ��ϸ������Ϣ�¼��Ե���Ӧ�ó����Ƿǳ��а�����.
+	Debug:指出细粒度信息事件对调试应用程序是非常有帮助的.
 
-	Info:��Ϣ�ڴ����ȼ�����ͻ��ǿ��Ӧ�ó�������й���.
+	Info:消息在粗粒度级别上突出强调应用程序的运行过程.
 
-	Warn:������漰warn���¼������־.
+	Warn:输出警告及warn以下级别的日志.
 
-	Error:���������Ϣ��־.
+	Error:输出错误信息日志.
 
-	Fatal:���ÿ�����صĴ����¼����ᵼ��Ӧ�ó�����˳�����־.
+	Fatal:输出每个严重的错误事件将会导致应用程序的退出的日志.
 
-	OFF:��ߵȼ��ģ����ڹر�������־��¼.
+	OFF:最高等级的，用于关闭所有日志记录.
 */
 enum LogLevel
 {
@@ -34,6 +34,8 @@ enum LogLevel
     if (g_lu_debugs_level & level##_log)  \
     {                                     \
       printf("%s", getTime());            \
+      printf("%s: Line %d:\t", __FUNCTION__, __LINE__);   \
       printf(__VA_ARGS__);                 \
+      printf("\n");						\
     }                                     \
   } while (0)
