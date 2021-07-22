@@ -6,7 +6,6 @@
 #include "TestTSingleton.h"
 #include "FileTool.h"
 #include "StringTool.h"
-#include "DebugTool.hpp"
 #include "RunTimeTool.h"
 #include "LogTool.h"
 #include "TimeTool.h"
@@ -29,16 +28,6 @@ int main()
 	auto age = people.SayAge();
 	SinglePeople::ReleaseInstance();
 
-	string a = "asd";
-	wstring b = L"ADAS";
-	DEBUG_LOG(11);
-	DEBUG_LOG(1.12);
-	DEBUG_LOG('a');
-	DEBUG_LOG("asdsad");
-	DEBUG_LOG(L"asdsad");
-	DEBUG_LOG(a);
-	DEBUG_LOG(b);
-
 #if 0
 	for (int i = 0; i < 20; ++i)
 	{
@@ -49,9 +38,15 @@ int main()
 
 	test.ElapsedTime();
 
+	std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() << std::endl;
+	std::cout << std::chrono::steady_clock::now().time_since_epoch().count() << std::endl;
+
+	std::cout << getUseconds() << std::endl;
+	std::cout << std::chrono::system_clock::now().time_since_epoch().count() << std::endl;
+
 	log_print(error, "asd %d", 1);
 	
-	assert(false);
+	//assert(false);
 
 	return 0;
 }

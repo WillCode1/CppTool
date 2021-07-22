@@ -42,9 +42,6 @@
     <ClInclude Include="singletonBase.hpp">
       <Filter>TSingleton</Filter>
     </ClInclude>
-    <ClInclude Include="DebugTool.hpp">
-      <Filter>DebugLogTool</Filter>
-    </ClInclude>
     <ClInclude Include="LogTool.h">
       <Filter>DebugLogTool</Filter>
     </ClInclude>

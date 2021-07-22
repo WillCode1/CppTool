@@ -167,7 +167,6 @@
     <ClInclude Include="TestTSingleton.h" />
     <ClInclude Include="TimeTool.h" />
     <ClInclude Include="TSingleton.hpp" />
-    <ClInclude Include="DebugTool.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3DMath.cpp" />

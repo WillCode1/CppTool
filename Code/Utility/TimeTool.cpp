@@ -1,9 +1,12 @@
 #include <chrono>
 #include <time.h>
-
-#ifdef _WIN32
+#include <thread>
+#ifndef _WIN32
+#include <sys/time.h>
+#else
 #include <windows.h>
 #include <winsock.h>
+#include "TimeTool.h"
 #pragma comment(lib, "Ws2_32.lib")
 #pragma comment(lib, "Wldap32.lib")
 
@@ -28,8 +31,6 @@ int gettimeofday(struct timeval *tp, void *tzp)
 
 	return 0;
 }
-#else
-#include <sys/time.h>
 #endif // _WIN32
 
 
@@ -49,64 +50,24 @@ long long getUseconds(void)
 	return ((long long)t.tv_sec) * 1000000 + (long long)t.tv_usec;
 }
 
-/*delay usec: the input usec is 0<= usec <= 1000*1000*/
-bool threadDelayUs(const long usec)
+void threadDelayS(const long long& seconds)
 {
-	struct timeval delay;
-
-	if (usec < 0 || usec>1000 * 1000) {
-		printf("Usec value invalid: %ld\n", usec);
-		return false;
-	}
-
-	delay.tv_sec = 0;
-	delay.tv_usec = usec;
-	if (0 != select(0, NULL, NULL, NULL, &delay)) {
-		return false;
-	}
-	else {
-		return true;
-	}
+	std::this_thread::sleep_for(std::chrono::seconds(seconds));
 }
 
-/*delay msec: the input msec is 0<= msec <= 1000*/
-bool threadDelayMs(const long msec)
+void threadDelayMs(const long long& milliseconds)
 {
-	struct timeval delay;
-
-	if (msec < 0 || msec>10000) {
-		printf("Msec value invalid: %ld\n", msec);
-		return false;
-	}
-
-	delay.tv_sec = 0;
-	delay.tv_usec = 1000 * msec;
-	if (0 != select(0, NULL, NULL, NULL, &delay)) {
-		return false;
-	}
-	else {
-		return true;
-	}
+	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
 
-/*delay sec: the input sec is 0<= sec <= 100*/
-bool threadDelayS(const long sec)
+void threadDelayUs(const long long& microseconds)
 {
-	struct timeval delay;
+	std::this_thread::sleep_for(std::chrono::microseconds(microseconds));
+}
 
-	if (sec < 0 || sec>100) {
-		printf("Delay sec value invalid: %ld\n", sec);
-		return false;
-	}
-
-	delay.tv_sec = sec;
-	delay.tv_usec = 0;
-	if (0 != select(0, NULL, NULL, NULL, &delay)) {
-		return false;
-	}
-	else {
-		return true;
-	}
+void threadDelayNs(const long long& nanoseconds)
+{
+	std::this_thread::sleep_for(std::chrono::nanoseconds(nanoseconds));
 }
 
 char *getTime()

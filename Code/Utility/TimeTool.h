@@ -5,9 +5,10 @@
 
 long long getMseconds(void);
 long long getUseconds(void);
-bool threadDelayUs(const long usec);
-bool threadDelayMs(const long msec);
-bool threadDelayS(const long sec);
+void threadDelayS(const long long & seconds);
+void threadDelayMs(const long long & milliseconds);
+void threadDelayUs(const long long & microseconds);
+void threadDelayNs(const long long & nanoseconds);
 char *getTime();
 bool getLocalTime(int *, int *);
 

@@ -39,3 +39,10 @@ enum LogLevel
       printf("\n");						\
     }                                     \
   } while (0)
+
+// 打印宽字节字符串
+//printf("%s\n", a.c_str());
+//printf("%S\n", b.c_str());
+
+//wprintf(L"%s\n", b.c_str());
+//wprintf(L"%S\n", a.c_str());
