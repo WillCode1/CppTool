@@ -1,3 +1,3 @@
 #include "LogTool.h"
 
-int g_lu_debugs_level = error_log;
+int g_log_print_level = error_log;
