@@ -40,7 +40,7 @@ int main()
 
 	log_print(error, "asd %d", 1);
 	
-	//assert(false);
+	assert(false);
 
 	return 0;
 }
