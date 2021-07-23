@@ -29,12 +29,12 @@ enum LogLevel
 };
 
 #define log_print(level, ...)	\
-  do                                      \
-  {                                       \
-    if (g_lu_debugs_level & level##_log)  \
-    {                                     \
-      printf("%s", getTime());            \
-      printf("%s: Line %d:\t", __FUNCTION__, __LINE__);   \
+  do										\
+  {											\
+    if (g_lu_debugs_level & level##_log)	\
+    {										\
+      printf("%s", TimeTool::getLocalTimeStamp());		\
+      printf("%s: Line %d:\t", __FUNCTION__, __LINE__);	\
       printf(__VA_ARGS__);                 \
       printf("\n");						\
     }                                     \
