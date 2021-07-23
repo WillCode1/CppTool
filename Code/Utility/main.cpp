@@ -2,14 +2,14 @@
 //
 
 #include <iostream>
-#include <direct.h>
+#include <cassert>
 #include "TestTSingleton.h"
 #include "FileTool.h"
 #include "StringTool.h"
 #include "LogTool.h"
-#include "TimeTool.h"
+#include "TimeTool.hpp"
+#include "Timer.hpp"
 #include "Random.hpp"
-#include <assert.h>
 
 using namespace std;
 
@@ -20,7 +20,7 @@ int main()
 	Timer test(true);
 	test.StartTimer();
 
-	TimeTool::threadDelayMs(1000);
+	TimeTool::ThreadDelayMs(1000);
 	//TestJson::JsonBase();
 
 	auto& people = SinglePeople::GetInstance();
@@ -37,10 +37,11 @@ int main()
 #endif
 
 	test.ElapsedByStart();
+	test.ElapsedByLast();
 
 	log_print(error, "asd %d", 1);
 	
-	assert(false);
+	//assert(false);
 
 	return 0;
 }

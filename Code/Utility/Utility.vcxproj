@@ -23,7 +23,7 @@
     <ProjectGuid>{6CCA39C9-DC6B-4B23-AE65-FBFF6A0FFFD5}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Utility</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -164,18 +164,17 @@
     <ClInclude Include="StringTool.h" />
     <ClInclude Include="SystemDetection.hpp" />
     <ClInclude Include="TestTSingleton.h" />
-    <ClInclude Include="TimeTool.h" />
+    <ClInclude Include="Timer.hpp" />
+    <ClInclude Include="TimeTool.hpp" />
     <ClInclude Include="TSingleton.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3DMath.cpp" />
     <ClCompile Include="Base64.cpp" />
     <ClCompile Include="FileTool.cpp" />
-    <ClCompile Include="LogTool.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MathTool.cpp" />
     <ClCompile Include="StringTool.cpp" />
-    <ClCompile Include="TimeTool.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

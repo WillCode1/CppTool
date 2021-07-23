@@ -1,7 +1,7 @@
 #pragma once
-#include "TimeTool.h"
+#include <cstdio>
+#include "TimeTool.hpp"
 
-extern int g_log_print_level;
 
 // https://blog.csdn.net/q343509740/article/details/79726708
 /*
@@ -28,12 +28,17 @@ enum LogLevel
 	error_log = 0x04
 };
 
+
+//#define	LOG_PRINT_LEVEL	(0)
+//#define	LOG_PRINT_LEVEL	(error_log)
+#define	LOG_PRINT_LEVEL	(debug_log | error_log)
+
 #define log_print(level, ...)	\
   do										\
   {											\
-    if (g_log_print_level & level##_log)	\
+    if (LOG_PRINT_LEVEL & level##_log)	\
     {										\
-      printf("%s", TimeTool::getLocalTimeStamp());		\
+      printf("%s", TimeTool::GetLocalTimeStamp());		\
       printf("%s: Line %d:\t", __FUNCTION__, __LINE__);	\
       printf(__VA_ARGS__);                 \
       printf("\n");						\
@@ -46,3 +51,4 @@ enum LogLevel
 
 //wprintf(L"%s\n", b.c_str());
 //wprintf(L"%S\n", a.c_str());
+
