@@ -1,107 +1,157 @@
-#include <chrono>
-#include <time.h>
-#include <thread>
-#ifndef _WIN32
-#include <sys/time.h>
-#else
-#include <windows.h>
-#include <winsock.h>
 #include "TimeTool.h"
-#pragma comment(lib, "Ws2_32.lib")
-#pragma comment(lib, "Wldap32.lib")
+#include <chrono>
+#include <ctime>
+#include <thread>
+#include <iostream>
 
 
-int gettimeofday(struct timeval *tp, void *tzp)
-{
-	time_t clock;
-	struct tm tm;
-	SYSTEMTIME wtm;
-
-	GetLocalTime(&wtm);
-	tm.tm_year = wtm.wYear - 1900;
-	tm.tm_mon = wtm.wMonth - 1;
-	tm.tm_mday = wtm.wDay;
-	tm.tm_hour = wtm.wHour;
-	tm.tm_min = wtm.wMinute;
-	tm.tm_sec = wtm.wSecond;
-	tm.tm_isdst = -1;
-	clock = mktime(&tm);
-	tp->tv_sec = clock;
-	tp->tv_usec = wtm.wMilliseconds * 1000;
-
-	return 0;
-}
-#endif // _WIN32
-
-
-
-long long getMseconds(void)
-{
-	auto start = std::chrono::steady_clock::now();
-	long long end = std::chrono::duration_cast<std::chrono::milliseconds>(
-		start.time_since_epoch()).count();
-	return end;
-}
-
-long long getUseconds(void)
-{
-	struct timeval t;
-	gettimeofday(&t, NULL);
-	return ((long long)t.tv_sec) * 1000000 + (long long)t.tv_usec;
-}
-
-void threadDelayS(const long long& seconds)
+void TimeTool::threadDelayS(const long long& seconds)
 {
 	std::this_thread::sleep_for(std::chrono::seconds(seconds));
 }
 
-void threadDelayMs(const long long& milliseconds)
+void TimeTool::threadDelayMs(const long long& milliseconds)
 {
 	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
 
-void threadDelayUs(const long long& microseconds)
+void TimeTool::threadDelayUs(const long long& microseconds)
 {
 	std::this_thread::sleep_for(std::chrono::microseconds(microseconds));
 }
 
-void threadDelayNs(const long long& nanoseconds)
+void TimeTool::threadDelayNs(const long long& nanoseconds)
 {
 	std::this_thread::sleep_for(std::chrono::nanoseconds(nanoseconds));
 }
 
-char *getTime()
-{
-	static char buf[100];
-	const char *wday[] = { "Sun","Mon","Tue","Wed","Thu","Fri","Sat" };
 
-	struct tm t;
-	time_t now;
-	time(&now);					//ªÒ»°œµÕ≥»’∆⁄∫Õ ±º‰
-	localtime_s(&t, &now);		//ªÒ»°µ±µÿ»’∆⁄∫Õ ±º‰
-	struct timeval nowtimeval;
-	gettimeofday(&nowtimeval, 0);
+char* TimeTool::getLocalTimeStamp()
+{
+	static char buf[50];
+	const static char *wday[] = { "Sun","Mon","Tue","Wed","Thu","Fri","Sat" };
+
+	auto now = getTimePointNow<std::chrono::system_clock>();
+	// Á≤æÁ°ÆÂà∞ÊØ´Áßí
+	int milliseconds = durationCast(now) % 1000;
+
+	//Ëé∑ÂèñÁ≥ªÁªüÊó•ÊúüÂíåÊó∂Èó¥
+	std::time_t now_st = std::chrono::system_clock::to_time_t(now);
+	//ctime_s(buf, 100, &now);
+	//std::cout << "now is: " << buf;
+
+	//Ëé∑ÂèñÂΩìÂú∞Êó•ÊúüÂíåÊó∂Èó¥
+	struct tm local_t;
+	localtime_s(&local_t, &now_st);
 
 	snprintf(buf, 100, "[%04d-%02d-%02d %s %02d:%02d:%02d %03d] ",
-		(1900 + t.tm_year), (1 + t.tm_mon), t.tm_mday, wday[t.tm_wday], t.tm_hour, t.tm_min, t.tm_sec, nowtimeval.tv_usec / 1000);
+		(1900 + local_t.tm_year), (1 + local_t.tm_mon), local_t.tm_mday, wday[local_t.tm_wday], 
+		local_t.tm_hour, local_t.tm_min, local_t.tm_sec, milliseconds);
 	return buf;
 }
 
-bool getLocalTime(int* h, int* m)
+
+Timer::Timer(bool print, TimerPrecision _timerPrecision) : need_print(print), timerPrecision(_timerPrecision)
 {
-	struct tm t;
-	time_t now;
-	time(&now);					//ªÒ»°œµÕ≥»’∆⁄∫Õ ±º‰
-	localtime_s(&t, &now);		//ªÒ»°µ±µÿ»’∆⁄∫Õ ±º‰
-	*h = t.tm_hour;
-	*m = t.tm_min;
-	//printf("get localtime: %d-%d-%d\n",1900+t.tm_year,t.tm_mon,t.tm_mday);//
-	//printf("week %d time %d:%d:%d\n",t.tm_wday,t.tm_hour,t.tm_min,t.tm_sec);//	
-	int thisyear = t.tm_year + 1900;
-	if (thisyear < 2017 || thisyear>2025)
+	switch (timerPrecision)
 	{
-		return false;
+	case Tp_Second:
+		unit = "s";
+		break;
+	case Tp_Millisecond:
+		unit = "ms";
+		break;
+	case Tp_Microsecond:
+		unit = "us";
+		break;
+	case Tp_Nanosecond:
+		unit = "ns";
+		break;
+	default:
+		break;
 	}
-	return true;
+}
+
+void Timer::StartTimer()
+{
+	switch (timerPrecision)
+	{
+	case Tp_Second:
+		startTime = TimeTool::getSteadyTime<std::chrono::seconds>();
+		lastTime = TimeTool::getSteadyTime<std::chrono::seconds>();
+		break;
+	case Tp_Millisecond:
+		startTime = TimeTool::getSteadyTime();
+		lastTime = TimeTool::getSteadyTime();
+		break;
+	case Tp_Microsecond:
+		startTime = TimeTool::getSteadyTime<std::chrono::microseconds>();
+		lastTime = TimeTool::getSteadyTime<std::chrono::microseconds>();
+		break;
+	case Tp_Nanosecond:
+		startTime = TimeTool::getSteadyTime<std::chrono::nanoseconds>();
+		lastTime = TimeTool::getSteadyTime<std::chrono::nanoseconds>();
+		break;
+	default:
+		break;
+	}
+}
+
+double Timer::ElapsedByStart() const
+{
+	long long total_time = 0;
+	switch (timerPrecision)
+	{
+	case Tp_Second:
+		total_time = TimeTool::durationTime<std::chrono::seconds>(lastTime);
+		break;
+	case Tp_Millisecond:
+		total_time = TimeTool::durationTime(lastTime);
+		break;
+	case Tp_Microsecond:
+		total_time = TimeTool::durationTime<std::chrono::microseconds>(lastTime);
+		break;
+	case Tp_Nanosecond:
+		total_time = TimeTool::durationTime<std::chrono::nanoseconds>(lastTime);
+		break;
+	default:
+		break;
+	}
+	if (need_print)
+	{
+		printf("Total took %lld%s.\n", total_time, unit.c_str());
+	}
+	return total_time;
+}
+
+double Timer::ElapsedByLast()
+{
+	long long total_time = 0;
+	switch (timerPrecision)
+	{
+	case Tp_Second:
+		total_time = TimeTool::durationTime<std::chrono::seconds>(lastTime);
+		lastTime = TimeTool::getSteadyTime<std::chrono::seconds>();
+		break;
+	case Tp_Millisecond:
+		total_time = TimeTool::durationTime(lastTime);
+		lastTime = TimeTool::getSteadyTime();
+		break;
+	case Tp_Microsecond:
+		total_time = TimeTool::durationTime<std::chrono::microseconds>(lastTime);
+		lastTime = TimeTool::getSteadyTime<std::chrono::microseconds>();
+		break;
+	case Tp_Nanosecond:
+		total_time = TimeTool::durationTime<std::chrono::nanoseconds>(lastTime);
+		lastTime = TimeTool::getSteadyTime<std::chrono::nanoseconds>();
+		break;
+	default:
+		break;
+	}
+	if (need_print)
+	{
+		printf("It took %lld%s.\n", total_time, unit.c_str());
+	}
+	return total_time;
 }
 
