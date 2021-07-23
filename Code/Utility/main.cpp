@@ -6,7 +6,6 @@
 #include "TestTSingleton.h"
 #include "FileTool.h"
 #include "StringTool.h"
-#include "RunTimeTool.h"
 #include "LogTool.h"
 #include "TimeTool.h"
 #include "Random.hpp"
@@ -18,9 +17,10 @@ using namespace std;
 
 int main()
 {
-	RunTimeTool test;
+	Timer test(true);
 	test.StartTimer();
 
+	TimeTool::threadDelayMs(1000);
 	//TestJson::JsonBase();
 
 	auto& people = SinglePeople::GetInstance();
@@ -36,13 +36,7 @@ int main()
 	}
 #endif
 
-	test.ElapsedTime();
-
-	std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() << std::endl;
-	std::cout << std::chrono::steady_clock::now().time_since_epoch().count() << std::endl;
-
-	std::cout << getUseconds() << std::endl;
-	std::cout << std::chrono::system_clock::now().time_since_epoch().count() << std::endl;
+	test.ElapsedByStart();
 
 	log_print(error, "asd %d", 1);
 	
