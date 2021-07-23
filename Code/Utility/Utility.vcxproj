@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -23,7 +23,7 @@
     <ProjectGuid>{6CCA39C9-DC6B-4B23-AE65-FBFF6A0FFFD5}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Utility</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -160,7 +160,6 @@
     <ClInclude Include="LogTool.h" />
     <ClInclude Include="MathTool.h" />
     <ClInclude Include="Random.hpp" />
-    <ClInclude Include="RunTimeTool.h" />
     <ClInclude Include="singletonBase.hpp" />
     <ClInclude Include="StringTool.h" />
     <ClInclude Include="SystemDetection.hpp" />
