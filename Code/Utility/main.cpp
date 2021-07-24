@@ -23,8 +23,7 @@ int main()
 	TimeTool::ThreadDelayMs(1000);
 	//TestJson::JsonBase();
 
-	auto& people = SinglePeople::GetInstance();
-	people.SetAge(18);
+	auto& people = SinglePeople::GetInstance(0, 24, "Will");
 	auto age = people.SayAge();
 	SinglePeople::ReleaseInstance();
 
