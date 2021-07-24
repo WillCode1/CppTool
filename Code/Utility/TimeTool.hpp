@@ -118,14 +118,14 @@ public:
 		return IsOverTime<std::chrono::nanoseconds>(last_time + duration_time);
 	}
 
-	static char* GetLocalTimeStamp()
+	static const char* GetLocalTimeStamp()
 	{
 		static char buf[50];
 		const static char *wday[] = { "Sun","Mon","Tue","Wed","Thu","Fri","Sat" };
 
 #if 1
 		//获取系统日期和时间
-		std::time_t now_st = GetSystemTimeMs();
+		auto now_st = GetSystemTimeMs();
 		
 		// 精确到毫秒
 		int milliseconds = now_st % 1000;

@@ -59,7 +59,9 @@
     <ClInclude Include="AbstractFactory.hpp">
       <Filter>Factory</Filter>
     </ClInclude>
-    <ClInclude Include="EKF.hpp" />
+    <ClInclude Include="TemplateEKF.hpp">
+      <Filter>Template</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

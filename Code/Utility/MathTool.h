@@ -28,9 +28,9 @@ public:
 	static double Round(double decimals, int digits = 0);
 
 	/// @brief 弧度转角度
-	static double TransRadianToAngle(const double& dRadian);
+	static double RadianToAngle(const double& dRadian);
 	/// @brief 角度转弧度
-	static double TransAngleToRadian(const double& dAngle);
+	static double AngleToRadian(const double& dAngle);
 	/// @brief 标准化角度
 	static double& NormalizeAngle(double& theta, double min = 0, double max = 2 * M_PI);
 

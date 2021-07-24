@@ -168,7 +168,6 @@
     <ClInclude Include="TSingleton.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="3DMath.cpp" />
     <ClCompile Include="Base64.cpp" />
     <ClCompile Include="FileTool.cpp" />
     <ClCompile Include="main.cpp" />

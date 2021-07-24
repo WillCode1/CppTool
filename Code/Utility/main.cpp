@@ -15,6 +15,7 @@ using namespace std;
 
 #define NDEBUG
 
+
 int main()
 {
 	Timer test(true);
@@ -37,6 +38,12 @@ int main()
 
 	test.ElapsedByStart();
 	test.ElapsedByLast();
+
+	test.TestFunctionCostTime(1000, [](int a, int b, int c) {
+		auto& people = SinglePeople::GetInstance(0, 24, "Will");
+		auto age = people.SayAge();
+		SinglePeople::ReleaseInstance();
+	}, 1,2,3);
 
 	log_print(error, "asd %d", 1);
 	

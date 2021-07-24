@@ -1,5 +1,5 @@
-#ifndef __EKF_H__
-#define __EKF_H__
+#ifndef __BASE_BF_H__
+#define __BASE_BF_H__
 
 #include "bfl/filter/extendedkalmanfilter.h"
 #include "bfl/model/linearanalyticsystemmodel_gaussianuncertainty.h"
@@ -10,9 +10,6 @@
 
 #include <unordered_map>
 #include <memory>
-
-#include "odom_model.h"
-#include "posteriori_model.h"
 
 
 namespace keenon_ekf
@@ -27,13 +24,13 @@ namespace keenon_ekf
 		typename MeasModel = BFL::LinearAnalyticMeasurementModelGaussianUncertainty, 
 		typename PriorPdf = BFL::Gaussian, 
 		typename Filter = BFL::ExtendedKalmanFilter>
-	class BaseEKF
+	class BaseBF
 	{
 	protected:
 		using MeasModelType = std::string;
 
 	public:
-		virtual ~BaseEKF() = default;
+		virtual ~BaseBF() = default;
 
 		void setSystemModel(const ColumnVector& sysNoise_Mu, const SymmetricMatrix& sysNoise_Cov)
 		{
@@ -101,8 +98,8 @@ namespace keenon_ekf
 		std::shared_ptr<Filter> filter_;
 	};
 
-	using OdomEKF = BaseEKF<BFL::NonLinearAnalyticConditionalGaussianOdo>;
-	using LabelEKF = BaseEKF<BFL::NonLinearAnalyticConditionalGaussianPosteriori>;
+	using OdomEKF = BaseBF<BFL::AnalyticConditionalGaussianAdditiveNoise>;
+	using LabelEKF = BaseBF<BFL::AnalyticConditionalGaussianAdditiveNoise>;
 }
 
 #endif

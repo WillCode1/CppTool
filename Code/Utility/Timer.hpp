@@ -97,6 +97,23 @@ public:
 		return res;
 	}
 
+	template <typename FunctionType, typename ...Args>
+	double TestFunctionCostTime(const int& runTimes, const FunctionType& func, Args&&... args) const
+	{
+		const long long& startTime = TimeTool::GetSteadyTime<CalculatePrecision>();
+
+		for (auto i = 0; i < runTimes; ++i)
+		{
+			func(std::forward<Args>(args)...);
+		}
+
+		const long long& costTime = TimeTool::DurationTime<CalculatePrecision>(startTime);
+		auto res = double(costTime) * precisionCastRatio;
+
+		printf("Function run %d times, took %f%s.\n", runTimes, res, unit.c_str());
+		return res;
+	}
+
 private:
 	bool need_print;
 	long long startTime;

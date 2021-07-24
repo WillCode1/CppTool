@@ -40,12 +40,12 @@ double GeoAlgoTool::Round(double decimals, int digits)
 		return round(decimals / pow(10, -digits)) * pow(10, -digits);
 }
 
-double GeoAlgoTool::TransRadianToAngle(const double& dRadian)
+double GeoAlgoTool::RadianToAngle(const double& dRadian)
 {
 	return (dRadian * 180 / M_PI);
 }
 
-double GeoAlgoTool::TransAngleToRadian(const double& dAngle)
+double GeoAlgoTool::AngleToRadian(const double& dAngle)
 {
 	return (dAngle * M_PI / 180);
 }

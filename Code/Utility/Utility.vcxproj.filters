@@ -57,9 +57,6 @@
     <ClCompile Include="Base64.cpp">
       <Filter>Base64</Filter>
     </ClCompile>
-    <ClCompile Include="3DMath.cpp">
-      <Filter>MathTool</Filter>
-    </ClCompile>
     <ClCompile Include="MathTool.cpp">
       <Filter>MathTool</Filter>
     </ClCompile>
