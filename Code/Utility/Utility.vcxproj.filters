@@ -36,9 +36,6 @@
     <ClInclude Include="FileTool.h">
       <Filter>CommonTool</Filter>
     </ClInclude>
-    <ClInclude Include="SystemDetection.hpp">
-      <Filter>CommonTool</Filter>
-    </ClInclude>
     <ClInclude Include="LogTool.h">
       <Filter>DebugTool</Filter>
     </ClInclude>

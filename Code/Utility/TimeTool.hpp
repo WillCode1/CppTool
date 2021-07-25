@@ -103,19 +103,19 @@ public:
 
 	static bool IsOverTimeS(const long long& last_time, const long long& duration_time)
 	{
-		return IsOverTime<std::chrono::seconds>(last_time + duration_time);
+		return IsOverTimeS(last_time + duration_time);
 	}
 	static bool IsOverTimeMs(const long long& last_time, const long long& duration_time)
 	{
-		return IsOverTime<std::chrono::milliseconds>(last_time + duration_time);
+		return IsOverTimeMs(last_time + duration_time);
 	}
 	static bool IsOverTimeUs(const long long& last_time, const long long& duration_time)
 	{
-		return IsOverTime<std::chrono::microseconds>(last_time + duration_time);
+		return IsOverTimeUs(last_time + duration_time);
 	}
 	static bool IsOverTimeNs(const long long& last_time, const long long& duration_time)
 	{
-		return IsOverTime<std::chrono::nanoseconds>(last_time + duration_time);
+		return IsOverTimeNs(last_time + duration_time);
 	}
 
 	static const char* GetLocalTimeStamp()
