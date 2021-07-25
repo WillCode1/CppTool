@@ -7,15 +7,15 @@ template <class T> class TSingleton
 public:
 	virtual ~TSingleton() = default;
 
-	template<typename ...Args>
-	static T& GetInstance(Args&&... args)
+	template<typename ...Types>
+	static T& GetInstance(Types&&... args)
 	{
 		if (nullptr == s_pInsatcne)
 		{
 			std::lock_guard<decltype(s_mutex)> lock(s_mutex);
 			if (nullptr == s_pInsatcne)
 			{
-				s_pInsatcne = std::make_shared<T>(std::forward<Args>(args)...);
+				s_pInsatcne = std::make_shared<T>(std::forward<Types>(args)...);
 			}
 		}
 

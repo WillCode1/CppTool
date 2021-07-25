@@ -159,7 +159,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C++11.h" />
-    <ClInclude Include="Base.h" />
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="DesignClass.h" />
     <ClInclude Include="OperatorOverload.h" />
     <ClInclude Include="shared_ptr.h" />
   </ItemGroup>

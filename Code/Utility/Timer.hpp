@@ -97,14 +97,14 @@ public:
 		return res;
 	}
 
-	template <typename FunctionType, typename ...Args>
-	double TestFunctionCostTime(const int& runTimes, const FunctionType& func, Args&&... args) const
+	template <typename FunctionType, typename ...Types>
+	double TestFunctionCostTime(const int& runTimes, const FunctionType& func, Types&&... args) const
 	{
 		const long long& startTime = TimeTool::GetSteadyTime<CalculatePrecision>();
 
 		for (auto i = 0; i < runTimes; ++i)
 		{
-			func(std::forward<Args>(args)...);
+			func(std::forward<Types>(args)...);
 		}
 
 		const long long& costTime = TimeTool::DurationTime<CalculatePrecision>(startTime);

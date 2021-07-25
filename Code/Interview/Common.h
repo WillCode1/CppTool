@@ -4,7 +4,7 @@
 #include <memory>
 using namespace std;
 
-class Base
+class Common
 {
 public:
 	void VectorUnique()

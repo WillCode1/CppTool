@@ -13,10 +13,13 @@
     <ClInclude Include="OperatorOverload.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Base.h">
+    <ClInclude Include="C++11.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="C++11.h">
+    <ClInclude Include="Common.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DesignClass.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
