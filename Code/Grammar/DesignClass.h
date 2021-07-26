@@ -45,7 +45,14 @@ namespace cpp11 {
 			{
 				return;
 			}
-			p = new int(*other.p);
+			if (other.p)
+			{
+				p = new int(*other.p);
+			}
+			else
+			{
+				p = nullptr;
+			}
 			c = other.c;
 			cout << this << " Copy Construct from " << &other << "." << endl;
 		}
@@ -63,6 +70,10 @@ namespace cpp11 {
 			if (other.p)
 			{
 				p = new int(*other.p);
+			}
+			else
+			{
+				p = nullptr;
 			}
 			c = other.c;
 			cout << this << " Copy Assign from " << &other << "." << endl;
