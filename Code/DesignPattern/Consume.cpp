@@ -1,11 +1,6 @@
 #include "Consume.h"
 #include <iostream>
 #include <thread>
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <unistd.h>
-#endif // _WIN32
 
 BlockingQueue<int> g_queue;
 
@@ -29,8 +24,6 @@ void Consume()
 		PopResult res = g_queue.pop(data);
 		if (res == POP_STOP) // 线程应该停止
 			break;
-		if (res == POP_UNEXPECTED) // 意外唤醒
-			continue;
 
 		// 处理数据
 		std::cout << "Consume：" << data << std::endl;
@@ -45,15 +38,10 @@ int testConsume()
 
 	// 等待数据处理完
 	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-#ifdef _WIN32
-	Sleep(1000);
-#else
-	usleep(1000 * 1000);
-#endif // _WIN32
 
 	produceThread.join();
 	// 停止线程
-	g_queue.Stop();
+	g_queue.stop();
 	consumerThread.join();
 
 	return 0;

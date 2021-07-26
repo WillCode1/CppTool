@@ -14,7 +14,8 @@ namespace cpp11 {
 	public:
 		TemplateConstruct(vector<short>& vec) : l(vec.begin(), vec.end()) {}
 		TemplateConstruct(deque<int>& deq) : l(deq.begin(), deq.end()) {}
-		template<class T> TemplateConstruct(T first, T last) : l(first, last) {}
+		template<class T>
+		TemplateConstruct(T first, T last) : l(first, last) {}
 
 	private:
 		list<int> l;
