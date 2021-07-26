@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28010.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DesignPattern", "Code\DesignPattern\DesignPattern.vcxproj", "{AA12F493-E749-457A-9404-D3240CCCFAD7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Interview", "Code\Interview\Interview.vcxproj", "{822F4D24-6FCE-45E6-898B-6D658A810165}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Grammar", "Code\Grammar\Grammar.vcxproj", "{822F4D24-6FCE-45E6-898B-6D658A810165}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThreadPool", "Code\ThreadPool\ThreadPool.vcxproj", "{B4F74981-280C-4A37-9C20-81E83FA4DFC7}"
 EndProject

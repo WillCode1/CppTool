@@ -4,6 +4,24 @@
 #include <memory>
 using namespace std;
 
+class A
+{
+	void foo() {}
+};
+
+class B :public A
+{
+public:
+	virtual void foo() {}
+
+	// “inline”是构造函数的唯一合法存储类
+	/*virtual*/ B() {}
+
+private:
+	// “B::~B”: 无法访问 private 成员(在“B”类中声明)
+	//~B() {}
+};
+
 class Common
 {
 public:
