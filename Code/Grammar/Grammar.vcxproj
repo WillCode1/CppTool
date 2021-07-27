@@ -156,12 +156,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Exception.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BitSet.h" />
     <ClInclude Include="C++11.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="DesignClass.h" />
+    <ClInclude Include="Exception.h" />
     <ClInclude Include="OperatorOverload.h" />
     <ClInclude Include="shared_ptr.h" />
   </ItemGroup>

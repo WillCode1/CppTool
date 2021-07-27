@@ -5,7 +5,7 @@ struct TPose2D
 	double  y;
 	double  phi;
 
-	TPose2D(double px = 0, double py = 0, double pp = 0)
+	TPose2D(const double& px = 0, const double& py = 0, const double& pp = 0)
 	{
 		x = px;
 		y = py;

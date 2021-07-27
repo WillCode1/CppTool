@@ -156,7 +156,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AdaptorComb.h" />
-    <ClCompile Include="Consume.cpp" />
+    <ClCompile Include="ProduceConsume.cpp" />
     <ClCompile Include="FactoryMethod.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Observer.cpp" />
@@ -168,7 +168,7 @@
   <ItemGroup>
     <ClInclude Include="AbstractFactory.hpp" />
     <ClInclude Include="AdaptorInherit .h" />
-    <ClInclude Include="Consume.h" />
+    <ClInclude Include="BlockingQueue.h" />
     <ClInclude Include="TemplateEKF.hpp" />
     <ClInclude Include="FactoryMethod.h" />
     <ClInclude Include="Observer.h" />
