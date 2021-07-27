@@ -8,12 +8,12 @@ using namespace std;
 
 
 namespace cpp11 {
-	// ¹¹Ôìº¯Êı·ºĞÍ±à³Ì
+	// æ„é€ å‡½æ•°æ³›å‹ç¼–ç¨‹
 	class TemplateConstruct
 	{
 	public:
-		TemplateConstruct(vector<short>& vec) : l(vec.begin(), vec.end()) {}
-		TemplateConstruct(deque<int>& deq) : l(deq.begin(), deq.end()) {}
+		TemplateConstruct(vector<short>& vec) : TemplateConstruct(vec.begin(), vec.end()) {}
+		TemplateConstruct(deque<int>& deq) : TemplateConstruct(deq.begin(), deq.end()) {}
 		template<class T>
 		TemplateConstruct(T first, T last) : l(first, last) {}
 
@@ -22,24 +22,24 @@ namespace cpp11 {
 	};
 
 	/*
-		1.Î¯ÍĞ¹¹Ôìº¯Êı
-		2.Éî¿½±´
-		3.ÒÆ¶¯¿½±´¹¹Ôì/¸³Öµ
-		4.ÓÒÖµÒıÓÃ
+		1.å§”æ‰˜æ„é€ å‡½æ•°
+		2.æ·±æ‹·è´
+		3.ç§»åŠ¨æ‹·è´æ„é€ /èµ‹å€¼
+		4.å³å€¼å¼•ç”¨
 	 */
 	class Base
 	{
 	public:
-		// Î¯ÍĞ¹¹Ôìº¯Êı
+		// å§”æ‰˜æ„é€ å‡½æ•°
 		Base() :Base(0.0) {}
 		Base(int _b) :Base(_b, 0.0) {}
-		// Ä¿±ê¹¹Ôìº¯Êı
+		// ç›®æ ‡æ„é€ å‡½æ•°
 		Base(double _c) :p(nullptr), c(_c) { init(); }
 		Base(int _b, double _c) :p(new int(_b)), c(_c) { init(); }
 
 		virtual ~Base() { delete p; cout << this << " Deconstruct." << endl; }
 
-		// ¿½±´¹¹Ôì/¸³Öµ
+		// æ‹·è´æ„é€ /èµ‹å€¼
 		Base(const Base& other)
 		{
 			if (this == &other)
@@ -81,7 +81,7 @@ namespace cpp11 {
 			return *this;
 		}
 
-		// ÒÆ¶¯¿½±´¹¹Ôì/¸³Öµ
+		// ç§»åŠ¨æ‹·è´æ„é€ /èµ‹å€¼
 		Base(Base&& other)
 		{
 			if (this == &other)
@@ -118,7 +118,7 @@ namespace cpp11 {
 		}
 
 #if 0
-		// ½ûÖ¹·µ»Ø¾Ö²¿ÓÒÖµÒıÓÃ
+		// ç¦æ­¢è¿”å›å±€éƒ¨å³å€¼å¼•ç”¨
 		static Base&& ReturnValue(int)
 		{
 			return Base();
@@ -141,7 +141,7 @@ namespace cpp11 {
 	class Derived :public Base
 	{
 	public:
-		using Base::Base;	// ¼Ì³Ğ¹¹Ôìº¯Êı
+		using Base::Base;	// ç»§æ‰¿æ„é€ å‡½æ•°
 		virtual ~Derived() {}
 
 	private:
