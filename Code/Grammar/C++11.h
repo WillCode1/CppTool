@@ -49,12 +49,26 @@ namespace cpp11 {
 	class NewSkill
 	{
 	public:
+		void TestListInitialization()
+		{
+			int a{ 4 + 5 };
+			int b = { 10 };
+			int c(5);
+			// 列表初始化会检查类型收窄
+			//int d{ 5.0 };	// error
+
+			int* p = new int{ 5 };
+			delete p;
+		}
+
 		void TestLamdba(int InValue)
 		{
 			int Value = 0;
 
 			auto a1 = [](int x) {/*仅能访问全局外部变量*/};
 			auto a2 = [Value](int x) {/*值传递局部变量Value*/};
+			// 默认情况下是一个const函数
+			auto a9 = [Value](int x) mutable {/*值传递局部变量Value*/return ++Value; };
 			auto a3 = [this](int x) {/*值传递this指针*/};
 			auto a4 = [&Value](int x) {/*引用传递局部变量Value*/};
 			auto a5 = [=](int x) {/*值传递所有可访问的外部变量*/};
