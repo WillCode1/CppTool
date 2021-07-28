@@ -34,6 +34,9 @@
     <ClInclude Include="BitSet.h">
       <Filter>C++11</Filter>
     </ClInclude>
+    <ClInclude Include="FunctionBind.h">
+      <Filter>C++11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

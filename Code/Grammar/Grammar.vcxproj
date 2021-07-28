@@ -165,6 +165,7 @@
     <ClInclude Include="Common.h" />
     <ClInclude Include="DesignClass.h" />
     <ClInclude Include="Exception.h" />
+    <ClInclude Include="FunctionBind.h" />
     <ClInclude Include="OperatorOverload.h" />
     <ClInclude Include="shared_ptr.h" />
   </ItemGroup>
