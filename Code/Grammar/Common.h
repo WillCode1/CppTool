@@ -14,11 +14,11 @@ class B :public A
 public:
 	virtual void foo() {}
 
-	// ¡°inline¡±ÊÇ¹¹Ôìº¯ÊıµÄÎ¨Ò»ºÏ·¨´æ´¢Àà
+	// â€œinlineâ€æ˜¯æ„é€ å‡½æ•°çš„å”¯ä¸€åˆæ³•å­˜å‚¨ç±»
 	/*virtual*/ B() {}
 
 private:
-	// ¡°B::~B¡±: ÎŞ·¨·ÃÎÊ private ³ÉÔ±(ÔÚ¡°B¡±ÀàÖĞÉùÃ÷)
+	// â€œB::~Bâ€: æ— æ³•è®¿é—® private æˆå‘˜(åœ¨â€œBâ€ç±»ä¸­å£°æ˜)
 	//~B() {}
 };
 
@@ -31,6 +31,15 @@ public:
 		std::sort(ivec.begin(), ivec.end());
 		auto unique_end = std::unique(ivec.begin(), ivec.end());
 		ivec.erase(unique_end, ivec.end());
+	}
+
+	void TestTypeidAndDecltype()
+	{
+		cout << typeid(A).name() << endl;
+		cout << typeid(B).name() << endl;
+
+		cout << typeid(A).hash_code() << endl;
+		cout << typeid(B).hash_code() << endl;
 	}
 };
 
