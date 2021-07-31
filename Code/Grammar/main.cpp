@@ -11,7 +11,11 @@
 #include "Exception.h"
 #include "BitSet.h"
 #include "FunctionBind.h"
+#include "Spec.hpp"
+#include "Part.hpp"
+#include "TemplateC++11.hpp"
 using namespace cpp11;
+using namespace Template;
 
 
 template <class T>
@@ -63,12 +67,15 @@ void testDesignClass()
 
 int main()
 {
-	Common().TestTypeidAndDecltype();
+	//Common().TestTypeidAndDecltype();
 	//VectorMoveCopy::testVectorMoveCopy();
 	//testDesignClass();
 	//ReferenceCollapse::testPerfectForward();
 	//testException();
 	//FunctionAndBind().TestFunction();
 	NewSkill().TestLamdba(1);
+	//TestSpec().Test();
+	//TestPartSpec().Test();
+	auto temp = VariableLengthArg::CreateObject<TestClass, bool, int, double>(false, 1, 3.14);
 	return 0;
 }

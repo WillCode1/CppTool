@@ -38,15 +38,15 @@ public:
 
 		precisionCastRatio = 1.0 * ClockType::period::num / ClockType::period::den;
 
-		if (typeid(CalculatePrecision) == typeid(std::chrono::seconds))
+		if (typeid(CalculatePrecision).hash_code() == typeid(std::chrono::seconds).hash_code())
 		{
 			precisionCastRatio *= 1e9;
 		}
-		else if (typeid(CalculatePrecision) == typeid(std::chrono::milliseconds))
+		else if (typeid(CalculatePrecision).hash_code() == typeid(std::chrono::milliseconds).hash_code())
 		{
 			precisionCastRatio *= 1e6;
 		}
-		else if (typeid(CalculatePrecision) == typeid(std::chrono::microseconds))
+		else if (typeid(CalculatePrecision).hash_code() == typeid(std::chrono::microseconds).hash_code())
 		{
 			precisionCastRatio *= 1e3;
 		}

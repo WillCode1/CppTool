@@ -11,6 +11,9 @@
     <Filter Include="Exception">
       <UniqueIdentifier>{44cbfeaa-dbbb-40ef-ade8-3cc94af1abb9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Template">
+      <UniqueIdentifier>{3516beda-f6f5-4501-9e66-3b8f3a3c5fc1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OperatorOverload.h">
@@ -37,11 +40,20 @@
     <ClInclude Include="FunctionBind.h">
       <Filter>C++11</Filter>
     </ClInclude>
+    <ClInclude Include="TemplateC++11.hpp">
+      <Filter>Template</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Exception.cpp">
       <Filter>Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="Spec.hpp">
+      <Filter>Template</Filter>
+    </ClCompile>
+    <ClCompile Include="Part.hpp">
+      <Filter>Template</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

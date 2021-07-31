@@ -76,6 +76,12 @@ namespace cpp11 {
 			auto a7 = [=, &Value](int x) {/*引用传递局部变量Value，值传递所有其他可访问的外部变量*/};
 			auto a8 = [&, Value](int x) {/*值传递局部变量Value，引用传递所有其他可访问的外部变量*/};
 		}
+
+		template<typename T1, typename T2>
+		auto Sum(T1& t1, T2& t2) -> decltype(t1 + t2)
+		{
+			return t1 + t2;
+		}
 	};
 
 	// 静态断言，编译时检查

@@ -156,6 +156,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Spec.hpp" />
+    <ClCompile Include="Part.hpp" />
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -168,6 +170,7 @@
     <ClInclude Include="FunctionBind.h" />
     <ClInclude Include="OperatorOverload.h" />
     <ClInclude Include="shared_ptr.h" />
+    <ClInclude Include="TemplateC++11.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
