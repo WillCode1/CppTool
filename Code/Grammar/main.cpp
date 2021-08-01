@@ -14,6 +14,8 @@
 #include "Spec.hpp"
 #include "Part.hpp"
 #include "TemplateC++11.hpp"
+#include "Tuple.h"
+#include "Container.h"
 using namespace cpp11;
 using namespace Template;
 
@@ -77,5 +79,7 @@ int main()
 	//TestSpec().Test();
 	//TestPartSpec().Test();
 	auto temp = VariableLengthArg::CreateObject<TestClass, bool, int, double>(false, 1, 3.14);
+	//Tuple().TestTuple();
+	//Container().TestUnorderedMap();
 	return 0;
 }

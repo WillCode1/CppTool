@@ -165,12 +165,14 @@
     <ClInclude Include="BitSet.h" />
     <ClInclude Include="C++11.h" />
     <ClInclude Include="Common.h" />
+    <ClInclude Include="Container.h" />
     <ClInclude Include="DesignClass.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="FunctionBind.h" />
     <ClInclude Include="OperatorOverload.h" />
     <ClInclude Include="shared_ptr.h" />
     <ClInclude Include="TemplateC++11.hpp" />
+    <ClInclude Include="Tuple.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
