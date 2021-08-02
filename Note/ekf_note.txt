@@ -1,0 +1,77 @@
+/* 概念理解 */
+1、先验概率和后验概率
+先验：根据先前经验（统计结论、运动模型计算）估计的概率
+后验：已知事件反推（根据测量修正等）的估计
+
+2、内部信息(如位姿)置信度
+--->bel(x_t) = p(x_t | z1:t, u1:t)
+--->这个后验概率是时刻t下状态x_t的概率分布，以所有过去测量z1:t和所有过去控制u1:t为条件
+
+3、贝叶斯滤波
+--->是根据每一时刻的u、z，来递归更新模型的
+--->每次迭代都有两步：第一步控制更新(预测)，第二步测量更新
+
+4、对KF的理解：
+(1)卡尔曼增益的理解；预测值会增大误差，观测值可以修正误差
+(2)covariance越小，会增大对最终预测的影响
+EKF、G2O
+covariance：协方差
+
+5、粒子滤波PF
+(1)重要性采样
+(2)重采样
+
+6、速度运动模型和里程表运动模型
+速度模型：用于概率运动规划，p(x_t|u_t,x_t-1)。控制数据u(v, ω)为设定速度。
+里程表模型：更精确但滞后，可用于相对位姿估计，并且可用距离测量计算代替控制。
+
+7、环境测量模型
+测距仪的波束模型
+测距仪的似然域
+基于相关性的测量模型
+基于特征的测量模型
+--->特征提取，降维
+--->地标的测量
+
+毫米波雷达
+贝叶斯准则
+
+===============================
+/* operator */
+网络：slam_robot
+密码：slamrobot
+---------------------
+机器：
+ssh root@172.16.21.158
+password：keenon
+password：870051
+
+cd /work/robot/Bin/Arm-Release/
+
+vim keenon
+script/guard.py
+kill -9 pid
+service keenon stop
+top
+---------------------
+算法板：
+ssh root@172.16.21.65
+password：keenon
+
+git clone ssh://diwei@review.keenonrobot.com:29418/linux/application/robot && scp -p -P 29418 diwei@review.keenonrobot.com:hooks/commit-msg robot/.git/hooks/
+git pull ssh://diwei@review.keenonrobot.com:29418/linux/application/robot refs/changes/15/10615/89
+git push origin HEAD:refs/for/mash
+git reset --hard "HEAD^"
+
+cd /work/robot/
+make -j4
+make clean
+
+===============================
+/* Matlab */
+grep -E "(\[\d{4}-\d{2}-\d{2} [a-zA-Z]+ \d{2}\:\d{2}\:\d{2} \d+\]){1} fuse cur_robot_pose:" log_duanwu >pose.txt
+grep -E "fuse cur|forcast" log_duanwu >pose.txt
+
+相对位姿：insert 3 sensordata
+全局位姿：fuse cur_robot_pose/forcast cur_robot_pose
+
