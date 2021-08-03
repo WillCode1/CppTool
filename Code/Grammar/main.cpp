@@ -81,6 +81,7 @@ int main()
 	auto temp = VariableLengthArg::CreateObject<TestClass, bool, int, double>(false, 1, 3.14);
 	//Tuple().TestTuple();
 	//Container().TestUnorderedMap();
+	//Container().TestVector();
 	//Container().TestList();
 	return 0;
 }
