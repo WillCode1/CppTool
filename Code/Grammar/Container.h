@@ -96,17 +96,17 @@ namespace cpp11 {
 		{
 			map<string, int> m1{ {"zhangfei", 80}, {"guanyu", 90}, {"zhaoyun", 60} };
 			for (auto a : m1)
-				cout << a.first << "：" << a.second << endl;
+				cout << a.first << ": " << a.second << endl;
 			cout << "--------" << endl;
 
 			unordered_map<string, int> m2{ {"zhangfei", 80}, {"guanyu", 90}, {"zhaoyun", 60} };
 			for (auto a : m2)
-				cout << a.first << "：" << a.second << endl;
+				cout << a.first << ": " << a.second << endl;
 			cout << "--------" << endl;
 			
 			unordered_map<Student, int, Hash, Equal> m3{ {{"zhangfei", 20}, 80}, { {"guanyu", 30}, 90}, { {"zhaoyun", 25}, 60} };
 			for (auto a : m3)
-				cout << a.first << "：" << a.second << endl;
+				cout << a.first << ": " << a.second << endl;
 		}
 	};
 }
