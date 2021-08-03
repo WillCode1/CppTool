@@ -21,7 +21,7 @@
     <ClCompile Include="ExtendedKalmanFilter_Test.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\ThirdParty\googletest\include\gtest\stub_shadow.cpp">
+    <ClCompile Include="..\..\ThirdParty\googletest\include\gtest\stub_shadow.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
   </ItemGroup>
