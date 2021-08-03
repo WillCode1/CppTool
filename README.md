@@ -5,6 +5,8 @@ C++工具包
 
 # Boost安装
 
+[Boost安装](https://blog.csdn.net/s_lisheng/article/details/72871218)
+
 一、 下载boost
 
 boost_1_51_0.zip 下载并解压到C盘根文件夹
