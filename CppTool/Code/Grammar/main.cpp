@@ -16,6 +16,7 @@
 #include "TemplateC++11.hpp"
 #include "Tuple.h"
 #include "Container.h"
+#include "Algorithm.h"
 using namespace cpp11;
 using namespace Template;
 
@@ -83,5 +84,6 @@ int main()
 	//Container().TestUnorderedMap();
 	//Container().TestVector();
 	//Container().TestList();
+	Algorithm().AlgoFind();
 	return 0;
 }
