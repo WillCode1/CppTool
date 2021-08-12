@@ -156,7 +156,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\ThirdParty\googletest\include\gtest\stub_shadow.cpp" />
     <ClCompile Include="ExtendedKalmanFilter_Test.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ExtendedKalmanFilter_Mock.cpp" />
