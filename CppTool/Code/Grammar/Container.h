@@ -109,6 +109,28 @@ namespace cpp11 {
 				cout << a.first << ": " << a.second << endl;
 		}
 
+		void TestMultimap()
+		{
+			multimap<string, int> msi;
+			msi.insert(make_pair("zhangfei", 80));
+			msi.insert(make_pair("zhaoyun", 70));
+			msi.insert(make_pair("guanyu", 60));
+			msi.insert(make_pair("zhangfei", 50));
+			msi.insert(make_pair("zhaoyun", 40));
+			msi.insert(make_pair("guanyu", 30));
+			for (auto it = msi.begin(); it != msi.end(); ++it)
+				cout << it->first << ": " << it->second << endl;
+			cout << "=============================" << endl;
+
+			typedef multimap<string, int>::iterator IT;
+			//返回符合映射内容的迭代器范围,保存在pair对象中
+			pair<IT, IT> res = msi.equal_range("zhangfei");
+			int sum = 0;
+			for (auto it = res.first; it != res.second; ++it)
+				sum += it->second;
+			cout << "zhangfei: " << sum << endl;
+		}
+
 		// c++优先队列(priority_queue)用法详解：https://www.cnblogs.com/huashanqingzhu/p/11040390.html
 	};
 }
