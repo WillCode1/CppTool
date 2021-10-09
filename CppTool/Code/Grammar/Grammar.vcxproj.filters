@@ -55,6 +55,9 @@
     <ClInclude Include="Algorithm.h">
       <Filter>STL</Filter>
     </ClInclude>
+    <ClInclude Include="Async.h">
+      <Filter>C++11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

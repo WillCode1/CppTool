@@ -17,6 +17,7 @@
 #include "Tuple.h"
 #include "Container.h"
 #include "Algorithm.h"
+#include "Async.h"
 using namespace cpp11;
 using namespace Template;
 
@@ -85,5 +86,7 @@ int main()
 	//Container().TestVector();
 	//Container().TestList();
 	Algorithm().AlgoFind();
+	test_promise();
+	test_async();
 	return 0;
 }
