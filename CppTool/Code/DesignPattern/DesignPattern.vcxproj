@@ -156,14 +156,29 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AdaptorComb.h" />
+    <ClCompile Include="Bridge.cpp" />
+    <ClCompile Include="Builder.cpp" />
+    <ClCompile Include="ChainOfResponsibility.cpp" />
+    <ClCompile Include="Command.cpp" />
+    <ClCompile Include="Composite.cpp" />
+    <ClCompile Include="Decorator.cpp" />
+    <ClCompile Include="Facade.cpp" />
+    <ClCompile Include="Flyweight.cpp" />
+    <ClCompile Include="Interpreter.cpp" />
+    <ClCompile Include="Mediator.cpp" />
+    <ClCompile Include="Memento.cpp" />
     <ClCompile Include="ProduceConsume.cpp" />
     <ClCompile Include="FactoryMethod.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Observer.cpp" />
+    <ClCompile Include="Prototype.cpp" />
+    <ClCompile Include="Proxy.cpp" />
     <ClCompile Include="SimpleFactory.cpp" />
     <ClCompile Include="Singleton.cpp" />
+    <ClCompile Include="State.cpp" />
     <ClCompile Include="Strategy.cpp" />
     <ClCompile Include="Template.cpp" />
+    <ClCompile Include="Visitor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AbstractFactory.hpp" />
