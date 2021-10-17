@@ -33,6 +33,12 @@
     <Filter Include="BlockingQueue">
       <UniqueIdentifier>{97061818-1894-4939-b9d6-9428070c4e5d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Behavior\State">
+      <UniqueIdentifier>{b614d7cf-e505-42b5-8be5-e8bf6727cdf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Behavior\Visitor">
+      <UniqueIdentifier>{cc1ee41b-a0bb-468a-85c0-01566bfd0076}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Singleton.h">
@@ -70,6 +76,9 @@
     </ClInclude>
     <ClInclude Include="BlockingQueue.h">
       <Filter>BlockingQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>Behavior\State</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -138,10 +147,13 @@
       <Filter>Behavior</Filter>
     </ClCompile>
     <ClCompile Include="State.cpp">
-      <Filter>Behavior</Filter>
+      <Filter>Behavior\State</Filter>
+    </ClCompile>
+    <ClCompile Include="Visitor.h">
+      <Filter>Behavior\Visitor</Filter>
     </ClCompile>
     <ClCompile Include="Visitor.cpp">
-      <Filter>Behavior</Filter>
+      <Filter>Behavior\Visitor</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
