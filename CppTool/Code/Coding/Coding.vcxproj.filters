@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Sort">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Search">
+      <UniqueIdentifier>{63c4bf11-8fcd-4d79-9598-74abfd800d30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructure">
+      <UniqueIdentifier>{8574b657-4e07-4fe4-83bd-ef1892d9f77f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Sort.h">
+      <Filter>Sort</Filter>
+    </ClInclude>
+    <ClInclude Include="Search.h">
+      <Filter>Search</Filter>
+    </ClInclude>
+    <ClInclude Include="List.h">
+      <Filter>DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="Tree.h">
+      <Filter>DataStructure</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sort.cpp">
+      <Filter>Sort</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Tree.cpp">
+      <Filter>DataStructure</Filter>
+    </ClCompile>
+    <ClCompile Include="List.cpp">
+      <Filter>DataStructure</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

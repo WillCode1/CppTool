@@ -50,16 +50,17 @@ void Sort::insertSort(vector<int>& nums)
 }
 
 //Ï£¶û
+// https://www.cnblogs.com/chengxiao/p/6104371.html
 void Sort::shellSort(vector<int>& nums, int n)
 {
-	for (int dk = n / 2; dk >= 1; dk = dk / 2) {
-		for (int i = dk; i < n; ++i) {
-			if (nums[i] < nums[i - dk]) {
+	for (int step = n / 2; step >= 1; step = step / 2) {
+		for (int i = step; i < n; ++i) {
+			if (nums[i] < nums[i - step]) {
 				int tmp = nums[i], j;
-				for (j = i - dk; j >= 0 && tmp < nums[j]; j -= dk) {
-					nums[j + dk] = nums[j];
+				for (j = i - step; j >= 0 && tmp < nums[j]; j -= step) {
+					nums[j + step] = nums[j];
 				}
-				nums[j + dk] = tmp;
+				nums[j + step] = tmp;
 			}
 		}
 	}
@@ -127,7 +128,7 @@ void Sort::quickSort(vector<int>& array, int left, int right)
 //	}
 //}
 
-// ¹é²¢
+// ¹é²¢(ÍÆ¼ö)
 void Sort::merge(vector<int>& arr, int left, int mid, int right)
 {
 	vector<int> L_arr(arr.begin() + left, arr.begin() + mid);
