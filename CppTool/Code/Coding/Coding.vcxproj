@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="List.h" />
+    <ClInclude Include="MyList.h" />
     <ClInclude Include="Search.h" />
     <ClInclude Include="Sort.h" />
     <ClInclude Include="Tree.h" />
@@ -27,6 +28,7 @@
   <ItemGroup>
     <ClCompile Include="List.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MyList.cpp" />
     <ClCompile Include="Sort.cpp" />
     <ClCompile Include="Tree.cpp" />
   </ItemGroup>

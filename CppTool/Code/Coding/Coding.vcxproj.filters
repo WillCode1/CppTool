@@ -25,6 +25,9 @@
     <ClInclude Include="Tree.h">
       <Filter>DataStructure</Filter>
     </ClInclude>
+    <ClInclude Include="MyList.h">
+      <Filter>DataStructure</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sort.cpp">
@@ -35,6 +38,9 @@
       <Filter>DataStructure</Filter>
     </ClCompile>
     <ClCompile Include="List.cpp">
+      <Filter>DataStructure</Filter>
+    </ClCompile>
+    <ClCompile Include="MyList.cpp">
       <Filter>DataStructure</Filter>
     </ClCompile>
   </ItemGroup>

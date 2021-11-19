@@ -58,6 +58,9 @@
     <ClInclude Include="Async.h">
       <Filter>C++11</Filter>
     </ClInclude>
+    <ClInclude Include="Polymorphic.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

@@ -18,6 +18,7 @@
 #include "Container.h"
 #include "Algorithm.h"
 #include "Async.h"
+#include "Polymorphic.h"
 using namespace cpp11;
 using namespace Template;
 
@@ -88,5 +89,7 @@ int main()
 	Algorithm().AlgoFind();
 	test_promise();
 	test_async();
+
+	testPolymorphic();
 	return 0;
 }

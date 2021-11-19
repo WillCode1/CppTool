@@ -172,6 +172,7 @@
     <ClInclude Include="Exception.h" />
     <ClInclude Include="FunctionBind.h" />
     <ClInclude Include="OperatorOverload.h" />
+    <ClInclude Include="Polymorphic.h" />
     <ClInclude Include="shared_ptr.h" />
     <ClInclude Include="TemplateC++11.hpp" />
     <ClInclude Include="Tuple.h" />
