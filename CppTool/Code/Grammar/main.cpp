@@ -19,6 +19,7 @@
 #include "Algorithm.h"
 #include "Async.h"
 #include "Polymorphic.h"
+#include "Common.h"
 using namespace cpp11;
 using namespace Template;
 
@@ -91,5 +92,7 @@ int main()
 	test_async();
 
 	testPolymorphic();
+    auto tmp = sizeof(C);
+    auto t = sizeof(int*);
 	return 0;
 }

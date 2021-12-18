@@ -22,6 +22,12 @@ private:
 	//~B() {}
 };
 
+class C
+{
+public:
+    A& a;
+};
+
 class Common
 {
 public:
