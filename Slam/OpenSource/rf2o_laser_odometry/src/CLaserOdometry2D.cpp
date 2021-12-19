@@ -757,7 +757,7 @@ namespace rf2o
                 const float tita_w = std::atan2(y_w, x_w);
                 const float range_w = std::sqrt(x_w * x_w + y_w * y_w);
 
-                //Calculate warping
+                //Calculate warping(index)
                 const float uwarp = kdtita * (tita_w + 0.5 * fovh);
 
                 //The warped pixel (which is not integer in general) contributes to all the surrounding ones
@@ -857,6 +857,7 @@ namespace rf2o
         const float cf = 15e3f * std::exp(-float(int(level))),
                     df = 0.05f * std::exp(-float(int(level)));
 
+        // 计算加速度??
         Eigen::Matrix<float, 3, 1> kai_b_fil;
         for (unsigned int i = 0; i < 3; i++)
         {
