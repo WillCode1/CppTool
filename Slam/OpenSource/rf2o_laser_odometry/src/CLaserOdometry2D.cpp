@@ -220,18 +220,18 @@ namespace rf2o
             findNullPoints();
 
             //4. Compute derivatives
-            calculaterangeDerivativesSurface();
+            calculaterangeDerivativesSurface();     // 计算Rt Rα d(α)
 
             //5. Compute normals
             //computeNormals();
 
             //6. Compute weights
-            computeWeights();
+            computeWeights();               // 对应公式(14)
 
             //7. Solve odometry
             if (num_valid_range > 3)
             {
-                solveSystemNonLinear();
+                solveSystemNonLinear();     // IRLS迭代求解
                 //solveSystemOneLevel();    //without robust-function
             }
             else

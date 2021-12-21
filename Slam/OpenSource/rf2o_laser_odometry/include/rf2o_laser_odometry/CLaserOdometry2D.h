@@ -101,7 +101,7 @@ namespace rf2o
         std::vector<Eigen::MatrixXf> range_old;
         std::vector<Eigen::MatrixXf> range_inter;
         std::vector<Eigen::MatrixXf> range_warped;
-        std::vector<Eigen::MatrixXf> xx;
+        std::vector<Eigen::MatrixXf> xx;        // 笛卡尔坐标
         std::vector<Eigen::MatrixXf> xx_inter;
         std::vector<Eigen::MatrixXf> xx_old;
         std::vector<Eigen::MatrixXf> xx_warped;
@@ -109,17 +109,17 @@ namespace rf2o
         std::vector<Eigen::MatrixXf> yy_inter;
         std::vector<Eigen::MatrixXf> yy_old;
         std::vector<Eigen::MatrixXf> yy_warped;
-        std::vector<Eigen::MatrixXf> transformations;
+        std::vector<Eigen::MatrixXf> transformations;   // 每一层相对于上一层的变换
 
-        Eigen::MatrixXf range_wf;
-        Eigen::MatrixXf dtita;
-        Eigen::MatrixXf dt;
-        Eigen::MatrixXf rtita;
+        Eigen::MatrixXf range_wf;   // 当前帧所有点距离
+        Eigen::MatrixXf dtita;      // 对应公式(19)
+        Eigen::MatrixXf dt;         // (3)中Rt
+        Eigen::MatrixXf rtita;      // (19)中d(α)
         Eigen::MatrixXf normx, normy, norm_ang;
-        Eigen::MatrixXf weights;
-        Eigen::MatrixXi null;
+        Eigen::MatrixXf weights;    // 对应(14)
+        Eigen::MatrixXi null;       // 每个点的距离是否为null
 
-        Eigen::MatrixXf A, Aw;
+        Eigen::MatrixXf A, Aw;      // 对应(8)，建立Ax=B，Aw是IRLS每次迭代
         Eigen::MatrixXf B, Bw;
 
         MatrixS31 Var; //3 unknowns: vx, vy, w
@@ -128,12 +128,12 @@ namespace rf2o
         //std::string LaserVarName;				//Name of the topic containing the scan lasers \laser_scan
         float fps;  //In Hz
         float fovh; //Horizontal FOV
-        unsigned int cols;
-        unsigned int cols_i;
+        unsigned int cols;                  // 总共多少点
+        unsigned int cols_i;                // 当前层多少点
         unsigned int width;
         unsigned int ctf_levels;
         unsigned int image_level, level;
-        unsigned int num_valid_range;
+        unsigned int num_valid_range;       // 有效点数
         unsigned int iter_irls;
         float g_mask[5];
 
@@ -142,6 +142,7 @@ namespace rf2o
         ros::WallDuration m_runtime;
         ros::Time last_odom_time, current_scan_time;
 
+        // 一段变换
         MatrixS31 kai_abs_;
         MatrixS31 kai_loc_;
         MatrixS31 kai_loc_old_;
