@@ -331,15 +331,15 @@ namespace estimation
     // manually set covariance until lo sends covariance
     if (lo_covariance_(1, 1) == 0.0)
     {
-      SymmetricMatrix measNoiseImu_Cov(6);
-      measNoiseImu_Cov = 0;
-      measNoiseImu_Cov(1, 1) = pow(0.007, 2);
-      measNoiseImu_Cov(2, 2) = pow(0.007, 2);
-      measNoiseImu_Cov(3, 3) = pow(0.007, 2);
-      measNoiseImu_Cov(4, 4) = pow(0.007, 2);
-      measNoiseImu_Cov(5, 5) = pow(0.007, 2);
-      measNoiseImu_Cov(6, 6) = pow(0.007, 2);
-      lo_covariance_ = measNoiseImu_Cov;
+      SymmetricMatrix measNoiseLo_Cov(6);
+      measNoiseLo_Cov = 0;
+      measNoiseLo_Cov(1, 1) = pow(0.007, 2);
+      measNoiseLo_Cov(2, 2) = pow(0.007, 2);
+      measNoiseLo_Cov(3, 3) = pow(0.007, 2);
+      measNoiseLo_Cov(4, 4) = pow(0.007, 2);
+      measNoiseLo_Cov(5, 5) = pow(0.007, 2);
+      measNoiseLo_Cov(6, 6) = pow(0.007, 2);
+      lo_covariance_ = measNoiseLo_Cov;
     }
 
     my_filter_.addMeasurement(tf::StampedTransform(lo_meas_.inverse(), lo_stamp_, base_footprint_frame_, "lo"), lo_covariance_);
