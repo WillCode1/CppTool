@@ -16,7 +16,7 @@ plt.plot(x_encode, y_encode, linestyle="-", color='blue', linewidth=1, label="en
 
 data_fuse = ct.loadtxt2matrix(path + 'sensordata.txt', ' ')
 xy_fuse = data_fuse[:, 3:5]
-# print(xy_fuse.shape)e
+# print(xy_fuse.shape)
 # 坐标转换
 delta_theta = data_encode[0, 3] - data_fuse[0, 5]
 xy_fuse = mt.coordinate_transformations_matrix2d(xy_fuse, mt.rotation_matrix2d(delta_theta))
