@@ -1,7 +1,5 @@
-import bagpy
 from bagpy import bagreader
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 
 path = '/home/diwei/catkin_ws/src/robot_pose_ekf/test/'
