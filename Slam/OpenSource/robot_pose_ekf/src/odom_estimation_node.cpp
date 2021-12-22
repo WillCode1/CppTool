@@ -576,7 +576,6 @@ namespace estimation
       }
 
       // initialize filter with odometry frame
-      // lo??
       if (imu_active_ && gps_active_ && !my_filter_.isInitialized())
       {
         Quaternion q = imu_meas_.getRotation();
