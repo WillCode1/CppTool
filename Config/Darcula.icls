@@ -1,0 +1,67 @@
+<scheme name="Darcula" version="142" parent_scheme="Darcula">
+  <metaInfo>
+    <property name="created">2021-06-25T21:28:54</property>
+    <property name="ide">Python</property>
+    <property name="ideVersion">2019.3.2.0.0</property>
+    <property name="modified">2021-06-25T21:29:01</property>
+    <property name="originalScheme">_@user_Darcula</property>
+  </metaInfo>
+  <attributes>
+    <option name="PY.BUILTIN_NAME">
+      <value>
+        <option name="FOREGROUND" value="b200b2" />
+      </value>
+    </option>
+    <option name="PY.CLASS_DEFINITION">
+      <value>
+        <option name="FOREGROUND" value="ffff" />
+      </value>
+    </option>
+    <option name="PY.DOC_COMMENT">
+      <value>
+        <option name="FOREGROUND" value="ff00cf" />
+        <option name="FONT_TYPE" value="2" />
+      </value>
+    </option>
+    <option name="PY.FUNCTION_CALL">
+      <value>
+        <option name="FOREGROUND" value="ff0600" />
+      </value>
+    </option>
+    <option name="PY.FUNC_DEFINITION">
+      <value>
+        <option name="FOREGROUND" value="ff8400" />
+      </value>
+    </option>
+    <option name="PY.KEYWORD">
+      <value>
+        <option name="FOREGROUND" value="cc" />
+      </value>
+    </option>
+    <option name="PY.LINE_COMMENT">
+      <value>
+        <option name="FOREGROUND" value="c800" />
+      </value>
+    </option>
+    <option name="PY.METHOD_CALL">
+      <value>
+        <option name="FOREGROUND" value="ff8400" />
+      </value>
+    </option>
+    <option name="PY.NUMBER">
+      <value>
+        <option name="FOREGROUND" value="ffff" />
+      </value>
+    </option>
+    <option name="PY.PARAMETER">
+      <value>
+        <option name="FOREGROUND" value="c800" />
+      </value>
+    </option>
+    <option name="PY.STRING.U">
+      <value>
+        <option name="FOREGROUND" value="ff6879" />
+      </value>
+    </option>
+  </attributes>
+</scheme>
