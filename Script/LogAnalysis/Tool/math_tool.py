@@ -56,4 +56,3 @@ if __name__ == '__main__':
     A = np.array([[1, 2], [2, 4], [3, 6], [4, 8], [8, 16]])
     B = np.array([0, 1, 1.5, 2, 5, 7, 9])
     temp = interpolation(A, B)
-    pass
