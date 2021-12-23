@@ -97,10 +97,11 @@ namespace rf2o
         bool verbose, module_initialized, first_laser_scan;
 
         // Internal Data
-        std::vector<Eigen::MatrixXf> range;
-        std::vector<Eigen::MatrixXf> range_old;
-        std::vector<Eigen::MatrixXf> range_inter;
-        std::vector<Eigen::MatrixXf> range_warped;
+        // 下面一堆vector就是激光金字塔，总共5层
+        std::vector<Eigen::MatrixXf> range;         // 当前帧的所有激光距离
+        std::vector<Eigen::MatrixXf> range_old;     // 上一帧的距离
+        std::vector<Eigen::MatrixXf> range_inter;   // 上一帧和当前帧的均值
+        std::vector<Eigen::MatrixXf> range_warped;  // 每一层warp之后的距离
         std::vector<Eigen::MatrixXf> xx;        // 笛卡尔坐标
         std::vector<Eigen::MatrixXf> xx_inter;
         std::vector<Eigen::MatrixXf> xx_old;
@@ -123,7 +124,7 @@ namespace rf2o
         Eigen::MatrixXf B, Bw;
 
         MatrixS31 Var; //3 unknowns: vx, vy, w
-        IncrementCov cov_odo;
+        IncrementCov cov_odo;       // 每层进行IRLS后的协方差
 
         //std::string LaserVarName;				//Name of the topic containing the scan lasers \laser_scan
         float fps;  //In Hz

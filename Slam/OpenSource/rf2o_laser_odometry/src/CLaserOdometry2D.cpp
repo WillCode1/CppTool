@@ -466,7 +466,7 @@ namespace rf2o
                 rtita(u) = std::sqrt(dist);
         }
 
-        //Spatial derivatives
+        //Spatial derivatives ==> (19)
         for (unsigned int u = 1; u < cols_i - 1; u++)
             dtita(u) = (rtita(u - 1) * (range_inter[image_level](u + 1) -
                                         range_inter[image_level](u)) +
@@ -747,18 +747,19 @@ namespace rf2o
         const float cols_lim = float(cols_i - 1);
         const float kdtita = cols_lim / fovh;
 
+        // 模拟坐标转换，类比于ICP方式
         for (unsigned int j = 0; j < cols_i; j++)
         {
             if (range[image_level](j) > 0.f)
             {
-                //Transform point to the warped reference frame
+                //Transform point to the warped reference frame ==> (16)
                 const float x_w = acu_trans(0, 0) * xx[image_level](j) + acu_trans(0, 1) * yy[image_level](j) + acu_trans(0, 2);
                 const float y_w = acu_trans(1, 0) * xx[image_level](j) + acu_trans(1, 1) * yy[image_level](j) + acu_trans(1, 2);
                 const float tita_w = std::atan2(y_w, x_w);
-                const float range_w = std::sqrt(x_w * x_w + y_w * y_w);
+                const float range_w = std::sqrt(x_w * x_w + y_w * y_w); //  ==> (17)
 
                 //Calculate warping(index)
-                const float uwarp = kdtita * (tita_w + 0.5 * fovh);
+                const float uwarp = kdtita * (tita_w + 0.5 * fovh);     //  ==> (18)
 
                 //The warped pixel (which is not integer in general) contributes to all the surrounding ones
                 if ((uwarp >= 0.f) && (uwarp < cols_lim))
