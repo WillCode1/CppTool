@@ -113,7 +113,7 @@ namespace rf2o
         std::vector<Eigen::MatrixXf> transformations;   // 每一层相对于上一层的变换
 
         Eigen::MatrixXf range_wf;   // 当前帧所有点距离
-        Eigen::MatrixXf dtita;      // 对应公式(19)
+        Eigen::MatrixXf dtita;      // (19)中Rα(α)
         Eigen::MatrixXf dt;         // (3)中Rt
         Eigen::MatrixXf rtita;      // (19)中d(α)
         Eigen::MatrixXf normx, normy, norm_ang;

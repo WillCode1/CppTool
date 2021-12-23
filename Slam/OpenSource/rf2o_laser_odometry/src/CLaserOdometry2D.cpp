@@ -438,6 +438,7 @@ namespace rf2o
             }
             else
             {
+                // 不是选择较小的吗??
                 range_inter[image_level](u) = 0.5f * (range_old[image_level](u) + range_warped[image_level](u));
                 xx_inter[image_level](u) = 0.5f * (xx_old[image_level](u) + xx_warped[image_level](u));
                 yy_inter[image_level](u) = 0.5f * (yy_old[image_level](u) + yy_warped[image_level](u));
@@ -477,7 +478,7 @@ namespace rf2o
         dtita(0) = dtita(1);
         dtita(cols_i - 1) = dtita(cols_i - 2);
 
-        //Temporal derivative
+        //Temporal derivative ??
         for (unsigned int u = 0; u < cols_i; u++)
             dt(u) = fps * (range_warped[image_level](u) - range_old[image_level](u));
 
@@ -544,7 +545,7 @@ namespace rf2o
         for (unsigned int u = 1; u < cols_i - 1; u++)
             if (null(u) == 0)
             {
-                //							Compute derivatives
+                //							Compute derivatives??
                 //-----------------------------------------------------------------------
                 const float ini_dtita = range_old[image_level](u + 1) - range_old[image_level](u - 1);
                 const float final_dtita = range_warped[image_level](u + 1) - range_warped[image_level](u - 1);
@@ -560,7 +561,7 @@ namespace rf2o
             }
 
         const float inv_max = 1.f / weights.maxCoeff();
-        weights = inv_max * weights;
+        weights = inv_max * weights;    //??
     }
 
     void CLaserOdometry2D::findNullPoints()
