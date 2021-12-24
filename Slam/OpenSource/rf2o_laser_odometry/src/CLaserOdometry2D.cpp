@@ -211,7 +211,7 @@ namespace rf2o
                 yy_warped[image_level] = yy[image_level];
             }
             else
-                performWarping();
+                performWarping();   // 模拟坐标转换，类比于ICP方式
 
             //2. Calculate inter coords
             calculateCoord();
@@ -478,7 +478,7 @@ namespace rf2o
         dtita(0) = dtita(1);
         dtita(cols_i - 1) = dtita(cols_i - 2);
 
-        //Temporal derivative ??
+        //Temporal derivative
         for (unsigned int u = 0; u < cols_i; u++)
             dt(u) = fps * (range_warped[image_level](u) - range_old[image_level](u));
 
@@ -545,7 +545,7 @@ namespace rf2o
         for (unsigned int u = 1; u < cols_i - 1; u++)
             if (null(u) == 0)
             {
-                //							Compute derivatives??
+                //							Compute derivatives
                 //-----------------------------------------------------------------------
                 const float ini_dtita = range_old[image_level](u + 1) - range_old[image_level](u - 1);
                 const float final_dtita = range_warped[image_level](u + 1) - range_warped[image_level](u - 1);
@@ -555,13 +555,13 @@ namespace rf2o
 
                 const float w_der = kdt * (dt(u) * dt(u)) +
                                     kdtita * (dtita(u) * dtita(u)) +
-                                    k2d * (std::abs(dtitat) + std::abs(dtita2));
+                                    k2d * (std::abs(dtitat) + std::abs(dtita2));    //??
 
                 weights(u) = std::sqrt(1.f / w_der);
             }
 
         const float inv_max = 1.f / weights.maxCoeff();
-        weights = inv_max * weights;    //??
+        weights = inv_max * weights;
     }
 
     void CLaserOdometry2D::findNullPoints()
@@ -643,7 +643,7 @@ namespace rf2o
                 const float tw = weights(u);
                 const float tita = -0.5 * fovh + u / kdtita;
 
-                //Fill the matrix A
+                //Fill the matrix A ==> (8)(15)
                 A(cont, 0) = tw * (std::cos(tita) + dtita(u) * kdtita * std::sin(tita) / range_inter[image_level](u));
                 A(cont, 1) = tw * (std::sin(tita) - dtita(u) * kdtita * std::cos(tita) / range_inter[image_level](u));
                 A(cont, 2) = tw * (-yy[image_level](u) * std::cos(tita) + xx[image_level](u) * std::sin(tita) - dtita(u) * kdtita);
@@ -664,7 +664,7 @@ namespace rf2o
         //cout << endl << "max res: " << res.maxCoeff();
         //cout << endl << "min res: " << res.minCoeff();
 
-        ////Compute the energy
+        ////Compute the energy ==> (10)
         //Compute the average dt
         float aver_dt = 0.f, aver_res = 0.f;
         unsigned int ind = 0;
@@ -684,7 +684,7 @@ namespace rf2o
         //	energy += log(1.f + mrpt::math::square(k*res(i)));
         //printf("\n\nEnergy(0) = %f", energy);
 
-        //Solve iterative reweighted least squares
+        //Solve iterative reweighted least squares(IRLS)
         //===================================================================
         for (unsigned int i = 1; i <= iter_irls; i++)
         {
@@ -693,6 +693,7 @@ namespace rf2o
             for (unsigned int u = 1; u < cols_i - 1; u++)
                 if (null(u) == 0)
                 {
+                    // (12)
                     const float res_weight = std::sqrt(1.f / (1.f + ((k * res(cont)) * (k * res(cont)))));
 
                     //Fill the matrix Aw
@@ -748,7 +749,6 @@ namespace rf2o
         const float cols_lim = float(cols_i - 1);
         const float kdtita = cols_lim / fovh;
 
-        // 模拟坐标转换，类比于ICP方式
         for (unsigned int j = 0; j < cols_i; j++)
         {
             if (range[image_level](j) > 0.f)

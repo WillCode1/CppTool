@@ -90,7 +90,9 @@ git push https://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@github.com/18012774699
 1.matlab和几何手绘软件
 2.激活码：https://www.jianshu.com/p/ddb1873d0aac
 
-3.twist 含义
-4.
+4.wrap之后不是说求最近点吗，calculateCoord里怎么是平均
+5.二阶泰勒展开
+6.computeWeights没能与（14）完全对应上
+
 
 

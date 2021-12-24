@@ -143,7 +143,7 @@ namespace rf2o
         ros::WallDuration m_runtime;
         ros::Time last_odom_time, current_scan_time;
 
-        // 一段变换
+        // Kai就是两帧之间的变换 带level的就是金字塔两层之前的
         MatrixS31 kai_abs_;
         MatrixS31 kai_loc_;
         MatrixS31 kai_loc_old_;
