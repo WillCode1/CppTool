@@ -86,6 +86,6 @@ if __name__ == '__main__':
     plt.ylabel("y")
     plt.title("track_compare")
     plt.legend()
-    plt.savefig(path + 'track_compare.png')
+    # plt.savefig(path + 'track_compare.png')
     plt.show()
 

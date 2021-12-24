@@ -1,0 +1,96 @@
+=============ROS环境配置==============
+mkdir -p ~/catkin_ws/src
+cd ~/catkin_ws/src
+catkin_init_workspace
+
+cd ~/catkin_ws/
+catkin_make
+
+echo $ROS_PACKAGE_PATH
+source devel/setup.bash
+echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
+echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+
+sudo apt install ros-melodic-bfl
+
+=============常用linux命令==============
+sudo df -h
+ps -aux: 查看所有正在运行的进程
+sudo gedit
+chmod 777 robot
+kill -9 pid
+sudo apt-get install ibus
+make -j4 && make install
+find /usr/tmp -name 'a*'    查找/usr/tmp目录下的所有以a开头的目录或文件
+
+grep: https://blog.csdn.net/llljjlj/article/details/89810340
+ps -ef | grep sshd  查找指定ssh服务进程 
+ps -ef | grep sshd | grep -v grep 查找指定服务进程，排除gerp身 
+ps -ef | grep sshd -c 查找指定进程个数 
+
+service rabbitmq-server start
+service rabbitmq-server stop
+service rabbitmq-server restart
+
+压缩：
+tar -zcvf ab.tar aa.txt bb.txt
+tar -zcvf ab.tar *
+
+解压：
+tar -zxvf ab.tar
+
+=============常用Git命令==============
+git status
+git branch：分支状态
+git branch -d：删除
+git checkout master：切换
+git checkout -b develop [master]：新建并切换
+git commit -am "本次提交描述" 
+git diff 文件名
+git log：可以查看各个历史版本记录
+
+git revert HEAD  撤销前一次 commit
+git revert HEAD^ 撤销前前一次 commit
+git revert commit (id) 撤销指定的版本，撤销也会作为一次提交进行保存。
+	
+git reset HEAD filename  从暂存区中移除文件
+git reset --hard HEAD~3  会将最新的3次提交全部重置，就像没有提交过一样。
+git reset --hard commit 38679ed709fd0a3767b79b93d0fba5bb8dd235f8
+
+----------------------------------
+1.Empty reply from server
+git config --unset http.proxy
+
+2.gnutls_handshake() failed
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+
+
+=============常用ROS命令==============
+roscore
+rosmake
+rosrun
+roscd package-name
+rosls package-name
+
+rosnode info/list/kill
+rostopic info/list
+rostopic echo [topic]
+rospack find package-name
+rospack depends
+
+rosbag record -a
+rosbag record -O subset <topic1> <topic2>
+rosbag info <bagfile_name>
+rosbag play <bagfile_name>
+
+=============备忘==============
+git push https://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@github.com/18012774699/CppTool.git
+
+1.matlab和几何手绘软件
+2.激活码：https://www.jianshu.com/p/ddb1873d0aac
+
+3.twist 含义
+4.
+
+

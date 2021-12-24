@@ -13,13 +13,7 @@ tf::TransformBroadcaster().sendTransform()：用于发布坐标转换关系
 
 
 ====================
-激活码：https://www.jianshu.com/p/ddb1873d0aac
-
-====================
 rf2o：
-有关算法的完整说明，请参阅：来自径向激光扫描仪的平面测距法。基于范围流的方法。
-ICRA 2016可在：http : //mapir.isa.uma.es/work/rf2o
-
 (1)公式(10)~(15)之可能包含两种方法?(IRLS)
 (2)Cauchy M-estimator是如何将(10)~(12)互相带入的?
 
