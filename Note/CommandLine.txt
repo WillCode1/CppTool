@@ -85,14 +85,18 @@ rosbag info <bagfile_name>
 rosbag play <bagfile_name>
 
 =============备忘==============
-git push https://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@github.com/18012774699/CppTool.git
+git push https://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@github.com/18012774699/CppTool.git
 
 1.matlab和几何手绘软件
 2.激活码：https://www.jianshu.com/p/ddb1873d0aac
+3.用例运行时间会与rosbag时间相同
 
+3.createImagePyramid
 4.wrap之后不是说求最近点吗，calculateCoord里怎么是平均
-5.二阶泰勒展开
+5.(13)是不是展开错了
 6.computeWeights没能与（14）完全对应上
+7.cov_odo计算
+8.Compute kai_loc and kai_abs
 
 
 

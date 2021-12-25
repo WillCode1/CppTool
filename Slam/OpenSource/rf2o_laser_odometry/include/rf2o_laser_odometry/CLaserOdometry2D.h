@@ -145,7 +145,7 @@ namespace rf2o
 
         // Kai就是两帧之间的变换 带level的就是金字塔两层之前的
         MatrixS31 kai_abs_;
-        MatrixS31 kai_loc_;
+        MatrixS31 kai_loc_;                 // vx, vy, w
         MatrixS31 kai_loc_old_;
         MatrixS31 kai_loc_level_;
 

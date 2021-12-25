@@ -245,7 +245,7 @@ namespace rf2o
                 continue;
             }
 
-            //8. Filter solution
+            //8. Filter solution, 低通滤波器过滤无特征场景
             if (!filterLevelSolution())
                 return false;
         }
@@ -811,6 +811,13 @@ namespace rf2o
 
     bool CLaserOdometry2D::filterLevelSolution()
     {
+        /*
+            最后，重要的是要注意到存在一些环境的几何配置，传感器运动无法从中恢复。
+            当激光雷达仅观察到墙壁时，最常见的情况就出现了。在这种情况下，平行于墙的运动是不确定的，因此求解器将为它提供任意解（不仅是我们的方法，而且是纯粹基于几何的任何方法）。
+            为了缓解这个问题，我们在速度ξ的本征空间中应用低通滤波器，其工作原理如下所述。
+            首先，分析IRLS解的协方差矩阵Σ∈R3×3的特征值，以检测哪些运动（或运动的组合）是不确定的，哪些是完全约束的。
+            在特征向量的空间中，由（10）提供的速度ξtM与前一时间间隔ξt-1的速度加权，以获得新的滤波速度ξt，对应(20)
+         */
         //		Calculate Eigenvalues and Eigenvectors
         //----------------------------------------------------------
         Eigen::SelfAdjointEigenSolver<Eigen::MatrixXf> eigensolver(cov_odo);
@@ -855,11 +862,10 @@ namespace rf2o
 
         assert((kai_loc_sub).isApprox(Bii * kai_b_old, 1e-5) && "Ax=b has no solution." && __LINE__);
 
-        //Filter speed
+        //Filter speed ==> (21)
         const float cf = 15e3f * std::exp(-float(int(level))),
                     df = 0.05f * std::exp(-float(int(level)));
 
-        // 计算加速度??
         Eigen::Matrix<float, 3, 1> kai_b_fil;
         for (unsigned int i = 0; i < 3; i++)
         {
