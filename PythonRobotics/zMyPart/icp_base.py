@@ -112,7 +112,7 @@ def icp(A, B, init_pose=None, max_iterations=50, tolerance=0.001):
     # calculcate final tranformation
     T, _, _ = best_fit_transform(A, src[0:3, :].T)
 
-    return T, distances
+    return T
 
 
 if __name__ == "__main__":
@@ -124,7 +124,7 @@ if __name__ == "__main__":
     trans = np.array([2.12, -0.2, 1.3])
     B = A.dot(rotz(np.pi / 4).T) + trans
 
-    T, distances = icp(A, B)
+    T = icp(A, B)
 
     np.set_printoptions(precision=3, suppress=True)
     print(T)

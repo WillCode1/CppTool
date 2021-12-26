@@ -253,5 +253,5 @@ if __name__ == "__main__":
     mr = MotionRoadmap(img, start, goal)
 
     # mr.prm_planning(100, 100)
-    # mr.rrt_planning(20, 20, 15000)
-    mr.pf_planning()
+    mr.rrt_planning(20, 20, 15000)
+    # mr.pf_planning()
