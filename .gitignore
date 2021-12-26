@@ -1,1 +1,5 @@
+*.gitignore
 *.json
+*.pyc
+*.iml
+*.xml
