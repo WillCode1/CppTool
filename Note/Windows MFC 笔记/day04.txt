@@ -1,0 +1,73 @@
+一 MFC菜单
+   1 相关类
+     CMenu类-封装了菜单句柄和操作菜单的API。
+   2 CMenu类的使用
+   2.1 加载菜单资源
+       CMenu::LoadMenu
+   2.2 将菜单设置到窗口
+       CWnd::SetMenu 
+   2.3 消息处理
+       ON_COMMAND
+       ON_UPDATE_COMMAND_UI
+   2.4 上下文菜单(右键菜单)，在ON_WM_CONTEXTMENU消息处理函数中添加
+       2.4.1 加载菜单资源
+             CMenu::LoadMenu
+       2.4.2 获取子菜单
+             CMenu::GetSubMenu
+       2.4.3 显示
+             CMenu::TrackPopupMenu 
+   2.5 命令消息的顺序
+       在应用程序类中也增加消息映射，处理"新建"菜单。
+       FrameWnd->App
+
+二 MFC工具栏
+   1 相关类
+     CToolBar类-提供了工具栏的相关操作
+   2 CToolBar类的使用
+   2.1 创建工具栏窗口
+       CToolBar::Create/Ex
+   2.2 加载工具栏资源
+       CToolBar::LoadToolBar   
+   2.3 停靠工具栏
+       2.3.1 设置工具栏允许停靠
+             CToolBar::EnableDocking
+       2.3.2 设置框架窗口允许被停靠
+             CFrameWnd::EnableDocking
+       2.3.3 停靠工具栏
+             CFrameWnd::DockControlBar
+   2.4 设置工具栏的显示状态
+       CFrameWnd::ShowControlBar     
+
+   课堂练习：写一个停靠在窗口的右边的工具栏，并且通过菜单控制的显示
+             状态了。（10分钟）
+   
+三 MFC状态栏
+   1 相关类
+     CStatusBar类-提供了状态栏的相关操作。
+     状态栏通常放在框架窗口的底部。是一个用来显示软件运行状态和信息的
+     窗口。通常会将状态栏窗口划分为几部分，分别显示不同的信息。
+   2 CStatusBar类的使用
+   2.1 创建状态栏窗口
+       CStatusBar::Create/Ex
+   2.2 设置状态栏指示器
+       CStatusBar::SetIndicators
+   2.3 设置状态栏上显示的信息
+       CStatusBar::SetPaneText
+
+  课堂练习： 在状态栏上实时的显示鼠标位置(10分钟)
+   
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+

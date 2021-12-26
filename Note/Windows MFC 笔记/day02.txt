@@ -1,0 +1,31 @@
+一 窗口创建过程
+   1 创建过程
+     1.1 加载菜单
+     1.2 调用CreateEx函数创建窗口
+         1.2.1 调用PreCreateWindow函数设计和注册窗口类
+         1.2.2 调用AfxHookWindowCreate设置CBT类型的钩子
+         1.2.3 调用::AfxCtxCreateWindowEx创建窗口
+         1.2.4 满足钩子条件，调用钩子处理函数_AfxCbtFilterHook
+               1> 连接MFC对象与Win32窗口句柄
+               2> 设置窗口处理函数为MFC提供的AfxWndProc函数
+         1.2.5 跳转回1.2.3以下的代码继续执行
+
+   2  SetWindowsHookEx()的介绍
+      HHOOK SetWindowsHookEx(
+        __in  int idHook,//钩子类型
+        __in  HOOKPROC lpfn,//钩子处理函数的函数指针
+        __in  HINSTANCE hMod,//dll的句柄。
+        __in  DWORD dwThreadId//线程ID
+      ); 
+      
+   3 重写CWnd::WindowProc函数，完成窗口消息的处理。
+
+   
+   4  框架窗口类CFramewnd类的总结
+      4.1 虚函数
+          4.1.1 PreCreateWindow()-在创建窗口前，修改窗口的一些参数。在MFC 框架内，作用是设计和注册窗口类。
+	  4.1.2 WindowProc()-窗口处理函数
+      4.2 成员变量
+          m_hWnd - 保存对应的窗口的句柄
+  
+       

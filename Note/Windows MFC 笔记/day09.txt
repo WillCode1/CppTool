@@ -1,0 +1,98 @@
+一 MFC的文件操作
+   1 相关类
+     CFile类-封装了文件句柄和操作文件的API。
+     CFileFind类-提供了文件查找功能。
+   2 CFile类的使用
+     2.1 新建或者打开文件
+         CFile::Open
+     2.2 文件读写
+         CFile::Read/Write
+     2.3 关闭
+         CFile::Close
+     注意的问题：1> 通常放到异常处理结构中
+                 2> 文件的指针位置
+     2.4 读写文件属性
+         CFile::GetStatus/SetStatus
+  3  CFileFind类的使用
+
+     3.1 开始查找(指定在哪个目录下查找)
+         CFileFind::FindFile
+     3.2 查找下一个
+         CFileFind::FindNextFile
+     3.3 获取或判断文件信息
+         CFileFind::GetXXX/IsXXX
+     3.4 关闭查找
+         CFileFind::Close
+
+   练习：1> 查找c:\的文件和子目录
+         2> 查找c:\的所有文件和子目录 （10分钟） 
+            a. 使用递归
+            b. find.GetFilePath()
+            c. 排除.目录  (  !find.IsDots()  )    
+二 序列化
+   1 概念
+     将数据以二进制流的方式依次写入到文件和从文件中读取的过程
+   2 相关类
+     CArchive类-归档类，代替CFile::Read/Write函数，完成具体的数据读写
+   
+   3 CArchive类的使用
+      3.1 新建或者打开文件
+          CFile::Open
+      3.2 文件读写
+          3.2.1 定义CArchive对象
+          3.2.2 数据读写
+                <<  "写操作"
+                >>  "读操作"   
+          3.2.3 关闭CArchive对象
+                CArchive::Close
+      3.3 关闭
+          CFile::Close               
+
+三 对象的序列化(串行化，持久化)
+
+   1 定义支持序列化的类
+   1.1 直接或者间接从CObject类派生
+   1.2 在类的定义中添加序列化的声明宏
+        DECLARE_SERIAL 
+       在类的实现中添加序列化的实现宏     
+        IMPLEMENT_SERIAL
+   1.3 重写CObject::Serialize()函数，在函数中，完成成员变量的序列化
+   
+   2 使用(读写对象)
+     读写对象时，函数的参数为对象的指针。
+   
+   练习:定义一个课程类(编号、名称、课时)，支持序列化。然后使用该类
+        完成对象的序列化。(20分钟)
+        
+   3 实现原理
+   3.1 宏展开
+       ...
+       在动态创建宏之上，多了一个读取对象的友元函数。
+   3.2 展开宏之后的代码介绍
+       3.2.1 _init_CStudent-全局的结构体变量。类型是AFX_CLASSINIT。
+             作用是：在进入main函数之前，将classCStudent的地址保存
+             到应用程序中。	
+       struct AFX_CLASSINIT
+       { 
+          AFX_CLASSINIT(CRuntimeClass* pNewClass) 
+          { 
+             AfxClassInit(pNewClass); 
+             {
+                // 将当前类的运行时类信息变量classCStudent的地址
+                   保存到应用程序的模块状态信息中  
+                pModuleState->m_classList.AddHead(pNewClass);
+
+             }
+          }
+       };
+
+      3.2.2 operator>>-当前类的友元函数，作用是读取对象。
+   3.3 写对象的过程
+
+   3.4 读对象的过程
+
+
+
+
+
+

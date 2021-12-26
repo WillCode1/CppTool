@@ -1,0 +1,90 @@
+一 MFC绘图
+   1 分类
+   1.1 绘图设备类
+   1.2 绘图对象类
+   2 绘图设备类的使用
+   2.1 CDC类-绘图设备类的父类。主要表示一般的绘图设备，例如：打印机、
+             显示器等。
+       2.1.1 创建DC
+             BOOL CreateDC(
+               LPCTSTR lpszDriverName,//设备驱动
+               LPCTSTR lpszDeviceName,//设备名称
+               LPCTSTR lpszOutput,//设备的接口名称
+               const void* lpInitData //设备的初始化参数
+             ); 
+             显示器：
+             CreateDC("DISPLAY",NULL,NULL,NULL);
+       2.1.2 使用DC
+              MoveTo/LineTo/TextOut/Rectangle/Ellipse ...
+       2.1.3 删除DC     
+             DeleteDC
+    2.2 CClientDC类-父类是CDC类，表示的是指定窗口的客户区。
+    2.3 CPaintDC类-父类是CDC类，表示的是指定窗口的客户区。只在
+                   窗口的WM_PAINT消息的处理函数中使用。
+
+    2.4 CMetaFileDC类-父类是CDC类，主要是用来保存图形绘制的命令，
+                   在需要时，可以重复使用。
+        2.4.1 创建
+              CMetaFileDC::Create
+        2.4.2 添加绘图的命令
+              TextOut/MoveTo/LineTo
+        2.4.3 关闭，返回MetaFileDC的句柄 HMETAFILE 
+              CMetaFileDC::Close
+        2.4.4 可以在指定的绘图设备中使用
+              CDC::PlayMetaFile(HMETAFILE)
+        2.4.5 删除DC
+              DeleteMetaFile(HMETAFILE)
+
+   3 绘图对象类的使用
+
+   3.1 CPen-画笔、CBrush-画刷和CFont-字体的使用步骤
+       3.1.1 构造或者创建绘图对象
+       3.1.2 将绘图对象选入到当前的绘图设备中
+       3.1.3 使用绘图对象
+       3.1.4 在绘图设备中恢复默认的绘图对象
+       3.1.5 删除绘图对象
+
+   3.2 CBitmap-位图 
+       3.2.1 定义位图对象，并加载位图资源
+       3.2.2 创建与当前绘图设备兼容的DC
+       3.2.3 将位图选入到兼容DC中
+       3.2.4 将位图从兼容DC拷贝到当前DC(绘图设备)
+       3.2.5 删除兼容DC
+       3.2.6 删除位图对象
+       
+
+   3.3 CPalette-调色板，从本质上是一个颜色表。可以降低位图占用的空间
+                800*600的24位位图：800*600*3
+                800*600的256色位图:800*600
+                800*600的单色位图：800*600 /8   
+              
+   
+   3.4 CRgn-区域(可以将图形进行几何运算)
+       3.4.1 创建区域
+             CRgn::CreateXXX
+       3.4.2 将两个不同的区域进行几何运算
+             CRgn::CombineRgn
+       3.4.3 在绘图设备上填充区域
+             CRgn::FillRgn
+       
+二 简单的鼠标绘图的例子
+   
+   CDC::SetROP2(R2_NOT)-设置绘图模式，会影响画笔和画刷的颜色。
+                
+                     
+
+
+
+
+
+
+
+
+
+
+      
+         
+
+
+
+

@@ -1,0 +1,96 @@
+一 MFC的列表控件  
+   1 相关类
+     CListCtrl类-控件类，提供了列表控件的相关操作。主要在对话框程序
+                 中使用。
+     CListView类-视图类，常用在文档视图程序中。通过调用GetListCtrl
+                 函数，获取视图关联的控件。 
+   2 CListCtrl类的使用
+   2.1 设置控件的图标列表
+       2.1.1 添加位图资源，设计图标
+       2.1.2 创建图标列表
+             CImageList::Create
+       2.1.3 设置到控件
+             CListCtrl::SetImageList
+   2.2 插入控件的列
+       CListCtrl::InsertColumn
+   2.3 插入选项
+       CListCtrl::InsertItem
+   2.4 设置列的文本
+       CListCtrl::SetItemText
+   2.5 清空控件的选项
+       CListCtrl::DeleteAllItems
+   2.6 设置控件的背景图片
+       2.6.1 初始化Ole库
+             AfxOleInit
+       2.6.2 设置控件的背景图片
+             CListCtrl::SetBkImage
+       2.6.3 设置文本的背景色透明
+             CListCtrl::SetTextBkColor(CLR_NONE);
+   ...
+                   
+二 MFC的树控件
+   1 相关类
+     CTreeCtrl类-控件类，常在对话框程序中使用，提供了树控件的相关操作。
+     CTreeView类-视图类，常在文档视图程序中使用。通过调用GetTreeCtrl
+                 函数，获取与视图关联的控件。
+   2 CTreeCtrl类的使用
+   2.1 为控件添加图标列表
+       CTreeCtrl::SetImageList
+   2.2 插入数据节点
+       CTreeCtrl::InsertItem
+       HTREEITEM InsertItem(
+         LPCTSTR lpszItem,//节点的文本
+         int nImage,//节点图标
+         int nSelectedImage,//节点被选中时的图标
+         HTREEITEM hParent = TVI_ROOT,//节点的父节点
+         HTREEITEM hInsertAfter = TVI_LAST//在某个节点后插入节点
+       );
+   2.3 设置节点高度
+       CTreeCtrl::SetItemHeight
+   2.4 设置节点的展开状态
+       CTreeCtrl::Expand
+   2.5 获取当前选中的节点
+       CTreeCtrl::GetSelectedItem
+   2.6 删除指定节点
+       CTreeCtrl::::DeleteItem 
+   2.7 设置节点的文本
+       CTreeCtrl::SetItemText
+    
+   
+三 MFC的属性控件
+   1 相关类
+     CTabCtrl类-提供了属性控件的相关操作。
+   2 CTabCtrl类的使用
+   2.1 插入标签
+       CTabCtrl::InsertItem
+   2.2 以Tab控件为父窗口创建对话框
+
+四 属性页对话框    
+   1 相关类
+     CPropertyPage类-页面类，父类是CDialog类。
+     CPropertySheet类-表单类。
+     一个完整的属性页对话框=一个表单对象+多个页面对象组成。
+   2 分类
+     标签式-常用于参数、选项等配置。
+     向导式-常用于引导用户按既定步骤操作，完成某种功能。
+   3 标签式属性页的使用步骤
+     3.1 插入对话框资源，双击生成相应的类，注意父类是CPropertyPage类。
+     3.2 添加CPropertSheet类的子类CSetupSheet类。
+     3.3 在表单中添加页面
+         CPropertSheet::AddPage
+     3.4 创建和显示
+         CPropertSheet::DoModal     
+   
+
+
+
+
+
+
+
+
+
+
+
+
+

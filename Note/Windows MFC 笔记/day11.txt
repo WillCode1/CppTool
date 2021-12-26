@@ -1,0 +1,62 @@
+一 MFC的各种控件
+   1 静态控件
+     主要包括静态文本、图片和分组框控件。
+   2 按钮控件
+     包括下压式按钮、复选按钮和单选按钮。对应的控件类都是CButton类。
+   3 组合框和列表框控件
+     3.1 组合框控件，控件类是CComboBox类
+         可以接受用户编辑选项也可以在多个选项中选择一项。
+
+     3.2 列表框控件，控件类是CListBox类
+         可以在多个选项中选择一项，也可以选择多项，不接受用户编辑。
+         3.2.1 添加选项
+               CListBox::AddString
+         3.2.2 获取当前选中项的索引
+               CListBox::GetCurSel
+         3.2.3 根据索引值获取文本
+               CListBox::GetText
+         3.2.4 删除指定选项
+               CListBox::DeleteString
+         3.2.5 获取选项的个数
+               CListBox::GetCount
+         3.2.6 清空选项
+               CListBox::ResetContent
+         ......
+    4 动画控件-控件类是CAnimateCtrl类。
+    5 播放动画的例子
+    5.1 CFileDialog类-文件对话框类。
+        5.1.1 构造函数
+        CFileDialog(
+         BOOL bOpenFileDialog,//TRUE：打开；FALSE:保存；
+         LPCTSTR lpszDefExt = NULL,//文件扩展名
+         LPCTSTR lpszFileName = NULL,//文件名称
+         DWORD dwFlags = OFN_HIDEREADONLY ,//对话框的风格
+         LPCTSTR lpszFilter = NULL,//文件类型过字符串
+         CWnd* pParentWnd = NULL,//父窗口指针
+         DWORD dwSize = 0,//对话框尺寸
+         BOOL bVistaStyle = TRUE //Vista样式
+        );
+    6 旋转按钮、进度条和滑块
+      旋转按钮-控件类是CSpinButtonCtrl类
+      进度条-控件类是CProgressCtrl类
+      滑块-控件类是CSliderCtrl类
+    6.1 设置范围     
+        CSpinButtonCtrl::SetRange
+    6.2 设置增量            
+        CSpinButtonCtrl::SetAccel 
+    6.3 设置位置
+        CSpinButtonCtrl::SetPos
+    
+
+
+
+
+
+
+
+
+
+
+
+
+        

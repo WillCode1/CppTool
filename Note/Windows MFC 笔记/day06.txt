@@ -1,0 +1,113 @@
+一 MFC的窗口切分(拆分)
+   1 窗口切分的类型
+     1.1 静态切分-程序编写时，就确定了窗口切分的数量。不同的视图窗口
+                  可以使用不同的视图类。
+     1.2 动态切分-程序运行时，由用户实时的完成窗口的切分。通常情况下，
+                  动态切分的视图窗口使用的是相同的视图类。
+   2 相关类与相关函数
+     CSplitterWnd类-主要提供了窗口切分的功能。
+     #include <afxext.h>
+
+     OnCreateClient()-是CFrameWnd类的成员函数，是一个虚函数，子类重写
+                      该函数，完成客户区对象以及窗口的创建。默认的被
+                      CFrameWnd::OnCreate函数调用。
+   
+   3 静态切分
+   3.1 创建静态切分窗口
+       virtual BOOL CreateStatic(
+         CWnd* pParentWnd,//父窗口对象的指针
+         int nRows,//行数，最大值是16
+         int nCols,//列数，最大值是16
+         DWORD dwStyle = WS_CHILD | WS_VISIBLE,//窗口的风格
+         UINT nID = AFX_IDW_PANE_FIRST//窗口ID 
+       );
+   3.2 创建视图
+       virtual BOOL CreateView(
+         int row,//行的索引
+         int col,//列的索引
+         CRuntimeClass* pViewClass,//视图类的运行时类信息
+         SIZE sizeInit,//初始尺寸(宽和高)
+         CCreateContext* pContext//创建上下文结构体的指针 
+       );  
+   3.3 根据行列位置获取对应的视图对象
+       CSplitterWnd::GetPane
+   
+  课堂练习：创建一个3*3的静态切分窗口，视图类使用CMyView类，
+            视图窗口的大小大致相同。(10分钟)
+             
+            GetClientRect()-获取窗口的客户区大小的。
+   4 动态窗口切分的实现
+     CSplitterWnd::Create
+     virtual BOOL Create(
+      CWnd* pParentWnd,//父窗口对象的指针
+      int nMaxRows,//最大行数
+      int nMaxCols,//最大列数
+      SIZE sizeMin,//最小尺寸
+      CCreateContext* pContext,//指定所需要的视图类的运行时类信息
+      DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL | SPLS_DYNAMIC_SPLIT,//窗口风格
+      UINT nID = AFX_IDW_PANE_FIRST //窗口ID
+     );
+     可以使用SPY++工具查看窗口的信息和消息。
+          
+   
+二 MFC的文档
+   1 相关类
+     CDocument类-父类是CCmdTarget类，作用是管理数据的，包括数据的
+                 保存和加载。
+   2 CDocument类的使用(在视图中显示来自于文档的数据)
+   2.1 CView::OnInitialUpdate( )-视图类的初始化更新函数。该函数在
+              第一次附加文档之后，初始化显示之前被框架调用。
+   2.2 CView::GetDocument()-获取与视图关联的文档
+   2.3 CFrameWnd::InitialUpdateFrame( )-初始化更新框架。创建框架
+              窗口之后调用该函数。引起所有与该框架相关的视图类的
+              OnInitialUpdate函数的调用
+   3 创建过程
+   3.1 框架窗口的WM_CREATE消息处理函数(CFrameWnd::OnCreate)
+       在函数中，动态创建视图对象，并创建视图窗口
+   3.2 视图窗口的WM_CREATE消息处理函数(CView::OnCreate)
+       在函数中，文档与视图相互保存对方地址
+   4 四个类(对象)之间的关系
+     CWinApp
+        |->m_pMainWnd (CFrameWnd)
+              |->m_pViewActive (CView)
+                    |->m_pDocument (CDocument)
+                          |->m_viewList (CView List)
+   
+   5 获取四个类(对象)的方法
+   5.1 获取应用程序对象
+       AfxGetApp();        
+   5.2 获取框架对象
+       AfxGetMainWnd( ); 
+   5.3 获取视图对象
+       ((CFrameWnd*)AfxGetMainWnd( ))->GetActiveView( )
+   5.4 获取文档对象 
+        ((CFrameWnd*)AfxGetMainWnd( ))->GetActiveView( )    
+        ->GetDocument()
+
+   6 命令消息的处理顺序（10分钟）
+     View->Frame->App   (CFrameWnd::OnCmdMsg)
+     View->Document      （CView::OnCmdMsg)
+
+     View->Document->Frame->App 
+     
+    引入文档模板类使得创建的过程简单，规范。底层代码使用文档模板类
+    创建框架、视图和文档对象，并且建立对象与对象之间的关系。
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

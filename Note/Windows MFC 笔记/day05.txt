@@ -1,0 +1,143 @@
+一 MFC的视图
+   1 相关类
+     CView类-父类是CWnd类，是一个专门显示数据的窗口，位置通常在框架
+             窗口的客户区。包含了一个纯虚函数OnDraw(),所以是抽象类。
+   2 CView类的使用
+   2.1 添加CView类的派生类CMyView类，并在CMyView类中实现OnDraw函数
+   2.2 在CMyFrameWnd类中添加成员指针变量
+       CMyView* m_pWndView;
+   2.3 在CMyFrameWnd::OnCreate函数中
+       2.3.1 创建视图对象
+             m_pWndView=new CMyView;
+       2.3.2 创建视图窗口
+             m_pWndView->Create(...);
+       2.3.3 把视图设置为框架窗口的活动视图
+             
+   2.4 视图窗口自适应框架窗口的客户区大小(,10分钟)
+       视图ID设置为AFX_IDW_PANE_FIRST
+ 
+   2.5 命令消息的处理顺序    
+       View->Frame-App
+   2.6 OnDraw()和OnPaint()之间的关系？
+       CView::OnPaint()=>CMyView::OnDraw()
+       CMyView::OnPaint() 
+   2.7 CView、CFrameWnd和CWinApp之间的关系？
+       CWinApp
+         |->m_pMainWnd (CFrameWnd)
+              |->m_pViewActive (CView)
+
+二  运行时类信息
+   1 概念
+     在程序运行的时候，获取对象的类的信息以及类的继承层次关系。
+     class CDog:public CAnimal:public CObject
+     void main()
+     {
+        CDog dog; 
+        dog is a CDog? TRUE
+        dog is a CAnimal? TRUE
+        dog is a CObject? TRUE
+        dog is a CWnd? FALSE
+     }
+   2 实现步骤
+   2.1 直接或者间接的继承自CObject
+   2.2 在类的定义中添加运行时类信息的声明宏
+       DECLARE_DYNAMIC(theClass)
+       在类的实现中添加运行时类信息的实现宏
+       IMPLEMENT_DYNAMIC(theClass,baseClass)
+   2.3 使用
+       2.3.1 相关函数
+             IsKindOf
+
+   2.4 实现原理 
+       2.4.1 展开宏
+             ... 
+                 
+       2.4.2 相关的结构体
+             struct CRuntimeClass
+             {
+	       LPCSTR m_lpszClassName;//类名
+	       int m_nObjectSize;//类的大小
+	       UINT m_wSchema; // 类的版本
+	       CObject* (PASCAL* m_pfnCreateObject)(); //创建对象的函数的指针，在运行时类信息中，为NULL  
+               CRuntimeClass* m_pBaseClass;//指向父类的CRuntimeClass的变量
+             }
+       2.4.3 成员的介绍
+             classCDog-静态的结构体变量，类型是CRuntimeClass。保存了
+             当前类的信息，和指向父类的变量classAnimal的指针。
+             GetRuntimeClass()-虚函数，返回classCDog的地址。
+       2.4.4 成员之间的关系
+       GetRuntimeClass()
+          |->&classCDog
+                |->包含了当前类的信息，包括类名、大小和版本。
+                |->&classCAnimal
+                        |->包含了CAnimal类的信息，包括类名、大小和版本。
+                        |->&classCObject
+                              |->包括了CObject类的信息，包括类名、大小和版本
+                              |->NULL
+
+        形成一个继承层次关系上的类的信息链表。
+
+        dog.IsKindOf(RUNTIME_CLASS(CObject))？   CWnd
+          &classCDog      &classCObject          &classCWnd
+          &classCAnimal
+          &classCObject       TRUE
+                                                 FALSE 
+三 动态创建
+   1 概念
+     创建未知类型的对象
+   2 实现
+     2.1 编写一个创建对象的函数
+     2.2 定义支持动态创建的类
+         2.2.1 直接或者间接从CObject类派生
+         2.2.2 在类的定义中添加动态创建的声明宏
+                DECLARE_DYNCREATE(theClass)
+               在类的实现中添加动态创建的实现宏
+                IMPLEMENT_DYNCREATE(theClass,baseClass)
+     2.3 使用
+   3 实现原理
+   3.1 展开宏
+       在运行时类信息的基础上， 多了一个创建对象的函数。
+   3.2 成员的作用
+       3.2.1 CreateObject()-静态的成员函数，作用是new 对象。
+       3.2.2 classCDog-静态的结构体变量。m_pfnCreateObject保存了
+             3.2.1 CDog::CreateObject()函数的地址。 
+   3.3 创建过程
+       
+
+
+
+
+
+
+
+
+
+
+
+
+    
+                       
+          
+        
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+        
+   
+  

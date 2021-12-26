@@ -1,0 +1,139 @@
+一 _ConnectionPtr类的使用
+    1 连接数据库
+           HRESULT Open (
+            _bstr_t ConnectionString,//连接字符串
+            _bstr_t UserID,//数据库的登录名称  ""
+            _bstr_t Password,//密码            ""
+            long Options//连接选项，默认-1 即可。-1
+            ); 
+     Access数据库的连接字符串：
+
+     Provider=Microsoft.Jet.OLEDB.4.0;
+     Data Source=E:\MFC\db\odbc.mdb
+
+     Provider=Microsoft.Jet.OLEDB.4.0;
+     Data Source=E:\MFC\db\odbc.mdb;
+     Persist Security Info=True;
+     User ID=csd1608;
+     PASSWORD=123456;
+
+    2 关闭数据库 
+         Close
+二 _RecordsetPtr类的使用
+   1 打开表
+      HRESULT Open (
+        const _variant_t & Source,//表名，Sql语句，存储过程名
+        const _variant_t & ActiveConnection,//数据库连接
+        enum CursorTypeEnum CursorType,//游标类型
+        enum LockTypeEnum LockType,//记录集的锁定类型
+        long Options//选项，标识第一个参数。adCmdTable/adCmdText/adCmdStoredProc
+      );  
+     
+      CursorTypeEnum
+     {
+       adOpenForwardOnly = 0,//单向的静态游标
+       adOpenKeyset = 1,//键集游标(动态游标的一种)
+       adOpenDynamic = 2,//动态游标
+       adOpenStatic = 3// 静态游标(双向的)
+     };  
+     LockTypeEnum
+     {
+      adLockReadOnly = 1,//只读
+      adLockPessimistic = 2,//悲观的锁定方式
+      adLockOptimistic = 3,//乐观的锁定方式
+    
+     };
+    2 字段的操作 (Fields)
+    2.1 获取字段的数量
+        Fields->GetCount()
+    2.2 获取字段的标题(名称)
+        Fields->GetItem(nIndex)->GetName()
+
+    2.3 获取/设置字段的值
+        Fields->GetItem(nIndex)->Value
+    2.4 记录集的指针操作
+        MoveNext( )
+        MovePrevious()
+        MoveFirst()
+        MoveLast()
+        Move(long nNumbers)
+        IsBOF()
+        IsEOF()
+三 通过记录集的方式完成对数据的增删改操作
+   1 添加记录
+     1.1 获取数据表的数据到记录集
+         OpenTable
+     1.2* 在记录集中添加一条新记录
+         AddNew           
+     1.3 设置该记录每个字段的值
+         SetFieldValue
+     1.4* 更新到数据库
+         Update  
+     1.5 重新显示数据
+         ShowData
+   2 删除记录
+     2.1 获取数据表的数据到记录集
+         OpenTable
+     2.2 将记录集的指针移动到要删除的记录
+         MoveLast()
+     2.3* 执行删除操作
+         Delete
+     2.4 更新到数据库
+         Update  
+     2.5 重新显示数据
+         ShowData
+   3 修改记录
+     3.1 获取数据表的数据到记录集
+         OpenTable
+     3.2 将记录集的指针移动到要修改的记录
+         MoveLast()
+     3.3 重新设置字段的值（避免重设主键值）
+         SetFieldValue  
+     3.4 更新到数据库
+         Update  
+     3.5 重新显示数据
+         ShowData              
+四 通过执行Sql语句的方式完成对数据的增删改
+   1 _ConnectionPtr类的Execute函数
+     
+   2 _RecordsetPtr类的Open函数
+
+五 事务处理
+   _ConnectionPtr类提供了事务处理的操作
+    
+MFC的第三部分 Windows平台的网络通信编程(socket通信)
+1 相关技术的介绍
+  1.1 基本的socket函数
+  1.2 以WSA开头的socket函数。
+  1.3 MFC的socket类，部分的封装了以WSA开头的socket函数。
+2 相关文件(2.2 版本的socket库为例)
+  2.1 dll文件：ws2_32.dll
+  2.2 lib文件：ws2_32.lib
+  2.3 头文件: winsock2.h
+3 开发步骤
+  3.1 初始化socket库
+      int WSAStartup(
+       __in   WORD wVersionRequested,//请求使用的库的版本
+       __out  LPWSADATA lpWSAData//返回可用的库的信息
+      );
+  
+  3.2 TCP或UDP通信
+
+  3.3 卸载socket库
+      int WSACleanup(void);
+    
+   
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
