@@ -1,4 +1,4 @@
-from Motion_planning.graph_search.tool import *
+from tool import *
 
 
 # 网格形式的图，如果用距离来代表损失则有以下这些启发函数可以使用：

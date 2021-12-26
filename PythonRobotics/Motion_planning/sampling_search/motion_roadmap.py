@@ -1,7 +1,7 @@
 # coding=utf-8
 import cv2
 import numpy as np
-import Motion_planning.sampling_search.motion_planning_tool as mpt
+import motion_planning_tool as mpt
 import math
 
 
@@ -243,7 +243,7 @@ class MotionRoadmap(object):
 if __name__ == "__main__":
     ## 预处理
     # 图像路径
-    image_path = "./map/map_1.bmp"
+    image_path = "map/map_1.bmp"
     # 读取图像
     img = cv2.imread(image_path)  # np.ndarray RGB uint8
     img = cv2.resize(img, (500, 500))
@@ -253,5 +253,5 @@ if __name__ == "__main__":
     mr = MotionRoadmap(img, start, goal)
 
     # mr.prm_planning(100, 100)
-    # mr.rrt_planning(20, 20, 15000)
-    mr.pf_planning()
+    mr.rrt_planning(20, 20, 15000)
+    # mr.pf_planning()
