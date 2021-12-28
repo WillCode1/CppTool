@@ -84,18 +84,39 @@ rosbag record -O subset <topic1> <topic2>
 rosbag info <bagfile_name>
 rosbag play <bagfile_name>
 
+<node pkg="rosbag" name="rosbag2" type="record" args="-O ekf_pose.bag -a" />
+<node pkg="rosbag" name="rosbag1" type="play" args="--clock --hz 100 -d .4 $(find robot_pose_ekf)/test/ekf_test2_indexed.bag" />
+  
+rostest --text <bagname> <*.test/*.launch>
 =============备忘==============
-git push https://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@github.com/18012774699/CppTool.git
+git push https://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@github.com/18012774699/CppTool.git
 
 1.matlab和几何手绘软件
 2.激活码：https://www.jianshu.com/p/ddb1873d0aac
-3.用例运行时间会与rosbag时间相同
 
-4.srf论文
+3.srf论文
 4.wrap之后不是说求最近点吗，calculateCoord里怎么是平均
 6.computeWeights没能与（14）完全对应上
 7.cov_odo计算
 8.Compute kai_loc and kai_abs
 9.特有部分
 
+=============融合方案及验证==============
+融合方式：
+--->采用ekf，对多传感器（LO、VO、GPS、imu、odom）位姿增量进行融合，输出局部定位信息。
+--->对每个激活的传感器，建立一个观测模型，并需要输入方差。
+--->输入数据为，激活项中共同的最新时刻，进行插值计算。
+
+验证评估：
+--->比较同时刻位姿变化量误差
+--->根据运动距离、角度或时间，计算误差平均
+
+风险项：
+1.真值轨迹的确定
+--->分段式，不同状态下以不同传感器为准，LO为主（融合结果必然与输入结果相近）
+--->使用粒子滤波输出为主
+
+2.rf2o的方差依据，及确定
+3.用例运行时间会与rosbag时间相同
+4.bfl可能存在内存泄漏
 
