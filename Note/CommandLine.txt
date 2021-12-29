@@ -84,18 +84,9 @@ rosbag record -O subset <topic1> <topic2>
 rosbag info <bagfile_name>
 rosbag play <bagfile_name>
 
-=============备忘==============
-git push https://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@github.com/18012774699/CppTool.git
-
-1.matlab和几何手绘软件
-2.激活码：https://www.jianshu.com/p/ddb1873d0aac
-3.用例运行时间会与rosbag时间相同
-
-4.srf论文
-4.wrap之后不是说求最近点吗，calculateCoord里怎么是平均
-6.computeWeights没能与（14）完全对应上
-7.cov_odo计算
-8.Compute kai_loc and kai_abs
-9.特有部分
+<node pkg="rosbag" name="rosbag2" type="record" args="-O ekf_pose.bag -a" />
+<node pkg="rosbag" name="rosbag1" type="play" args="--clock --hz 100 -d .4 $(find robot_pose_ekf)/test/ekf_test2_indexed.bag" />
+  
+rostest --text <bagname> <*.test/*.launch>
 
 
