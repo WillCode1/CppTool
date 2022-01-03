@@ -58,6 +58,7 @@ visualization_msgs::Marker CreateTrajectoryMarker(const int trajectory_id,
   return marker;
 }
 
+//返回一个指定id的landmark在container中的索引值；
 int GetLandmarkIndex(
     const std::string& landmark_id,
     std::unordered_map<std::string, int>* landmark_id_to_index) {
@@ -104,6 +105,7 @@ MapBuilderBridge::MapBuilderBridge(
       map_builder_(std::move(map_builder)),
       tf_buffer_(tf_buffer) {}
 
+// 调用了map_builder_的成员函数LoadState来加载一个.pbstream文件。
 void MapBuilderBridge::LoadState(const std::string& state_filename,
                                  bool load_frozen_state) {
   // Check if suffix of the state file is ".pbstream".
@@ -170,6 +172,10 @@ bool MapBuilderBridge::SerializeState(const std::string& filename,
 void MapBuilderBridge::HandleSubmapQuery(
     cartographer_ros_msgs::SubmapQuery::Request& request,
     cartographer_ros_msgs::SubmapQuery::Response& response) {
+  /*
+    可以看到，这里基本上就是利用/src/cartographer/cartographer/mapping下的工具来查询指定id的submap的一些信息。
+    proto是Google提供的一个ProtoBuf库的工具Google Protobuf库，用来实现数据的序列化和反序列化。
+   */
   cartographer::mapping::proto::SubmapQuery::Response response_proto;
   cartographer::mapping::SubmapId submap_id{request.trajectory_id,
                                             request.submap_index};
@@ -287,6 +293,7 @@ visualization_msgs::MarkerArray MapBuilderBridge::GetTrajectoryNodeList() {
   const auto node_poses = map_builder_->pose_graph()->GetTrajectoryNodePoses();
   // Find the last node indices for each trajectory that have either
   // inter-submap or inter-trajectory constraints.
+  // 找出具有子映射间或轨迹间约束的每个轨迹的最后一个节点索引。
   std::map<int, int /* node_index */>
       trajectory_to_last_inter_submap_constrained_node;
   std::map<int, int /* node_index */>
@@ -359,9 +366,11 @@ visualization_msgs::MarkerArray MapBuilderBridge::GetTrajectoryNodeList() {
       }
       // Work around the 16384 point limit in RViz by splitting the
       // trajectory into multiple markers.
+      // 在RViz中通过将轨迹分解成多个标记来完成16384点的限制。
       if (marker.points.size() == 16384) {
         PushAndResetLineMarker(&marker, &trajectory_node_list.markers);
         // Push back the last point, so the two markers appear connected.
+        // Push back最后一个点，这样两个标记看起来就相连了。
         marker.points.push_back(node_point);
       }
     }
@@ -394,6 +403,7 @@ visualization_msgs::MarkerArray MapBuilderBridge::GetLandmarkPosesList() {
   return landmark_poses_list;
 }
 
+// 获取Constraint. 应该是与GetTrajectoryStateNodeList配合使用的。
 visualization_msgs::MarkerArray MapBuilderBridge::GetConstraintList() {
   visualization_msgs::MarkerArray constraint_list;
   int marker_id = 0;
@@ -412,6 +422,7 @@ visualization_msgs::MarkerArray MapBuilderBridge::GetConstraintList() {
   // This and other markers which are less numerous are set to be slightly
   // above the intra constraints marker in order to ensure that they are
   // visible.
+  // 这个和其他数量较少的标记被设置为稍微高于约束内标记，以确保它们是可见的。
   residual_intra_marker.pose.position.z = 0.1;
 
   visualization_msgs::Marker constraint_inter_same_trajectory_marker =
@@ -456,6 +467,7 @@ visualization_msgs::MarkerArray MapBuilderBridge::GetConstraintList() {
       // Color mapping for submaps of various trajectories - add trajectory id
       // to ensure different starting colors. Also add a fixed offset of 25
       // to avoid having identical colors as trajectories.
+      // 不同轨迹子图的颜色映射-添加轨迹id以确保不同的起始颜色。还添加一个固定偏移量25，以避免有相同的颜色作为轨迹。
       color_constraint = ToMessage(
           cartographer::io::GetColor(constraint.submap_id.submap_index +
                                      constraint.submap_id.trajectory_id + 25));

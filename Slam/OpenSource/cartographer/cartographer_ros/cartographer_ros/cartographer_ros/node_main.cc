@@ -49,25 +49,28 @@ namespace {
 
 void Run() {
   constexpr double kTfBufferCacheTimeInSeconds = 10.;
-  tf2_ros::Buffer tf_buffer{::ros::Duration(kTfBufferCacheTimeInSeconds)};
-  tf2_ros::TransformListener tf(tf_buffer);
-  NodeOptions node_options;
+  tf2_ros::Buffer tf_buffer{::ros::Duration(kTfBufferCacheTimeInSeconds)};//tf2_ros::Buffer是tf2 library的主要工具。Its main public API is defined by tf2_ros::BufferInterface. 
+  tf2_ros::TransformListener tf(tf_buffer);//订阅适当的主题以接收转换.
+  NodeOptions node_options; //NodeOptions, 该struct中包含了对一些基本参数的设置，比如接收tf的timeout时间设置、子图发布周期设置等
   TrajectoryOptions trajectory_options;
+  //将LoadOptions读取目录下的配置文件, 获取到的参数值分别赋给node_options和trajectory_options.
   std::tie(node_options, trajectory_options) =
       LoadOptions(FLAGS_configuration_directory, FLAGS_configuration_basename);
 
   auto map_builder =
       cartographer::mapping::CreateMapBuilder(node_options.map_builder_options);
+  // Node构造函数中订阅了很多传感器的topic。收集传感器数据
   Node node(node_options, std::move(map_builder), &tf_buffer,
             FLAGS_collect_metrics);
   if (!FLAGS_load_state_filename.empty()) {
-    node.LoadState(FLAGS_load_state_filename, FLAGS_load_frozen_state);
+    node.LoadState(FLAGS_load_state_filename, FLAGS_load_frozen_state);//加载数据包数据
   }
 
   if (FLAGS_start_trajectory_with_default_topics) {
     node.StartTrajectoryWithDefaultTopics(trajectory_options);
   }
 
+  /* ros::spin() 将会进入循环， 一直调用回调函数chatterCallback() */
   ::ros::spin();
 
   node.FinishAllTrajectories();
