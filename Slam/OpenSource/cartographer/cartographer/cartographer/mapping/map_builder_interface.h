@@ -55,6 +55,7 @@ class MapBuilderInterface {
   MapBuilderInterface& operator=(const MapBuilderInterface&) = delete;
 
   // Creates a new trajectory builder and returns its index.
+  // 创建一个TrajectoryBuilder并返回他的index，即trajectory_id
   virtual int AddTrajectoryBuilder(
       const std::set<SensorId>& expected_sensor_ids,
       const proto::TrajectoryBuilderOptions& trajectory_options,
@@ -62,22 +63,25 @@ class MapBuilderInterface {
 
   // Creates a new trajectory and returns its index. Querying the trajectory
   // builder for it will return 'nullptr'.
+  // 从一个序列化的数据中构造出一个trajectory并返回他的index
   virtual int AddTrajectoryForDeserialization(
       const proto::TrajectoryBuilderOptionsWithSensorIds&
           options_with_sensor_ids_proto) = 0;
 
   // Returns the 'TrajectoryBuilderInterface' corresponding to the specified
-  // 'trajectory_id' or 'nullptr' if the trajectory has no corresponding
-  // builder.
+  // 'trajectory_id' or 'nullptr' if the trajectory has no corresponding builder.
   virtual mapping::TrajectoryBuilderInterface* GetTrajectoryBuilder(
       int trajectory_id) const = 0;
 
   // Marks the TrajectoryBuilder corresponding to 'trajectory_id' as finished,
   // i.e. no further sensor data is expected.
+  // 将'trajectory_id'对应的TrajectoryBuilder标记为finished，也就是说，不需要进一步的传感器数据。
   virtual void FinishTrajectory(int trajectory_id) = 0;
 
   // Fills the SubmapQuery::Response corresponding to 'submap_id'. Returns an
   // error string on failure, or an empty string on success.
+  // 根据指定的submap_id来查询submap，把结果放到SubmapQuery::Response中。
+  // 如果出现错误，返回error string; 成功则返回empty string.
   virtual std::string SubmapToProto(const SubmapId& submap_id,
                                     proto::SubmapQuery::Response* response) = 0;
 
@@ -85,6 +89,7 @@ class MapBuilderInterface {
   // 'include_unfinished_submaps' is set to true, unfinished submaps, i.e.
   // submaps that have not yet received all rangefinder data insertions, will
   // be included in the serialized state.
+  // 序列化当前状态到一个proto流中。
   virtual void SerializeState(bool include_unfinished_submaps,
                               io::ProtoStreamWriterInterface* writer) = 0;
 
@@ -98,6 +103,7 @@ class MapBuilderInterface {
 
   // Loads the SLAM state from a proto stream. Returns the remapping of new
   // trajectory_ids.
+  // 从一个proto流中加载SLAM状态
   virtual std::map<int /* trajectory id in proto */, int /* trajectory id */>
   LoadState(io::ProtoStreamReaderInterface* reader, bool load_frozen_state) = 0;
 
@@ -106,10 +112,13 @@ class MapBuilderInterface {
   virtual std::map<int /* trajectory id in proto */, int /* trajectory id */>
   LoadStateFromFile(const std::string& filename, bool load_frozen_state) = 0;
 
+  // 返回系统中当前已有的trajectory_builder的数量
   virtual int num_trajectory_builders() const = 0;
 
+  // 返回一个PoseGraphInterface的接口指针。PoseGraph用来进行Loop Closure。
   virtual mapping::PoseGraphInterface* pose_graph() = 0;
 
+  // 获取所有TrajectoryBuilder的配置项。
   virtual const std::vector<proto::TrajectoryBuilderOptionsWithSensorIds>&
   GetAllTrajectoryBuilderOptions() const = 0;
 };

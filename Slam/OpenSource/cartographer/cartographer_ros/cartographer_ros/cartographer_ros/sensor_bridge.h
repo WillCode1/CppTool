@@ -87,7 +87,7 @@ class SensorBridge {
   const int num_subdivisions_per_laser_scan_;
   std::map<std::string, cartographer::common::Time>
       sensor_to_previous_subdivision_time_;
-  const TfBridge tf_bridge_;
+  const TfBridge tf_bridge_;    // 通过TfBridge查询某一个传感器在某一个历史时刻的位姿。
   ::cartographer::mapping::TrajectoryBuilderInterface* const
       trajectory_builder_;
 

@@ -121,8 +121,7 @@ class PoseGraph : public PoseGraphInterface {
   virtual sensor::MapByTime<sensor::OdometryData> GetOdometryData() const = 0;
 
   // Returns the fixed frame pose data.
-  virtual sensor::MapByTime<sensor::FixedFramePoseData> GetFixedFramePoseData()
-      const = 0;
+  virtual sensor::MapByTime<sensor::FixedFramePoseData> GetFixedFramePoseData() const = 0;
 
   // Returns the landmark data.
   virtual std::map<std::string /* landmark ID */, PoseGraph::LandmarkNode>

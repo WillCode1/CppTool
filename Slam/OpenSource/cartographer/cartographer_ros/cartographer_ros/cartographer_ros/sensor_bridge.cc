@@ -72,6 +72,7 @@ void SensorBridge::HandleOdometryMessage(
   }
 }
 
+// Navigation Satellite fix(GPS)
 void SensorBridge::HandleNavSatFixMessage(
     const std::string& sensor_id, const sensor_msgs::NavSatFix::ConstPtr& msg) {
   const carto::common::Time time = FromRos(msg->header.stamp);
@@ -223,6 +224,7 @@ void SensorBridge::HandleLaserScan(
   }
 }
 
+// Rangefinder：测距仪(laser/RGBD/etc.)
 void SensorBridge::HandleRangefinder(
     const std::string& sensor_id, const carto::common::Time time,
     const std::string& frame_id, const carto::sensor::TimedPointCloud& ranges) {

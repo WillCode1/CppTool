@@ -213,10 +213,10 @@ class Node {
   };
 
   // These are keyed with 'trajectory_id'.
-  std::map<int, ::cartographer::mapping::PoseExtrapolator> extrapolators_;
+  std::map<int, ::cartographer::mapping::PoseExtrapolator> extrapolators_;  // 估计pose
   std::map<int, ::ros::Time> last_published_tf_stamps_;
-  std::unordered_map<int, TrajectorySensorSamplers> sensor_samplers_;
-  std::unordered_map<int, std::vector<Subscriber>> subscribers_;
+  std::unordered_map<int, TrajectorySensorSamplers> sensor_samplers_;   // 处理传感器
+  std::unordered_map<int, std::vector<Subscriber>> subscribers_;    // 消息订阅
   std::unordered_set<std::string> subscribed_topics_;
   std::unordered_set<int> trajectories_scheduled_for_finish_;
 

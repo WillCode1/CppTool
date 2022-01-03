@@ -76,8 +76,7 @@ void MaybeAddPureLocalizationTrimmer(
 
 MapBuilder::MapBuilder(const proto::MapBuilderOptions& options)
     : options_(options), thread_pool_(options.num_background_threads()) {
-  CHECK(options.use_trajectory_builder_2d() ^
-        options.use_trajectory_builder_3d());
+  CHECK(options.use_trajectory_builder_2d() ^ options.use_trajectory_builder_3d());
   if (options.use_trajectory_builder_2d()) {
     pose_graph_ = absl::make_unique<PoseGraph2D>(
         options_.pose_graph_options(),
@@ -92,13 +91,14 @@ MapBuilder::MapBuilder(const proto::MapBuilderOptions& options)
             options_.pose_graph_options().optimization_problem_options()),
         &thread_pool_);
   }
-  if (options.collate_by_trajectory()) {
+  if (options.collate_by_trajectory()) {//根据collate_by_trajectory的不同，CollatorInterface有两种不同的实现
     sensor_collator_ = absl::make_unique<sensor::TrajectoryCollator>();
   } else {
     sensor_collator_ = absl::make_unique<sensor::Collator>();
   }
 }
 
+//创建一个新的TrajectoryBuilder并返回它的trajectory_id.
 int MapBuilder::AddTrajectoryBuilder(
     const std::set<SensorId>& expected_sensor_ids,
     const proto::TrajectoryBuilderOptions& trajectory_options,
@@ -111,15 +111,25 @@ int MapBuilder::AddTrajectoryBuilder(
     pose_graph_odometry_motion_filter.emplace(
         MotionFilter(trajectory_options.pose_graph_odometry_motion_filter()));
   }
-
+  /*
+  * 可以看到，根据是2d建图还是3d建图分为了两种情况。
+  * 针对两种不同的情况，首先建立一个LocalTrajectoryBuilder2D或LocalTrajectoryBuilder3D的变量local_trajectory_builder；
+  * 这个类是不带Loop Closure的Local Slam, 包含了Pose Extrapolator, Scan Matching等；
+  * 但注意，这两个类并没有继承TrajectoryBuilder,并不是一个TrajectoryBuilder的实现，而只是一个工具类
+  * 真正地创建一个TrajectoryBuilder是在后面，trajectory_builders_的push_back函数里面。
+  * 其中CollatedTrajectoryBuilder继承了接口TrajectoryBuilder;
+  * 而前面生成的local_trajectory_builder则用于CreateGlobalTrajectoryBuilder2D函数的第一个参数，用于生成一个CollatedTrajectoryBuilder的智能指针
+  */
   if (options_.use_trajectory_builder_3d()) {
     std::unique_ptr<LocalTrajectoryBuilder3D> local_trajectory_builder;
+    //是否有跟该trajectory相关的参数，如果有就设置一下
     if (trajectory_options.has_trajectory_builder_3d_options()) {
       local_trajectory_builder = absl::make_unique<LocalTrajectoryBuilder3D>(
           trajectory_options.trajectory_builder_3d_options(),
           SelectRangeSensorIds(expected_sensor_ids));
     }
     DCHECK(dynamic_cast<PoseGraph3D*>(pose_graph_.get()));
+    //真正地创建一个TrajectoryBuilder
     trajectory_builders_.push_back(absl::make_unique<CollatedTrajectoryBuilder>(
         trajectory_options, sensor_collator_.get(), trajectory_id,
         expected_sensor_ids,
@@ -143,6 +153,7 @@ int MapBuilder::AddTrajectoryBuilder(
             static_cast<PoseGraph2D*>(pose_graph_.get()),
             local_slam_result_callback, pose_graph_odometry_motion_filter)));
   }
+  // ??
   MaybeAddPureLocalizationTrimmer(trajectory_id, trajectory_options,
                                   pose_graph_.get());
 

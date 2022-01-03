@@ -102,59 +102,53 @@ Node::Node(
     carto::metrics::RegisterAllMetrics(metrics_registry_.get());
   }
 
-  submap_list_publisher_ =
-      node_handle_.advertise<::cartographer_ros_msgs::SubmapList>(
-          kSubmapListTopic, kLatestOnlyPublisherQueueSize);
-  trajectory_node_list_publisher_ =
-      node_handle_.advertise<::visualization_msgs::MarkerArray>(
-          kTrajectoryNodeListTopic, kLatestOnlyPublisherQueueSize);
-  landmark_poses_list_publisher_ =
-      node_handle_.advertise<::visualization_msgs::MarkerArray>(
-          kLandmarkPosesListTopic, kLatestOnlyPublisherQueueSize);
-  constraint_list_publisher_ =
-      node_handle_.advertise<::visualization_msgs::MarkerArray>(
-          kConstraintListTopic, kLatestOnlyPublisherQueueSize);
+  /*
+  |-------kSubmapListTopic: 将构建的submap的list发布出来
+  |-------kTrajectoryNodeListTopic：trajectory的list发布出来
+  |-------kLandmarkPosesListTopic： Landmark的位姿list
+  |-------kConstraintListTopic: constraintlist发布
+  |-------kScanMatchedPointCloudTopic：匹配上的点云数据
+   */
+  submap_list_publisher_ = node_handle_.advertise<::cartographer_ros_msgs::SubmapList>(kSubmapListTopic, kLatestOnlyPublisherQueueSize);
+  trajectory_node_list_publisher_ = node_handle_.advertise<::visualization_msgs::MarkerArray>(kTrajectoryNodeListTopic, kLatestOnlyPublisherQueueSize);
+  landmark_poses_list_publisher_ = node_handle_.advertise<::visualization_msgs::MarkerArray>(kLandmarkPosesListTopic, kLatestOnlyPublisherQueueSize);
+  constraint_list_publisher_ =node_handle_.advertise<::visualization_msgs::MarkerArray>(kConstraintListTopic, kLatestOnlyPublisherQueueSize);
   if (node_options_.publish_tracked_pose) {
-    tracked_pose_publisher_ =
-        node_handle_.advertise<::geometry_msgs::PoseStamped>(
-            kTrackedPoseTopic, kLatestOnlyPublisherQueueSize);
+    tracked_pose_publisher_ = node_handle_.advertise<::geometry_msgs::PoseStamped>(kTrackedPoseTopic, kLatestOnlyPublisherQueueSize);
   }
-  service_servers_.push_back(node_handle_.advertiseService(
-      kSubmapQueryServiceName, &Node::HandleSubmapQuery, this));
-  service_servers_.push_back(node_handle_.advertiseService(
-      kTrajectoryQueryServiceName, &Node::HandleTrajectoryQuery, this));
-  service_servers_.push_back(node_handle_.advertiseService(
-      kStartTrajectoryServiceName, &Node::HandleStartTrajectory, this));
-  service_servers_.push_back(node_handle_.advertiseService(
-      kFinishTrajectoryServiceName, &Node::HandleFinishTrajectory, this));
-  service_servers_.push_back(node_handle_.advertiseService(
-      kWriteStateServiceName, &Node::HandleWriteState, this));
-  service_servers_.push_back(node_handle_.advertiseService(
-      kGetTrajectoryStatesServiceName, &Node::HandleGetTrajectoryStates, this));
-  service_servers_.push_back(node_handle_.advertiseService(
-      kReadMetricsServiceName, &Node::HandleReadMetrics, this));
 
-  scan_matched_point_cloud_publisher_ =
-      node_handle_.advertise<sensor_msgs::PointCloud2>(
-          kScanMatchedPointCloudTopic, kLatestOnlyPublisherQueueSize);
+  /*
+  |-------kSubmapQueryServiceName: 查询Submap
+  |-------kStartTrajectoryServiceName： 开始一段trajectory
+  |-------kFinishTrajectoryServiceName: 结束一段trajectory
+  |-------kWriteStateServiceName: 写状态
 
-  wall_timers_.push_back(node_handle_.createWallTimer(
-      ::ros::WallDuration(node_options_.submap_publish_period_sec),
-      &Node::PublishSubmapList, this));
+  错误纠正：
+    之前我对trajectory的理解有偏差，误以为trajectory是程序根据实际建图的情况自动生成的，一条trajectory与一个submap相对应。
+    后来在跟我的Leader请教后才发现自己理解错了。实际上，一条trajectory可以理解为一次建图过程。
+    如果只让机器人跑一圈，那么trajectory数就是1. 
+    但比如说，建好图后又需要在图中走，这时候可以增加一条trajectory，把这条trajectory设置成/src/cartographer/configuration_files/trajectory_builder.lua中的pure_localization设为true，
+    那么机器人再重新跑的过程中就会跟已经建好的图进行匹配，估计机器人在地图中的路径。所以，一次运行就代表了一条trajectory。
+   */
+  service_servers_.push_back(node_handle_.advertiseService(kSubmapQueryServiceName, &Node::HandleSubmapQuery, this));
+  service_servers_.push_back(node_handle_.advertiseService(kTrajectoryQueryServiceName, &Node::HandleTrajectoryQuery, this));
+  service_servers_.push_back(node_handle_.advertiseService(kStartTrajectoryServiceName, &Node::HandleStartTrajectory, this));
+  service_servers_.push_back(node_handle_.advertiseService(kFinishTrajectoryServiceName, &Node::HandleFinishTrajectory, this));
+  service_servers_.push_back(node_handle_.advertiseService(kWriteStateServiceName, &Node::HandleWriteState, this));
+  service_servers_.push_back(node_handle_.advertiseService(kGetTrajectoryStatesServiceName, &Node::HandleGetTrajectoryStates, this));
+  service_servers_.push_back(node_handle_.advertiseService(kReadMetricsServiceName, &Node::HandleReadMetrics, this));
+
+  //又发布了一个跟点云相关的Topic
+  scan_matched_point_cloud_publisher_ = node_handle_.advertise<sensor_msgs::PointCloud2>(kScanMatchedPointCloudTopic, kLatestOnlyPublisherQueueSize);
+
+  //一个存储::ros::WallTimer类型的vector
+  wall_timers_.push_back(node_handle_.createWallTimer(::ros::WallDuration(node_options_.submap_publish_period_sec), &Node::PublishSubmapList, this));
   if (node_options_.pose_publish_period_sec > 0) {
-    publish_local_trajectory_data_timer_ = node_handle_.createTimer(
-        ::ros::Duration(node_options_.pose_publish_period_sec),
-        &Node::PublishLocalTrajectoryData, this);
+    publish_local_trajectory_data_timer_ = node_handle_.createTimer(::ros::Duration(node_options_.pose_publish_period_sec), &Node::PublishLocalTrajectoryData, this);
   }
-  wall_timers_.push_back(node_handle_.createWallTimer(
-      ::ros::WallDuration(node_options_.trajectory_publish_period_sec),
-      &Node::PublishTrajectoryNodeList, this));
-  wall_timers_.push_back(node_handle_.createWallTimer(
-      ::ros::WallDuration(node_options_.trajectory_publish_period_sec),
-      &Node::PublishLandmarkPosesList, this));
-  wall_timers_.push_back(node_handle_.createWallTimer(
-      ::ros::WallDuration(kConstraintPublishPeriodSec),
-      &Node::PublishConstraintList, this));
+  wall_timers_.push_back(node_handle_.createWallTimer(::ros::WallDuration(node_options_.trajectory_publish_period_sec), &Node::PublishTrajectoryNodeList, this));
+  wall_timers_.push_back(node_handle_.createWallTimer(::ros::WallDuration(node_options_.trajectory_publish_period_sec), &Node::PublishLandmarkPosesList, this));
+  wall_timers_.push_back(node_handle_.createWallTimer(::ros::WallDuration(kConstraintPublishPeriodSec), &Node::PublishConstraintList, this));
 }
 
 Node::~Node() { FinishAllTrajectories(); }
@@ -399,6 +393,12 @@ int Node::AddTrajectory(const TrajectoryOptions& options) {
       expected_sensor_ids = ComputeExpectedSensorIds(options);
   const int trajectory_id =
       map_builder_bridge_.AddTrajectory(expected_sensor_ids, options);
+  /*
+    同时，每增加一条轨迹，都需要给该轨迹增加必要的处理，
+    比如添加位姿估计的AddExtrapolator，
+    设置传感器的AddSensorSamplers，
+    用来订阅必要的Topic以接收数据的LaunchSubscribers等。
+   */
   AddExtrapolator(trajectory_id, options);
   AddSensorSamplers(trajectory_id, options);
   LaunchSubscribers(options, trajectory_id);
@@ -413,6 +413,11 @@ int Node::AddTrajectory(const TrajectoryOptions& options) {
 
 void Node::LaunchSubscribers(const TrajectoryOptions& options,
                              const int trajectory_id) {
+  /* 
+    都是在订阅传感器发布的消息。
+    可以看到有Laser, MultiEchoLaser, PointCloud2, IMU, Odometry, NavSatFixMessage, Landmark等，其中后三项是用if来判断该传感器使用情况。
+    所以不同的应用场景需要不同地修改配置文件。
+   */
   for (const std::string& topic :
        ComputeRepeatedTopicNames(kLaserScanTopic, options.num_laser_scans)) {
     subscribers_[trajectory_id].push_back(
@@ -438,8 +443,7 @@ void Node::LaunchSubscribers(const TrajectoryOptions& options,
          topic});
   }
 
-  // For 2D SLAM, subscribe to the IMU if we expect it. For 3D SLAM, the IMU is
-  // required.
+  // For 2D SLAM, subscribe to the IMU if we expect it. For 3D SLAM, the IMU is required.
   if (node_options_.map_builder_options.use_trajectory_builder_3d() ||
       (node_options_.map_builder_options.use_trajectory_builder_2d() &&
        options.trajectory_builder_options.trajectory_builder_2d_options()
@@ -522,6 +526,12 @@ cartographer_ros_msgs::StatusResponse Node::TrajectoryStateToStatus(
 
 cartographer_ros_msgs::StatusResponse Node::FinishTrajectoryUnderLock(
     const int trajectory_id) {
+  /*
+    前面检查了一下是否可以关掉，指定id是否存在，是否已经被Finished了等情况后.
+    如果一切正常，则停止订阅Topic、清除id及其他与该trajectory相关的量.
+    最后调用map_builder_bridge_中的FinishTrajectory函数。
+    最后交给了cartographer这个包中的MapBuilder去处理.
+   */
   cartographer_ros_msgs::StatusResponse status_response;
   if (trajectories_scheduled_for_finish_.count(trajectory_id)) {
     status_response.message = absl::StrCat("Trajectory ", trajectory_id,

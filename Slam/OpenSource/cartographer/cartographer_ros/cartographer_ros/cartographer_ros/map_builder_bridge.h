@@ -53,15 +53,16 @@ class MapBuilderBridge {
     // Contains the trajectory data received from local SLAM, after
     // it had processed accumulated 'range_data_in_local' and estimated
     // current 'local_pose' at 'time'.
+    // 该结构体存储的是local SLAM处理后的结果。由range_data_in_local中已经估计出了在时刻time时的当前local_pose
     struct LocalSlamData {
       ::cartographer::common::Time time;
-      ::cartographer::transform::Rigid3d local_pose;
-      ::cartographer::sensor::RangeData range_data_in_local;
+      ::cartographer::transform::Rigid3d local_pose;    //优化匹配出来的local_pose——在submap这个局部坐标系中的位姿
+      ::cartographer::sensor::RangeData range_data_in_local;    //激光数据
     };
     std::shared_ptr<const LocalSlamData> local_slam_data;
-    cartographer::transform::Rigid3d local_to_map;
-    std::unique_ptr<cartographer::transform::Rigid3d> published_to_tracking;
-    TrajectoryOptions trajectory_options;
+    cartographer::transform::Rigid3d local_to_map;  //submap到global map的坐标变换关系
+    std::unique_ptr<cartographer::transform::Rigid3d> published_to_tracking; //猜测是要输入PoseExtrapolator（“详见Cartographer源码阅读1——整体框架介绍”中的第一个图）中与IMU、里程计等数据融合来估计位姿的。
+    TrajectoryOptions trajectory_options;   //配置参数
   };
 
   MapBuilderBridge(
@@ -117,7 +118,7 @@ class MapBuilderBridge {
   std::unique_ptr<cartographer::mapping::MapBuilderInterface> map_builder_;
   tf2_ros::Buffer* const tf_buffer_;
 
-  std::unordered_map<std::string /* landmark ID */, int> landmark_to_index_;
+  std::unordered_map<std::string /* landmark ID */, int> landmark_to_index_; //跟landmark相关，其中std::string变量表征landmark的ID
 
   // These are keyed with 'trajectory_id'.
   std::unordered_map<int, TrajectoryOptions> trajectory_options_;
