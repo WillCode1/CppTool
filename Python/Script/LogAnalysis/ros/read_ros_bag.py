@@ -6,9 +6,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import math
-from Tool import matrix_tool as mt
-
-path = '/home/diwei/catkin_ws/src/robot_pose_ekf/test/'
+from Script.LogAnalysis.Tool import matrix_tool as mt
 
 
 def preview_data(pandas_data):
@@ -71,13 +69,26 @@ def draw_track_by_topic(ros_bag, topic: str, color: str, label: str, reference=N
 
 
 if __name__ == '__main__':
-    bag = bagreader(path + 'ekf_pose.bag')
+    is_test = True
+    # is_test = False
+
+    if is_test:
+        path = '/home/diwei/.ros/'
+        bag = bagreader(path + 'ekf_pose_record.bag')
+    else:
+        path = '/home/diwei/catkin_ws/src/robot_pose_ekf/bagfiles/'
+        # bag = bagreader(path + 'oneloop/8309_2022-01-03-21-01-39.bag')
+        bag = bagreader(path + 'oneloop/front_desk_1F_1_2022-01-03-21-04-03.bag')
     # preview_data(bag)
 
     odom = draw_track_by_topic(bag, '/peter_motor_core/odom', 'blue', 'odom')
     draw_track_by_topic(bag, '/odom_rf2o', 'red', 'lo', odom)
     draw_track_by_topic(bag, '/sf', 'gray', 'sf', odom)
-    draw_track_by_topic(bag, '/robot_pose_ekf/odom', 'orange', 'ekf', odom)
+    if is_test:
+        draw_track_by_topic(bag, '/robot_pose_ekf/odom', 'orange', 'ekf', odom)
+    else:
+        # draw_track_by_topic(bag, '/robot_pose_ekf/odom', 'orange', 'ekf', odom)
+        draw_track_by_topic(bag, '/map_server/robot_pose', 'black', 'global', odom)
 
     # plt.axis([x.min(), x.max(), y.min(), y.max()])
     plt.xlim(x_range[0], x_range[1])
@@ -86,6 +97,6 @@ if __name__ == '__main__':
     plt.ylabel("y")
     plt.title("track_compare")
     plt.legend()
-    # plt.savefig(path + 'track_compare.png')
+    plt.savefig(path + 'track_compare.png')
     plt.show()
 
