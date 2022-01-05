@@ -45,12 +45,13 @@ struct TrajectoryNode {
   struct Data {
     common::Time time;
 
-    // Transform to approximately gravity align the tracking frame as
-    // determined by local SLAM.
+    // Transform to approximately gravity align the tracking frame as determined by local SLAM.
+    // 一个表示旋转矩阵的四元数。该旋转矩阵将非水平面的传感器数据投射到水平面上
+    // 利用IMU的重力传感器可计算出该旋转矩阵
     Eigen::Quaterniond gravity_alignment;
 
-    // Used for loop closure in 2D: voxel filtered returns in the
-    // 'gravity_alignment' frame.
+    // Used for loop closure in 2D: voxel filtered returns in the 'gravity_alignment' frame.
+    // 经过水平投射后的点云数据，可用于2D情况下做Loop Closure.
     sensor::PointCloud filtered_gravity_aligned_point_cloud;
 
     // Used for loop closure in 3D.

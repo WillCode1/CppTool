@@ -45,12 +45,16 @@ class LocalSlamResultData;
 // global SLAM stack, i.e. local SLAM for initial pose estimates, scan matching
 // to detect loop closure, and a sparse pose graph optimization to compute
 // optimized pose estimates.
+/*
+  此接口可用于2D和3D SLAM。 实现连接一个全局SLAM堆栈，即局部SLAM用于初始姿态估计，
+  扫描匹配检测环路闭合，以及稀疏位姿图优化计算优化的姿态估计。
+ */ 
 class TrajectoryBuilderInterface {
  public:
   struct InsertionResult {
     NodeId node_id;
-    std::shared_ptr<const TrajectoryNode::Data> constant_data;
-    std::vector<std::shared_ptr<const Submap>> insertion_submaps;
+    std::shared_ptr<const TrajectoryNode::Data> constant_data;  //TrajectoryNode::Data包含了经过处理的一帧传感器数据
+    std::vector<std::shared_ptr<const Submap>> insertion_submaps; //已经建立起来的子图列表
   };
 
   // A callback which is called after local SLAM processes an accumulated

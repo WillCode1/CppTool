@@ -73,12 +73,14 @@ class Grid2D : public GridInterface {
 
   // Fills in 'offset' and 'limits' to define a subregion of that contains all
   // known cells.
+  // 进行一下裁剪。裁剪一个subregion，使得该subregion包含了所有的已有概率值的cells
   void ComputeCroppedLimits(Eigen::Array2i* const offset,
                             CellLimits* const limits) const;
 
   // Grows the map as necessary to include 'point'. This changes the meaning of
   // these coordinates going forward. This method must be called immediately
   // after 'FinishUpdate', before any calls to 'ApplyLookupTable'.
+  // 必要时grow我们的submap
   virtual void GrowLimits(const Eigen::Vector2f& point);
 
   virtual std::unique_ptr<Grid2D> ComputeCroppedGrid() const = 0;
@@ -116,13 +118,15 @@ class Grid2D : public GridInterface {
   }
 
  private:
+  // probability表示一个pixel坐标被occupied的概率； probability + correspondence_cost = 1
   MapLimits limits_;
-  std::vector<uint16> correspondence_cost_cells_;
-  float min_correspondence_cost_;
+  std::vector<uint16> correspondence_cost_cells_; // 存储概率值，这里的概率值是Free的概率值
+  float min_correspondence_cost_; // 分别是一个pixel坐标是否不被occupied的概率的最小最大值
   float max_correspondence_cost_;
   std::vector<int> update_indices_;
 
   // Bounding box of known cells to efficiently compute cropping limits.
+  // 维护一个已知概率值的所有cells的盒子。方便计算裁剪范围
   Eigen::AlignedBox2i known_cells_box_;
   const std::vector<float>* value_to_correspondence_cost_table_;
 };

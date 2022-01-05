@@ -62,7 +62,7 @@ class Submap2D : public Submap {
   void Finish();
 
  private:
-  std::unique_ptr<Grid2D> grid_;
+  std::unique_ptr<Grid2D> grid_;  // 存储栅格化图上的概率值
   ValueConversionTables* conversion_tables_;
 };
 

@@ -66,6 +66,7 @@ class MapLimits {
   // Returns the index of the cell containing the 'point' which may be outside
   // the map, i.e., negative or too large indices that will return false for
   // Contains().
+  // 给出一个point在Submap中的坐标，求其pixel坐标
   Eigen::Array2i GetCellIndex(const Eigen::Vector2f& point) const {
     // Index values are row major and the top left has Eigen::Array2i::Zero()
     // and contains (centered_max_x, centered_max_y). We need to flip and
@@ -90,9 +91,9 @@ class MapLimits {
   }
 
  private:
-  double resolution_;
-  Eigen::Vector2d max_;
-  CellLimits cell_limits_;
+  double resolution_;       // 分辨率 程序中设置是0.05m.也就是5cm
+  Eigen::Vector2d max_;     // 表示x、y方向的最大值
+  CellLimits cell_limits_;  // 栅格化后的x和y方向的格子数
 };
 
 inline proto::MapLimits ToProto(const MapLimits& map_limits) {

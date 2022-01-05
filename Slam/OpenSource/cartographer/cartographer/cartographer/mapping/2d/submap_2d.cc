@@ -139,14 +139,14 @@ void Submap2D::InsertRangeData(
     const RangeDataInserterInterface* range_data_inserter) {
   CHECK(grid_);
   CHECK(!insertion_finished());
-  range_data_inserter->Insert(range_data, grid_.get());
+  range_data_inserter->Insert(range_data, grid_.get()); //调用RangeDataInserterInterface来更新概率图
   set_num_range_data(num_range_data() + 1);
 }
 
 void Submap2D::Finish() {
   CHECK(grid_);
   CHECK(!insertion_finished());
-  grid_ = grid_->ComputeCroppedGrid();
+  grid_ = grid_->ComputeCroppedGrid();  //计算裁剪栅格图
   set_insertion_finished(true);
 }
 

@@ -56,6 +56,11 @@ inline uint8 ProbabilityToLogOddsInteger(const float probability) {
 // track of how many range data were inserted into it, and sets
 // 'insertion_finished' when the map no longer changes and is ready for loop
 // closing.
+/*
+  一个子图，首先要有一个local_pose。这个local_pose可以看做是没有经过全局优化的该submap相对于世界坐标系的位姿。
+  一张子图要不停地监视有多少range data（这里的range data我理解的就是点云）被插入到这个submap中。
+  当没有range data插入时，则设置成员变量finished_为真，然后开始做Loop Closure。
+ */
 class Submap {
  public:
   Submap(const transform::Rigid3d& local_submap_pose)
