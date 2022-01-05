@@ -53,10 +53,9 @@ std::vector<std::string> SelectRangeSensorIds(
   return range_sensor_ids;
 }
 
-void MaybeAddPureLocalizationTrimmer(
-    const int trajectory_id,
-    const proto::TrajectoryBuilderOptions& trajectory_options,
-    PoseGraph* pose_graph) {
+void MaybeAddPureLocalizationTrimmer(const int trajectory_id,
+    const proto::TrajectoryBuilderOptions& trajectory_options, PoseGraph* pose_graph) {
+  // 如果开启纯定位功能，看到这里我觉得可能cartographer还是保留了纯定位的功能的
   if (trajectory_options.pure_localization()) {
     LOG(WARNING)
         << "'TrajectoryBuilderOptions::pure_localization' field is deprecated. "
@@ -98,6 +97,16 @@ MapBuilder::MapBuilder(const proto::MapBuilderOptions& options)
   }
 }
 
+/*
+  MapBuilder::AddTrajectoryBuilder这个函数可以说是cartographer中最重要的一个函数
+
+  一个MapBuilder的类对应了一次建图过程，
+  在整个建图过程中，用于全局优化的PoseGraph的对象只有一个，即pose_graph_，而这个变量是在构造函数中就生成了。
+  在AddTrajectorybuilder函数中只需要检查一下pose_graph_是否符合PoseGraph2D或PoseGraph3D的情况。
+  而一个trajectory对应了机器人运行一圈。在图建好后机器人可能多次运行。
+  每一次运行都是新增一条trajectory，因此，需要动态地维护一个trajectory的列表。
+  每生成一个trajectory时都是调用AddTrajectoryBuilder来创建的。
+ */
 //创建一个新的TrajectoryBuilder并返回它的trajectory_id.
 int MapBuilder::AddTrajectoryBuilder(
     const std::set<SensorId>& expected_sensor_ids,
@@ -153,10 +162,13 @@ int MapBuilder::AddTrajectoryBuilder(
             static_cast<PoseGraph2D*>(pose_graph_.get()),
             local_slam_result_callback, pose_graph_odometry_motion_filter)));
   }
-  // ??
-  MaybeAddPureLocalizationTrimmer(trajectory_id, trajectory_options,
-                                  pose_graph_.get());
+  MaybeAddPureLocalizationTrimmer(trajectory_id, trajectory_options, pose_graph_.get());
 
+  // 如果该轨迹有初始pose；开始一条轨迹前我们是否已知初始位姿。
+  // 这对应的情况就是比如说，我们检测到了一个Landmark。那么这时，我们可以新增加一条trajectory，
+  // 增加新的trajectory时设置has.initial_trajectory_pose为真，
+  // 然后根据机器人与Landmark之间的相对位姿推算机器人相对于世界坐标系的相对位姿。
+  // 以该位姿作为新增加的trajectory的初始位姿。这样情况下，在检测到Landmark时就能有效降低累积误差。
   if (trajectory_options.has_initial_trajectory_pose()) {
     const auto& initial_trajectory_pose =
         trajectory_options.initial_trajectory_pose();
@@ -165,6 +177,7 @@ int MapBuilder::AddTrajectoryBuilder(
         transform::ToRigid3(initial_trajectory_pose.relative_pose()),
         common::FromUniversal(initial_trajectory_pose.timestamp()));
   }
+  //将一些跟传感器相关的配置项转成proto流，然后统一放到all_trajectory_builder_options_这个向量列表中
   proto::TrajectoryBuilderOptionsWithSensorIds options_with_sensor_ids_proto;
   for (const auto& sensor_id : expected_sensor_ids) {
     *options_with_sensor_ids_proto.add_sensor_id() = ToProto(sensor_id);
@@ -176,21 +189,26 @@ int MapBuilder::AddTrajectoryBuilder(
   return trajectory_id;
 }
 
+//从序列化的数据中构造一条trajectory
 int MapBuilder::AddTrajectoryForDeserialization(
     const proto::TrajectoryBuilderOptionsWithSensorIds&
         options_with_sensor_ids_proto) {
   const int trajectory_id = trajectory_builders_.size();
-  trajectory_builders_.emplace_back();
+  trajectory_builders_.emplace_back();  //这里emplace_back里怎么没有参数呢？
   all_trajectory_builder_options_.push_back(options_with_sensor_ids_proto);
   CHECK_EQ(trajectory_builders_.size(), all_trajectory_builder_options_.size());
   return trajectory_id;
 }
 
+//结束一条轨迹
 void MapBuilder::FinishTrajectory(const int trajectory_id) {
+  //清除对传感器的占用等操作
   sensor_collator_->FinishTrajectory(trajectory_id);
+  //完成对trajectory的全局优化
   pose_graph_->FinishTrajectory(trajectory_id);
 }
 
+// 根据指定的submap_id来查询submap，把结果放到SubmapQuery::Response中
 std::string MapBuilder::SubmapToProto(
     const SubmapId& submap_id, proto::SubmapQuery::Response* const response) {
   if (submap_id.trajectory_id < 0 ||
@@ -201,6 +219,7 @@ std::string MapBuilder::SubmapToProto(
   }
 
   const auto submap_data = pose_graph_->GetSubmapData(submap_id);
+  //一些子图可能在优化过程中被裁掉
   if (submap_data.submap == nullptr) {
     return "Requested submap " + std::to_string(submap_id.submap_index) +
            " from trajectory " + std::to_string(submap_id.trajectory_id) +
@@ -210,6 +229,7 @@ std::string MapBuilder::SubmapToProto(
   return "";
 }
 
+//调用io::WritePbStream工具，保存所有数据
 void MapBuilder::SerializeState(bool include_unfinished_submaps,
                                 io::ProtoStreamWriterInterface* const writer) {
   io::WritePbStream(*pose_graph_, all_trajectory_builder_options_, writer,
@@ -224,23 +244,21 @@ bool MapBuilder::SerializeStateToFile(bool include_unfinished_submaps,
   return (writer.Close());
 }
 
+// 从一个proto流中加载SLAM状态
 std::map<int, int> MapBuilder::LoadState(
     io::ProtoStreamReaderInterface* const reader, bool load_frozen_state) {
   io::ProtoStreamDeserializer deserializer(reader);
 
-  // Create a copy of the pose_graph_proto, such that we can re-write the
-  // trajectory ids.
+  // Create a copy of the pose_graph_proto, such that we can re-write the trajectory ids.
   proto::PoseGraph pose_graph_proto = deserializer.pose_graph();
-  const auto& all_builder_options_proto =
-      deserializer.all_trajectory_builder_options();
+  const auto& all_builder_options_proto = deserializer.all_trajectory_builder_options();
 
+  //逐条trajectory恢复
   std::map<int, int> trajectory_remapping;
   for (int i = 0; i < pose_graph_proto.trajectory_size(); ++i) {
     auto& trajectory_proto = *pose_graph_proto.mutable_trajectory(i);
-    const auto& options_with_sensor_ids_proto =
-        all_builder_options_proto.options_with_sensor_ids(i);
-    const int new_trajectory_id =
-        AddTrajectoryForDeserialization(options_with_sensor_ids_proto);
+    const auto& options_with_sensor_ids_proto = all_builder_options_proto.options_with_sensor_ids(i);
+    const int new_trajectory_id = AddTrajectoryForDeserialization(options_with_sensor_ids_proto);
     CHECK(trajectory_remapping
               .emplace(trajectory_proto.trajectory_id(), new_trajectory_id)
               .second)
@@ -252,6 +270,7 @@ std::map<int, int> MapBuilder::LoadState(
   }
 
   // Apply the calculated remapping to constraints in the pose graph proto.
+  //恢复trajectory上的节点间的约束关系
   for (auto& constraint_proto : *pose_graph_proto.mutable_constraint()) {
     constraint_proto.mutable_submap_id()->set_trajectory_id(
         trajectory_remapping.at(constraint_proto.submap_id().trajectory_id()));
@@ -259,6 +278,7 @@ std::map<int, int> MapBuilder::LoadState(
         trajectory_remapping.at(constraint_proto.node_id().trajectory_id()));
   }
 
+  //恢复Submap
   MapById<SubmapId, transform::Rigid3d> submap_poses;
   for (const proto::Trajectory& trajectory_proto :
        pose_graph_proto.trajectory()) {
@@ -270,9 +290,9 @@ std::map<int, int> MapBuilder::LoadState(
     }
   }
 
+  //恢复节点的pose
   MapById<NodeId, transform::Rigid3d> node_poses;
-  for (const proto::Trajectory& trajectory_proto :
-       pose_graph_proto.trajectory()) {
+  for (const proto::Trajectory& trajectory_proto : pose_graph_proto.trajectory()) {
     for (const proto::Trajectory::Node& node_proto : trajectory_proto.node()) {
       node_poses.Insert(
           NodeId{trajectory_proto.trajectory_id(), node_proto.node_index()},
@@ -281,6 +301,7 @@ std::map<int, int> MapBuilder::LoadState(
   }
 
   // Set global poses of landmarks.
+  // 设置Landmark
   for (const auto& landmark : pose_graph_proto.landmark_poses()) {
     pose_graph_->SetLandmarkPose(landmark.landmark_id(),
                                  transform::ToRigid3(landmark.global_pose()),
@@ -295,6 +316,7 @@ std::map<int, int> MapBuilder::LoadState(
            "Cartographer documentation for details. ";
   }
 
+  //不停读取，直到读完
   SerializedData proto;
   while (deserializer.ReadNextSerializedData(&proto)) {
     switch (proto.data_case()) {
@@ -371,10 +393,8 @@ std::map<int, int> MapBuilder::LoadState(
   if (load_frozen_state) {
     // Add information about which nodes belong to which submap.
     // This is required, even without constraints.
-    for (const proto::PoseGraph::Constraint& constraint_proto :
-         pose_graph_proto.constraint()) {
-      if (constraint_proto.tag() !=
-          proto::PoseGraph::Constraint::INTRA_SUBMAP) {
+    for (const proto::PoseGraph::Constraint& constraint_proto : pose_graph_proto.constraint()) {
+      if (constraint_proto.tag() != proto::PoseGraph::Constraint::INTRA_SUBMAP) {
         continue;
       }
       pose_graph_->AddNodeToSubmap(
@@ -387,8 +407,7 @@ std::map<int, int> MapBuilder::LoadState(
     // When loading unfrozen trajectories, 'AddSerializedConstraints' will
     // take care of adding information about which nodes belong to which
     // submap.
-    pose_graph_->AddSerializedConstraints(
-        FromProto(pose_graph_proto.constraint()));
+    pose_graph_->AddSerializedConstraints(FromProto(pose_graph_proto.constraint()));
   }
   CHECK(reader->eof());
   return trajectory_remapping;
