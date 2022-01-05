@@ -30,6 +30,8 @@ namespace mapping {
 
 // Wires up the complete SLAM stack with TrajectoryBuilders (for local submaps)
 // and a PoseGraph for loop closure.
+// MapBuilder是cartographer算法的最顶层设计，MapBuilder包括了两个部分
+// 使用TrajectoryBuilders(用于局部子地图)和PoseGraph(用于闭环检测)将完整的SLAM堆栈连接起来。
 class MapBuilder : public MapBuilderInterface {
  public:
   explicit MapBuilder(const proto::MapBuilderOptions &options);
@@ -72,8 +74,7 @@ class MapBuilder : public MapBuilderInterface {
     return trajectory_builders_.size();
   }
 
-  mapping::TrajectoryBuilderInterface *GetTrajectoryBuilder(
-      int trajectory_id) const override {
+  mapping::TrajectoryBuilderInterface *GetTrajectoryBuilder(int trajectory_id) const override {
     return trajectory_builders_.at(trajectory_id).get();
   }
 
@@ -83,20 +84,24 @@ class MapBuilder : public MapBuilderInterface {
   }
 
  private:
-  const proto::MapBuilderOptions options_;
+  /*
+    trajectory是机器人跑一圈时的轨迹，在这其中需要记录和维护传感器的数据。
+    根据这个trajectory上传感器收集的数据，我们可以逐步构建出栅格化的地图Submap，
+    但这个submap会随着时间或trajectory的增长而产生误差累积，但trajectory增长到超过一个阈值，则会新增一个submap。
+    而PoseGraph是用来进行全局优化，将所有的Submap紧紧tie在一起，构成一个全局的Map，消除误差累积。
+   */
+  const proto::MapBuilderOptions options_;  //MapBuilder的配置项
   common::ThreadPool thread_pool_;
 
   std::unique_ptr<PoseGraph> pose_graph_;
 
-  std::unique_ptr<sensor::CollatorInterface> sensor_collator_;
-  std::vector<std::unique_ptr<mapping::TrajectoryBuilderInterface>>
-      trajectory_builders_;
-  std::vector<proto::TrajectoryBuilderOptionsWithSensorIds>
-      all_trajectory_builder_options_;
+  std::unique_ptr<sensor::CollatorInterface> sensor_collator_;  //收集传感器数
+  // 每一个TrajectoryBuilder对应了机器人运行了一圈。这个向量列表就管理了整个图中的所有submap。
+  std::vector<std::unique_ptr<mapping::TrajectoryBuilderInterface>> trajectory_builders_;
+  std::vector<proto::TrajectoryBuilderOptionsWithSensorIds> all_trajectory_builder_options_;
 };
 
-std::unique_ptr<MapBuilderInterface> CreateMapBuilder(
-    const proto::MapBuilderOptions& options);
+std::unique_ptr<MapBuilderInterface> CreateMapBuilder(const proto::MapBuilderOptions& options);
 
 }  // namespace mapping
 }  // namespace cartographer
