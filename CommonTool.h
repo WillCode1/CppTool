@@ -1,4 +1,7 @@
 /* Author: Will Di */
+#ifndef __COMMON_TOOL__
+#define __COMMON_TOOL__
+
 #include <cmath>
 #include <math.h>
 
@@ -171,6 +174,8 @@ struct Pose3d
   EulerAngle euler;
   Quaternion quat;
 };
+
+#endif
 
 //=============test==============
 #if 0
