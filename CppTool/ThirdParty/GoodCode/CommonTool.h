@@ -2,8 +2,13 @@
 #ifndef __COMMON_TOOL__
 #define __COMMON_TOOL__
 
+#include <iostream>
 #include <cmath>
-#include <math.h>
+
+#define M_PI 3.14159265358979323846
+
+//using Pose2d = Eigen::Isometry2d;
+//using Pose3d = Eigen::Isometry3d;
 
 double RadianToAngle(const double &dRadian)
 {

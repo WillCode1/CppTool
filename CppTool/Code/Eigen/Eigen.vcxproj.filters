@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Common.cpp" />
+    <ClCompile Include="MatrixAndVector.cpp" />
+    <ClCompile Include="Pose.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Common.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="MatrixAndVector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="Pose.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{50032b39-ea93-46b6-91f0-b81b5cd6bc5f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
