@@ -74,8 +74,7 @@ class CollatedTrajectoryBuilder : public TrajectoryBuilderInterface {
       AddData(sensor::MakeDispatchable(sensor_id, fixed_frame_pose_data));
       return;
     }
-    wrapped_trajectory_builder_->AddSensorData(sensor_id,
-                                               fixed_frame_pose_data);
+    wrapped_trajectory_builder_->AddSensorData(sensor_id, fixed_frame_pose_data);
   }
 
   void AddSensorData(const std::string& sensor_id,
@@ -102,7 +101,7 @@ class CollatedTrajectoryBuilder : public TrajectoryBuilderInterface {
   const bool collate_landmarks_;
   const bool collate_fixed_frame_;
   const int trajectory_id_;
-  std::unique_ptr<TrajectoryBuilderInterface> wrapped_trajectory_builder_;
+  std::unique_ptr<TrajectoryBuilderInterface> wrapped_trajectory_builder_;  // GlobalTrajectoryBuilder
 
   // Time at which we last logged the rates of incoming sensor data.
   std::chrono::steady_clock::time_point last_logging_time_;

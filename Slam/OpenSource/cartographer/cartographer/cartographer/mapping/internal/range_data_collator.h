@@ -30,6 +30,11 @@ namespace mapping {
 // timing. Up to one message per sensor is buffered, so a delay of the period of
 // the slowest sensor may be introduced, which can be alleviated by passing
 // subdivisions.
+/*
+  同步来自不同传感器的TimedPointCloudData。
+  输入只需要在'TimedPointCloudData::time'中是单调的，输出在逐点计时中是单调的。
+  每个传感器最多可以缓冲一个消息，因此可以引入最慢传感器的周期延迟，这可以通过通过细分来缓解。
+ */
 class RangeDataCollator {
  public:
   explicit RangeDataCollator(

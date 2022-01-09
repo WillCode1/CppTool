@@ -33,6 +33,10 @@ namespace mapping {
 // Keep poses for a certain duration to estimate linear and angular velocity.
 // Uses the velocities to extrapolate motion. Uses IMU and/or odometry data if
 // available to improve the extrapolation.
+/*
+  保持姿势一段时间，估计线速度和角速度。用速度推断运动。
+  使用IMU和/或里程计数据(如果有的话)来改进推断。
+ */
 class PoseExtrapolator : public PoseExtrapolatorInterface {
  public:
   explicit PoseExtrapolator(common::Duration pose_queue_duration,
@@ -76,7 +80,8 @@ class PoseExtrapolator : public PoseExtrapolatorInterface {
     common::Time time;
     transform::Rigid3d pose;
   };
-  std::deque<TimedPose> timed_pose_queue_;
+  std::deque<TimedPose> timed_pose_queue_;  //存储要持续跟踪的Poses,应该是从ScanMatching输出的PoseObservation
+  // 从持续跟踪一段时间的Pose队列中估计出来的线/角速度，初始化为0
   Eigen::Vector3d linear_velocity_from_poses_ = Eigen::Vector3d::Zero();
   Eigen::Vector3d angular_velocity_from_poses_ = Eigen::Vector3d::Zero();
 
@@ -85,9 +90,13 @@ class PoseExtrapolator : public PoseExtrapolatorInterface {
   std::unique_ptr<ImuTracker> imu_tracker_;
   std::unique_ptr<ImuTracker> odometry_imu_tracker_;
   std::unique_ptr<ImuTracker> extrapolation_imu_tracker_;
-  TimedPose cached_extrapolated_pose_;
+  // imu_tracker_是存放由IMU数据得到的信息
+  // odometry_imu_tracker_是存放由里程计得到的信息
+  // extrapolation_imu_tracker_是存放经过数据融合后的结果
+  TimedPose cached_extrapolated_pose_;  //缓存的一个带时间的Pose
 
   std::deque<sensor::OdometryData> odometry_data_;
+  // 从里程计获取到的线/角速度，初始化为0
   Eigen::Vector3d linear_velocity_from_odometry_ = Eigen::Vector3d::Zero();
   Eigen::Vector3d angular_velocity_from_odometry_ = Eigen::Vector3d::Zero();
 };

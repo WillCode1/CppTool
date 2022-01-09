@@ -29,6 +29,11 @@ namespace sensor {
 // detected. 'misses' are points in the direction of rays for which no return
 // was detected, and were inserted at a configured distance. It is assumed that
 // between the 'origin' and 'misses' is free space.
+/*
+  射线从“origin”开始。“returns”指的是发现障碍物的点。
+  “misses”指的是在光线方向上没有检测到返回的点，并按设定的距离插入。
+  假设在“origin”和“misses”之间是自由空间。
+ */
 struct RangeData {
   Eigen::Vector3f origin;
   PointCloud returns;

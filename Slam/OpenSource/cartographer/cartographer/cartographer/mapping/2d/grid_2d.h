@@ -83,6 +83,7 @@ class Grid2D : public GridInterface {
   // 必要时grow我们的submap
   virtual void GrowLimits(const Eigen::Vector2f& point);
 
+  // 得到一个裁剪后的栅格图
   virtual std::unique_ptr<Grid2D> ComputeCroppedGrid() const = 0;
 
   virtual proto::Grid2D ToProto() const;

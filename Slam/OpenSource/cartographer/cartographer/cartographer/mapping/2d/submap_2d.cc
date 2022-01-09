@@ -161,6 +161,7 @@ std::vector<std::shared_ptr<const Submap2D>> ActiveSubmaps2D::submaps() const {
 std::vector<std::shared_ptr<const Submap2D>> ActiveSubmaps2D::InsertRangeData(
     const sensor::RangeData& range_data) {
   if (submaps_.empty() ||
+      //如果插入的RangeData达到一定数量，则重新添加一个submap
       submaps_.back()->num_range_data() == options_.num_range_data()) {
     AddSubmap(range_data.origin.head<2>());
   }

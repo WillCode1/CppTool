@@ -31,6 +31,11 @@ proto::MotionFilterOptions CreateMotionFilterOptions(
     common::LuaParameterDictionary* parameter_dictionary);
 
 // Takes poses as input and filters them to get fewer poses.
+/*
+  MotionFilter，其主要作用是对数据进行一下滤波。
+  当两帧数据的间隔时间/两帧的Pose跨过的距离/两帧的Pose转过的角度等不超过一定的阈值时，
+  认为新的数据提供的信息很少，这些数据可以直接舍去。
+ */
 class MotionFilter {
  public:
   explicit MotionFilter(const proto::MotionFilterOptions& options);

@@ -59,13 +59,19 @@ bool ProbabilityGrid::ApplyLookupTable(const Eigen::Array2i& cell_index,
                                        const std::vector<uint16>& table) {
   DCHECK_EQ(table.size(), kUpdateMarker);
   const int flat_index = ToFlatIndex(cell_index);
+  // mutable_correspondence_cost_cells()是Grid2D的成员函数，返回存放概率值的一维向量
+  // 根据cell坐标，返回该cell中原本的value值
   uint16* cell = &(*mutable_correspondence_cost_cells())[flat_index];
   if (*cell >= kUpdateMarker) {
     return false;
   }
+  // 已更新的信息都存储在update_indices_这个向量中，所以该cell被处理过后它的index要加入到这个向量中
   mutable_update_indices()->push_back(flat_index);
+  // 根据该pixel返回的值cell来查表，获取更新后应该是什么值。然后把这个值放入到cell原先的地址中。实际就是更新该值
   *cell = table[*cell];
   DCHECK_GE(*cell, kUpdateMarker);
+  // mutable_known_cells_box()是Grid2D的成员函数，返回存放已知概率值的一个子区域的盒子。
+  // 现在就是把该cell放入已知概率值的盒子中
   mutable_known_cells_box()->extend(cell_index.matrix());
   return true;
 }

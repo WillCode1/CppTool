@@ -107,6 +107,7 @@ void Grid2D::FinishUpdate() {
 
 // Fills in 'offset' and 'limits' to define a subregion of that contains all
 // known cells.
+// 填写'offset'和'limits'来定义包含all的子区域已知栅格
 void Grid2D::ComputeCroppedLimits(Eigen::Array2i* const offset,
                                   CellLimits* const limits) const {
   if (known_cells_box_.isEmpty()) {
@@ -122,6 +123,7 @@ void Grid2D::ComputeCroppedLimits(Eigen::Array2i* const offset,
 // Grows the map as necessary to include 'point'. This changes the meaning of
 // these coordinates going forward. This method must be called immediately
 // after 'FinishUpdate', before any calls to 'ApplyLookupTable'.
+// 根据需要扩展地图以包含“点”
 void Grid2D::GrowLimits(const Eigen::Vector2f& point) {
   GrowLimits(point, {mutable_correspondence_cost_cells()},
              {kUnknownCorrespondenceValue});
@@ -131,6 +133,7 @@ void Grid2D::GrowLimits(const Eigen::Vector2f& point,
                         const std::vector<std::vector<uint16>*>& grids,
                         const std::vector<uint16>& grids_unknown_cell_values) {
   CHECK(update_indices_.empty());
+  // 首先将point转化为Grid坐标系，然后判断该点是否在该坐标系下，不是则进入下面
   while (!limits_.Contains(limits_.GetCellIndex(point))) {
     const int x_offset = limits_.cell_limits().num_x_cells / 2;
     const int y_offset = limits_.cell_limits().num_y_cells / 2;

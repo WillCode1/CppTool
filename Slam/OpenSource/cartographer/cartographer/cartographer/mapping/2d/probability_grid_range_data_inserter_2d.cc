@@ -49,6 +49,8 @@ void GrowAsNeeded(const sensor::RangeData& range_data,
                                kPadding * Eigen::Vector2f::Ones());
 }
 
+// 可以想见，CastRay中就是把RangeData中包含的一系列点 ，计算出一条从原点到每个点的射线，射线端点处的点是Hit，
+// 射线中间的点是Free。把所有这些点要在地图上把相应的cell进行更新。
 void CastRays(const sensor::RangeData& range_data,
               const std::vector<uint16>& hit_table,
               const std::vector<uint16>& miss_table,
@@ -56,35 +58,43 @@ void CastRays(const sensor::RangeData& range_data,
   GrowAsNeeded(range_data, probability_grid);
 
   const MapLimits& limits = probability_grid->limits();
+  // 定义一个超分辨率像素，把当前的分辨率又划分成了kSubpixelScale份，这里int kSubpixelScale = 1000
   const double superscaled_resolution = limits.resolution() / kSubpixelScale;
+  // 根据超分辨率像素又生成了一个新的MapLimits
   const MapLimits superscaled_limits(
       superscaled_resolution, limits.max(),
       CellLimits(limits.cell_limits().num_x_cells * kSubpixelScale,
                  limits.cell_limits().num_y_cells * kSubpixelScale));
+  // 根据RangeData原点的前两项，获取其对应的栅格化坐标。该坐标是我们所求的射线的起点
   const Eigen::Array2i begin =
       superscaled_limits.GetCellIndex(range_data.origin.head<2>());
   // Compute and add the end points.
+  // 定义一个向量集合，该集合存储RangeData中的hits的点
   std::vector<Eigen::Array2i> ends;
   ends.reserve(range_data.returns.size());
   for (const sensor::RangefinderPoint& hit : range_data.returns) {
     ends.push_back(superscaled_limits.GetCellIndex(hit.position.head<2>()));
+    // 这里我猜测，hit_table就是预先计算好的。如果一个cell，原先的值是value，那么在检测到hit后应该更新为多少
     probability_grid->ApplyLookupTable(ends.back() / kSubpixelScale, hit_table);
   }
 
   if (!insert_free_space) {
+    // 如果配置项里设置是不考虑free space。那么函数到这里结束，只处理完hit后返回即可
+    // 否则的话，需要计算那条射线，射线中间的点都是free space，同时，没有检测到hit的misses集里也都是free
     return;
   }
 
   // Now add the misses.
+  // 处理origin跟hit之间的射线中间的点
   for (const Eigen::Array2i& end : ends) {
-    std::vector<Eigen::Array2i> ray =
-        RayToPixelMask(begin, end, kSubpixelScale);
+    std::vector<Eigen::Array2i> ray = RayToPixelMask(begin, end, kSubpixelScale);
     for (const Eigen::Array2i& cell_index : ray) {
       probability_grid->ApplyLookupTable(cell_index, miss_table);
     }
   }
 
   // Finally, compute and add empty rays based on misses in the range data.
+  // 同样处理miss集合中的点
   for (const sensor::RangefinderPoint& missing_echo : range_data.misses) {
     std::vector<Eigen::Array2i> ray = RayToPixelMask(
         begin, superscaled_limits.GetCellIndex(missing_echo.position.head<2>()),
@@ -116,10 +126,8 @@ CreateProbabilityGridRangeDataInserterOptions2D(
 ProbabilityGridRangeDataInserter2D::ProbabilityGridRangeDataInserter2D(
     const proto::ProbabilityGridRangeDataInserterOptions2D& options)
     : options_(options),
-      hit_table_(ComputeLookupTableToApplyCorrespondenceCostOdds(
-          Odds(options.hit_probability()))),
-      miss_table_(ComputeLookupTableToApplyCorrespondenceCostOdds(
-          Odds(options.miss_probability()))) {}
+      hit_table_(ComputeLookupTableToApplyCorrespondenceCostOdds(Odds(options.hit_probability()))),
+      miss_table_(ComputeLookupTableToApplyCorrespondenceCostOdds(Odds(options.miss_probability()))) {}
 
 void ProbabilityGridRangeDataInserter2D::Insert(
     const sensor::RangeData& range_data, GridInterface* const grid) const {
@@ -127,8 +135,8 @@ void ProbabilityGridRangeDataInserter2D::Insert(
   CHECK(probability_grid != nullptr);
   // By not finishing the update after hits are inserted, we give hits priority
   // (i.e. no hits will be ignored because of a miss in the same cell).
-  CastRays(range_data, hit_table_, miss_table_, options_.insert_free_space(),
-           probability_grid);
+  // 调用CastRays函数更新Grid
+  CastRays(range_data, hit_table_, miss_table_, options_.insert_free_space(), probability_grid);
   probability_grid->FinishUpdate();
 }
 

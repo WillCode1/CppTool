@@ -76,6 +76,12 @@ class Submap2D : public Submap {
 // considered initialized: the old submap is no longer changed, the "new" submap
 // is now the "old" submap and is used for scan-to-map matching. Moreover, a
 // "new" submap gets created. The "old" submap is forgotten by this object.
+/*
+    第一个活动子映射将在插入第一个范围数据时创建。除了在这个初始化过程中，当没有或只有一个子映射存在时，
+  总是有两个子映射插入范围数据:一个用于匹配的旧子映射，和一个正在初始化的新子映射，它将用于下一个匹配。
+    一旦插入了一定数量的范围数据，就认为新的子映射已初始化:旧的子映射不再更改，“新”子映射现在是“旧”子映射，并用于扫描到映射的匹配。
+  此外，还会创建一个“新的”子映射。“旧的”子映射被该对象遗忘。
+ */
 class ActiveSubmaps2D {
  public:
   explicit ActiveSubmaps2D(const proto::SubmapsOptions2D& options);
@@ -92,7 +98,6 @@ class ActiveSubmaps2D {
  private:
   std::unique_ptr<RangeDataInserterInterface> CreateRangeDataInserter();
   std::unique_ptr<GridInterface> CreateGrid(const Eigen::Vector2f& origin);
-  void FinishSubmap();
   void AddSubmap(const Eigen::Vector2f& origin);
 
   const proto::SubmapsOptions2D options_;
