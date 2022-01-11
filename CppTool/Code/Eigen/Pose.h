@@ -3,8 +3,7 @@
 using namespace std;
 using namespace Eigen;
 
-void testPose3d();
-Eigen::Quaterniond RollPitchYaw(const double roll, const double pitch, const double yaw);
+# define M_PI		3.14159265358979323846	/* pi */
 
 template <typename FloatType>
 class Rigid2 {
@@ -42,19 +41,10 @@ public:
 
     Rotation2D rotation() const { return rotation_; }
 
-    double normalized_angle() const {
-        return common::NormalizeAngleDifference(rotation().angle());
-    }
-
     Rigid2 inverse() const {
         const Rotation2D rotation = rotation_.inverse();
         const Vector translation = -(rotation * translation_);
         return Rigid2(translation, rotation);
-    }
-
-    std::string DebugString() const {
-        return absl::Substitute("{ t: [$0, $1], r: [$2] }", translation().x(),
-            translation().y(), rotation().angle());
     }
 
 private:
@@ -83,20 +73,27 @@ using Rigid2f = Rigid2<float>;
 //===============================
 
 template <typename FloatType>
-class Rigid3 {
+class Rigid3
+{
 public:
     using Vector = Eigen::Matrix<FloatType, 3, 1>;
+    using EulerAngle = Eigen::Matrix<FloatType, 3, 1>;
     using Quaternion = Eigen::Quaternion<FloatType>;
     using AngleAxis = Eigen::AngleAxis<FloatType>;
 
-    Rigid3() : translation_(Vector::Zero()), rotation_(Quaternion::Identity()) {}
+    Rigid3() : translation_(Vector::Zero()), quat_(Quaternion::Identity()), euler_(Vector::Zero()) {}
     Rigid3(const Vector& translation, const Quaternion& rotation)
-        : translation_(translation), rotation_(rotation) {}
-    Rigid3(const Vector& translation, const AngleAxis& rotation)
-        : translation_(translation), rotation_(rotation) {}
-
-    static Rigid3 Rotation(const AngleAxis& angle_axis) {
-        return Rigid3(Vector::Zero(), Quaternion(angle_axis));
+        : translation_(translation), quat_(rotation)
+    {
+        euler_ = quat_.matrix().eulerAngles(2, 1, 0);
+    }
+    Rigid3(const Vector &translation, const EulerAngle& rotation)
+        : translation_(translation), euler_(rotation)
+    {
+        AngleAxis rollAngle(AngleAxis(euler_(2), Vector::UnitX()));
+        AngleAxis pitchAngle(AngleAxis(euler_(1), Vector::UnitY()));
+        AngleAxis yawAngle(AngleAxis(euler_(0), Vector::UnitZ()));
+        quat_ = yawAngle * pitchAngle * rollAngle;
     }
 
     static Rigid3 Rotation(const Quaternion& rotation) {
@@ -110,60 +107,103 @@ public:
     static Rigid3 FromArrays(const std::array<FloatType, 4>& rotation,
         const std::array<FloatType, 3>& translation) {
         return Rigid3(Eigen::Map<const Vector>(translation.data()),
-            Eigen::Quaternion<FloatType>(rotation[0], rotation[1],
-                rotation[2], rotation[3]));
+            Eigen::Quaternion<FloatType>(rotation[0], rotation[1], rotation[2], rotation[3]));
     }
 
     static Rigid3<FloatType> Identity() { return Rigid3<FloatType>(); }
 
-    template <typename OtherType>
-    Rigid3<OtherType> cast() const {
-        return Rigid3<OtherType>(translation_.template cast<OtherType>(),
-            rotation_.template cast<OtherType>());
-    }
-
     const Vector& translation() const { return translation_; }
-    const Quaternion& rotation() const { return rotation_; }
+    const Quaternion& quaternion() const { return quat_; }
+    const EulerAngle& eulerAngle() const { return euler_; }
 
     Rigid3 inverse() const {
-        const Quaternion rotation = rotation_.conjugate();
+        const Quaternion rotation = quat_.conjugate();
         const Vector translation = -(rotation * translation_);
         return Rigid3(translation, rotation);
     }
 
-    std::string DebugString() const {
-        return absl::Substitute("{ t: [$0, $1, $2], q: [$3, $4, $5, $6] }",
-            translation().x(), translation().y(),
-            translation().z(), rotation().w(), rotation().x(),
-            rotation().y(), rotation().z());
+    double distance2d(const Rigid3<FloatType> &target) const
+    {
+        auto a = translation();
+        auto b = target.translation();
+        return std::sqrt(std::pow(a(0) - b(0), 2) + std::pow(a(0) - b(0), 2));
     }
 
-    bool IsValid() const {
-        return !std::isnan(translation_.x()) && !std::isnan(translation_.y()) &&
-            !std::isnan(translation_.z()) &&
-            std::abs(FloatType(1) - rotation_.norm()) < FloatType(1e-3);
+    double distance3d(const Rigid3<FloatType> &target) const
+    {
+        auto a = translation();
+        auto b = target.translation();
+        return std::sqrt(std::pow(a(0) - b(0), 2) + std::pow(a(1) - b(1), 2) + std::pow(a(2) - b(2), 2));
+    }
+
+    EulerAngle deltaAngle(const Rigid3<FloatType> &target) const
+    {
+        auto a = eulerAngle();
+        auto b = target.eulerAngle();
+        EulerAngle euler(b(0) - a(0), b(1) - a(1), b(2) - a(2));
+        return euler;
+    }
+
+    EulerAngle absAngle(const Rigid3<FloatType> &target) const
+    {
+        auto a = eulerAngle();
+        auto b = target.eulerAngle();
+        EulerAngle euler(std::abs(b(0) - a(0)), std::abs(b(1) - a(1)), std::abs(b(2) - a(2)));
+        return euler;
+    }
+
+    double &NormalizeAngle(double &theta, double min, double max)
+    {
+        while (theta >= max)
+            theta -= 2 * M_PI;
+        while (theta < min)
+            theta += 2 * M_PI;
+        return theta;
+    }
+    void Normalize(const EulerAngle &target)
+    {
+        NormalizeAngle(target(2), roll_min, roll_max);
+        NormalizeAngle(target(1), pitch_min, pitch_max);
+        NormalizeAngle(target(0), yaw_min, yaw_max);
     }
 
 private:
     Vector translation_;
-    Quaternion rotation_;
+    Quaternion quat_;
+    EulerAngle euler_;
+
+    // set min max
+    static double roll_min;
+    static double roll_max;
+    static double pitch_min;
+    static double pitch_max;
+    static double yaw_min;
+    static double yaw_max;
 };
+template <typename FloatType> double Rigid3<FloatType>::roll_min = -M_PI;
+template <typename FloatType> double Rigid3<FloatType>::roll_max = M_PI;
+template <typename FloatType> double Rigid3<FloatType>::pitch_min = -M_PI;
+template <typename FloatType> double Rigid3<FloatType>::pitch_max = M_PI;
+template <typename FloatType> double Rigid3<FloatType>::yaw_min = -M_PI;
+template <typename FloatType> double Rigid3<FloatType>::yaw_max = M_PI;
+
 
 template <typename FloatType>
 Rigid3<FloatType> operator*(const Rigid3<FloatType>& lhs,
     const Rigid3<FloatType>& rhs) {
     return Rigid3<FloatType>(
-        lhs.rotation() * rhs.translation() + lhs.translation(),
-        (lhs.rotation() * rhs.rotation()).normalized());
+        lhs.quaternion() * rhs.translation() + lhs.translation(),
+        (lhs.quaternion() * rhs.quaternion()).normalized());
 }
 
 template <typename FloatType>
 typename Rigid3<FloatType>::Vector operator*(
     const Rigid3<FloatType>& rigid,
     const typename Rigid3<FloatType>::Vector& point) {
-    return rigid.rotation() * point + rigid.translation();
+    return rigid.quaternion() * point + rigid.translation();
 }
 
 using Rigid3d = Rigid3<double>;
 using Rigid3f = Rigid3<float>;
 
+void testPose3d();

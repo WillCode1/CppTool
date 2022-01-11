@@ -259,7 +259,7 @@ LocalTrajectoryBuilder2D::AddAccumulatedRangeData(
   }
 
   // local map frame <- gravity-aligned frame
-  // 调用ScanMathc函数进行匹配，求取Scan插入Submap的最优Pose
+  // 调用ScanMath函数进行匹配，求取Scan插入Submap的最优Pose
   std::unique_ptr<transform::Rigid2d> pose_estimate_2d =
       ScanMatch(time, pose_prediction, filtered_gravity_aligned_point_cloud);
   if (pose_estimate_2d == nullptr) {
