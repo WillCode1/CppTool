@@ -126,14 +126,14 @@ public:
     {
         auto a = translation();
         auto b = target.translation();
-        return std::sqrt(std::pow(a(1) - b(1), 2) + std::pow(a(2) - b(2), 2));
+        return std::sqrt(std::pow(a(0) - b(0), 2) + std::pow(a(0) - b(0), 2));
     }
 
     double distance3d(const Pose3<FloatType> &target) const
     {
         auto a = translation();
         auto b = target.translation();
-        return std::sqrt(std::pow(a(1) - b(1), 2) + std::pow(a(2) - b(2), 2) + std::pow(a(3) - b(3), 2));
+        return std::sqrt(std::pow(a(0) - b(0), 2) + std::pow(a(1) - b(1), 2) + std::pow(a(2) - b(2), 2));
     }
 
     EulerAngle deltaAngle(const Pose3<FloatType> &target) const
