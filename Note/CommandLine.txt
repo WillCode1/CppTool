@@ -40,6 +40,7 @@ tar -zcvf ab.tar *
 tar -zxvf ab.tar
 
 rar: https://www.cnblogs.com/hechangchun/articles/9466582.html
+rar x etc.rar
 
 =============常用Git命令==============
 git status
