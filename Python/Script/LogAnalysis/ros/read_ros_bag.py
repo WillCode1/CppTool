@@ -37,7 +37,7 @@ def fix_range(x, y):
         y_range[1] = y.max()
 
 
-def draw_track_by_topic(ros_bag, topic: str, color: str, label: str, reference=None, positive=True):
+def draw_track_by_topic(ros_bag, topic: str, color: str, label: str, reference=None):
     msg_file = ros_bag.message_by_topic(topic)
     data = pd.read_csv(msg_file)
     x = data['pose.pose.position.x']
@@ -46,23 +46,23 @@ def draw_track_by_topic(ros_bag, topic: str, color: str, label: str, reference=N
         coord = np.stack((x.values, y.values), axis=-1)
 
         # 坐标转换
-        if positive:
-            radian = (math.acos(reference['pose.pose.orientation.w'][0]) -
-                      math.acos(data['pose.pose.orientation.w'][0])) * 2
-        else:
-            radian = (math.acos(reference['pose.pose.orientation.w'][0]) +
-                      math.acos(data['pose.pose.orientation.w'][0])) * 2
-
+        a = math.acos(reference['pose.pose.orientation.w'][0])
+        b = math.acos(data['pose.pose.orientation.w'][0])
+        if reference['pose.pose.orientation.z'][0] < 0:
+            a *= -1
+        if data['pose.pose.orientation.z'][0] < 0:
+            b *= -1
+        radian = (a - b) * 2
         rotation = mt.rotation_matrix2d(radian)
         coord = mt.coordinate_transformations_matrix2d(coord, rotation)
 
         print(label, at.radian2angle(2 * math.acos(data['pose.pose.orientation.w'][0])),
-                     at.radian2angle(2 * math.acos(reference['pose.pose.orientation.w'][0])),
-                     at.radian2angle(2 * math.acos(reference['pose.pose.orientation.w'][0]) +
-                                     2 * math.acos(data['pose.pose.orientation.w'][0])))
+              at.radian2angle(2 * math.acos(reference['pose.pose.orientation.w'][0])),
+              at.radian2angle(2 * math.acos(reference['pose.pose.orientation.w'][0]) +
+                              2 * math.acos(data['pose.pose.orientation.w'][0])))
 
         trans_vector = np.array([reference['pose.pose.position.x'][0],
-                                 reference['pose.pose.position.y'][0]])-coord[0]
+                                 reference['pose.pose.position.y'][0]]) - coord[0]
         translation = mt.translation_matrix2d(trans_vector)
         coord = mt.coordinate_transformations_matrix2d(coord, translation)
 
@@ -87,10 +87,10 @@ if __name__ == '__main__':
 
     sf = draw_track_by_topic(bag, '/sf', 'gray', 'sf')
     draw_track_by_topic(bag, '/peter_motor_core/odom', 'blue', 'odom', sf)
-    draw_track_by_topic(bag, '/odom_rf2o', 'red', 'lo', sf, False)
+    draw_track_by_topic(bag, '/odom_rf2o', 'red', 'lo', sf)
     if is_test:
         draw_track_by_topic(bag, '/robot_pose_ekf/odom', 'orange', 'ekf', sf)
-    # else:
+        # else:
         # draw_track_by_topic(bag, '/robot_pose_ekf/odom', 'orange', 'ekf', odom)
         draw_track_by_topic(bag, '/map_server/robot_pose', 'black', 'global', sf)
 
@@ -103,4 +103,3 @@ if __name__ == '__main__':
     plt.legend()
     plt.savefig(path + 'track_compare.png')
     plt.show()
-
