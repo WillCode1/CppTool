@@ -7,6 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import math
 from Script.LogAnalysis.Tool import matrix_tool as mt
+from Script.LogAnalysis.Tool import angle_tool as at
 
 
 def preview_data(pandas_data):
@@ -36,7 +37,7 @@ def fix_range(x, y):
         y_range[1] = y.max()
 
 
-def draw_track_by_topic(ros_bag, topic: str, color: str, label: str, reference=None, need_rotate=True):
+def draw_track_by_topic(ros_bag, topic: str, color: str, label: str, reference=None, positive=True):
     msg_file = ros_bag.message_by_topic(topic)
     data = pd.read_csv(msg_file)
     x = data['pose.pose.position.x']
@@ -45,17 +46,20 @@ def draw_track_by_topic(ros_bag, topic: str, color: str, label: str, reference=N
         coord = np.stack((x.values, y.values), axis=-1)
 
         # 坐标转换
-        # a = math.acos(data['pose.pose.orientation.w'][0]) * 2
-        # print(a)
-        # b = math.acos(reference['pose.pose.orientation.w'][0]) * 2
-        # print(b)
-        # print(a-b)
-        # print('======')
+        if positive:
+            radian = (math.acos(reference['pose.pose.orientation.w'][0]) -
+                      math.acos(data['pose.pose.orientation.w'][0])) * 2
+        else:
+            radian = (math.acos(reference['pose.pose.orientation.w'][0]) +
+                      math.acos(data['pose.pose.orientation.w'][0])) * 2
 
-        if need_rotate:
-            rotation = mt.rotation_matrix2d((math.acos(data['pose.pose.orientation.w'][0]) -
-                                             math.acos(reference['pose.pose.orientation.w'][0])) * 2)
-            coord = mt.coordinate_transformations_matrix2d(coord, rotation)
+        rotation = mt.rotation_matrix2d(radian)
+        coord = mt.coordinate_transformations_matrix2d(coord, rotation)
+
+        print(label, at.radian2angle(2 * math.acos(data['pose.pose.orientation.w'][0])),
+                     at.radian2angle(2 * math.acos(reference['pose.pose.orientation.w'][0])),
+                     at.radian2angle(2 * math.acos(reference['pose.pose.orientation.w'][0]) +
+                                     2 * math.acos(data['pose.pose.orientation.w'][0])))
 
         trans_vector = np.array([reference['pose.pose.position.x'][0],
                                  reference['pose.pose.position.y'][0]])-coord[0]
@@ -81,14 +85,14 @@ if __name__ == '__main__':
         bag = bagreader(path + 'oneloop/front_desk_1F_1_2022-01-03-21-04-03.bag')
     # preview_data(bag)
 
-    odom = draw_track_by_topic(bag, '/peter_motor_core/odom', 'blue', 'odom')
-    draw_track_by_topic(bag, '/odom_rf2o', 'red', 'lo', odom)
-    draw_track_by_topic(bag, '/sf', 'gray', 'sf', odom)
+    sf = draw_track_by_topic(bag, '/sf', 'gray', 'sf')
+    draw_track_by_topic(bag, '/peter_motor_core/odom', 'blue', 'odom', sf)
+    draw_track_by_topic(bag, '/odom_rf2o', 'red', 'lo', sf, False)
     if is_test:
-        draw_track_by_topic(bag, '/robot_pose_ekf/odom', 'orange', 'ekf', odom)
-    else:
+        draw_track_by_topic(bag, '/robot_pose_ekf/odom', 'orange', 'ekf', sf)
+    # else:
         # draw_track_by_topic(bag, '/robot_pose_ekf/odom', 'orange', 'ekf', odom)
-        draw_track_by_topic(bag, '/map_server/robot_pose', 'black', 'global', odom)
+        draw_track_by_topic(bag, '/map_server/robot_pose', 'black', 'global', sf)
 
     # plt.axis([x.min(), x.max(), y.min(), y.max()])
     plt.xlim(x_range[0], x_range[1])
