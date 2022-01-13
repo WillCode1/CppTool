@@ -10,16 +10,11 @@ from Script.LogAnalysis.Tool import matrix_tool as mt
 from Script.LogAnalysis.Tool import angle_tool as at
 
 
-def preview_data(pandas_data):
-    # 表头
-    print(pandas_data.head())
-    # 表信息描述
-    print(pandas_data.info())
-    # DataFrame统计信息
-    print(pandas_data.describe())
-    # 绘制统计图
-    pandas_data.hist(bins=50, figsize=(20, 15))
-    plt.show()
+def cal_yaw(quat_w, quat_z):
+    radian = 2 * math.acos(quat_w)
+    if quat_z < 0:
+        radian *= -1
+    return radian
 
 
 x_range = [np.inf, -np.inf]
@@ -46,14 +41,9 @@ def draw_track_by_topic(ros_bag, topic: str, color: str, label: str, reference=N
         coord = np.stack((x.values, y.values), axis=-1)
 
         # 坐标转换
-        a = math.acos(reference['pose.pose.orientation.w'][0])
-        b = math.acos(data['pose.pose.orientation.w'][0])
-        if reference['pose.pose.orientation.z'][0] < 0:
-            a *= -1
-        if data['pose.pose.orientation.z'][0] < 0:
-            b *= -1
-        radian = (a - b) * 2
-        rotation = mt.rotation_matrix2d(radian)
+        a = cal_yaw(reference['pose.pose.orientation.w'][0], reference['pose.pose.orientation.z'][0])
+        b = cal_yaw(data['pose.pose.orientation.w'][0], data['pose.pose.orientation.z'][0])
+        rotation = mt.rotation_matrix2d(a - b)
         coord = mt.coordinate_transformations_matrix2d(coord, rotation)
 
         print(label, at.radian2angle(2 * math.acos(data['pose.pose.orientation.w'][0])),
