@@ -414,6 +414,8 @@ class MapById {
   static int GetIndex(const NodeId& id) { return id.node_index; }
   static int GetIndex(const SubmapId& id) { return id.submap_index; }
 
+  // 不是特指cartographer中的一条trajectory的概念，而是一个抽象的数据链的概念。
+  // 这个数据链可以是TrajectoryNode, 也可以是Submap等等。
   std::map<int, MapByIndex> trajectories_;
 };
 

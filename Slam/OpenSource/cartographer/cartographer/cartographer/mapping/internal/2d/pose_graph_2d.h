@@ -248,14 +248,19 @@ class PoseGraph2D : public PoseGraph {
   std::unique_ptr<WorkQueue> work_queue_ GUARDED_BY(work_queue_mutex_);
 
   // We globally localize a fraction of the nodes from each trajectory.
+  // 我们对每个轨迹中的节点进行全局局部定位。
+  // FixedFrame是跟GPS信号相关的；所以猜测这个应该是GPS信号的采样器。
+  // 一条轨迹会有一个GPS信号采样器，负责处理GPS数据
   absl::flat_hash_map<int, std::unique_ptr<common::FixedRatioSampler>>
       global_localization_samplers_ GUARDED_BY(mutex_);
 
   // Number of nodes added since last loop closure.
+  // 标记上次Loop Closure之后又新添加了多少Nodes
   int num_nodes_since_last_loop_closure_ GUARDED_BY(mutex_) = 0;
 
   // Current optimization problem.
   std::unique_ptr<optimization::OptimizationProblem2D> optimization_problem_;
+  // 创建约束的Builder
   constraints::ConstraintBuilder2D constraint_builder_;
 
   // Thread pool used for handling the work queue.
@@ -264,12 +269,14 @@ class PoseGraph2D : public PoseGraph {
   // List of all trimmers to consult when optimizations finish.
   std::vector<std::unique_ptr<PoseGraphTrimmer>> trimmers_ GUARDED_BY(mutex_);
 
+  // 位姿图数据
   PoseGraphData data_ GUARDED_BY(mutex_);
 
   ValueConversionTables conversion_tables_;
 
   // Allows querying and manipulating the pose graph by the 'trimmers_'. The
   // 'mutex_' of the pose graph is held while this class is used.
+  // 允许通过' trimers_ '查询和操作姿势图。当这个类被使用时，姿态图的'mutex_'被持有。
   class TrimmingHandle : public Trimmable {
    public:
     TrimmingHandle(PoseGraph2D* parent);

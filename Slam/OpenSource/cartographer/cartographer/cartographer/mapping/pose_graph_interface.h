@@ -35,7 +35,7 @@ class PoseGraphInterface {
   // 2010 IEEE/RSJ International Conference on (pp. 22--29). IEEE, 2010.
   struct Constraint {
     struct Pose {
-      transform::Rigid3d zbar_ij;
+      transform::Rigid3d zbar_ij; // 相对位姿
       double translation_weight;
       double rotation_weight;
     };
@@ -44,14 +44,17 @@ class PoseGraphInterface {
     NodeId node_id;      // 'j' in the paper.
 
     // Pose of the node 'j' relative to submap 'i'.
+    //节点j相对于Submap i的相对位姿
     Pose pose;
 
     // Differentiates between intra-submap (where node 'j' was inserted into
     // submap 'i') and inter-submap constraints (where node 'j' was not inserted
     // into submap 'i').
+    // 每一对儿node和submap，都分为两种情况：节点j有插入该submap中和没有插入该submap中。
     enum Tag { INTRA_SUBMAP, INTER_SUBMAP } tag;
   };
 
+  // Landmark相当于路标，每个Node与Landmark之间的相对位姿也应该加入到约束之中。
   struct LandmarkNode {
     struct LandmarkObservation {
       int trajectory_id;
@@ -67,12 +70,12 @@ class PoseGraphInterface {
 
   struct SubmapPose {
     int version;
-    transform::Rigid3d pose;
+    transform::Rigid3d pose;  //submap的绝对位姿
   };
 
   struct SubmapData {
-    std::shared_ptr<const Submap> submap;
-    transform::Rigid3d pose;
+    std::shared_ptr<const Submap> submap;   //栅格概率图数据
+    transform::Rigid3d pose;                //submap的绝对位姿
   };
 
   struct TrajectoryData {
