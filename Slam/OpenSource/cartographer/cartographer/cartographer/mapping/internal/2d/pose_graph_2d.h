@@ -260,7 +260,7 @@ class PoseGraph2D : public PoseGraph {
 
   // Current optimization problem.
   std::unique_ptr<optimization::OptimizationProblem2D> optimization_problem_;
-  // 创建约束的Builder
+  // 创建约束的Builder，内含回环检测功能
   constraints::ConstraintBuilder2D constraint_builder_;
 
   // Thread pool used for handling the work queue.

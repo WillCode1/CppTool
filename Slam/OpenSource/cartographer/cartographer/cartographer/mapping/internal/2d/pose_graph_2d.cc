@@ -351,6 +351,7 @@ void PoseGraph2D::ComputeConstraint(const NodeId& node_id,
         data_.submap_data.at(submap_id).submap.get());
   }
 
+  // constraint_builder_闭环检测成功后，才添加约束
   if (maybe_add_local_constraint) {
     // 计算该node和submap的相对位姿
     const transform::Rigid2d initial_relative_pose =

@@ -110,7 +110,7 @@ class ConstraintBuilder2D {
   struct SubmapScanMatcher {
     const Grid2D* grid = nullptr;
     std::unique_ptr<scan_matching::FastCorrelativeScanMatcher2D>
-        fast_correlative_scan_matcher;
+        fast_correlative_scan_matcher;  // 快速相关扫描匹配
     std::weak_ptr<common::Task> creation_task_handle;
   };
 
