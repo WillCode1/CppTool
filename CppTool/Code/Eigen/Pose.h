@@ -126,7 +126,7 @@ public:
     {
         auto a = translation();
         auto b = target.translation();
-        return std::sqrt(std::pow(a(0) - b(0), 2) + std::pow(a(0) - b(0), 2));
+        return std::sqrt(std::pow(a(0) - b(0), 2) + std::pow(a(1) - b(1), 2));
     }
 
     double distance3d(const Rigid3<FloatType> &target) const

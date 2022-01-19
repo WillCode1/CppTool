@@ -35,6 +35,9 @@ namespace mapping {
 // transitions to 'kFinished', all nodes are tried to match
 // against this submap. Likewise, all new nodes are matched against submaps in
 // that state.
+// 一个枚举类，表征一个Submap的状态：kActive或kFinished。
+// 当一个submap由Active转为kFinished时，所有的Nodes都要跟该submap做一个匹配。
+// 同样的，当在trajectory增长的过程中又有新增的Nodes，这些新的Nodes也需要跟所有已经finished的submap做一下match
 enum class SubmapState { kNoConstraintSearch, kFinished };
 
 struct InternalTrajectoryState {
@@ -44,11 +47,13 @@ struct InternalTrajectoryState {
     WAIT_FOR_DELETION
   };
 
+  //默认情况，submap是kActive，除非满足一定条件后把它置为kFinished
   PoseGraphInterface::TrajectoryState state =
       PoseGraphInterface::TrajectoryState::ACTIVE;
   DeletionState deletion_state = DeletionState::NORMAL;
 };
 
+// 存储与一个Submap相关联的Node
 struct InternalSubmapData {
   std::shared_ptr<const Submap> submap;
   SubmapState state = SubmapState::kNoConstraintSearch;
@@ -56,6 +61,8 @@ struct InternalSubmapData {
   // IDs of the nodes that were inserted into this map together with
   // constraints for them. They are not to be matched again when this submap
   // becomes 'kFinished'.
+  // 所有跟该submap有插入关系并存在约束的节点的ID的集合。
+  // 当这个submap被finished时他们就不用重新跟该submap进行match，而只需match新的node并把他们加入相应submap的这个集合中
   std::set<NodeId> node_ids;
 };
 
@@ -65,6 +72,7 @@ struct PoseGraphData {
   MapById<SubmapId, InternalSubmapData> submap_data;
 
   // Global submap poses currently used for displaying data.
+  // 全局的submap的Pose. 会用于在rviz中显示建图效果
   MapById<SubmapId, optimization::SubmapSpec2D> global_submap_poses_2d;
   MapById<SubmapId, optimization::SubmapSpec3D> global_submap_poses_3d;
 
@@ -72,6 +80,7 @@ struct PoseGraphData {
   MapById<NodeId, TrajectoryNode> trajectory_nodes;
 
   // Global landmark poses with all observations.
+  // 存储所有landmark的Id及他们的观测数据
   std::map<std::string /* landmark ID */, PoseGraphInterface::LandmarkNode>
       landmark_nodes;
 
@@ -81,8 +90,10 @@ struct PoseGraphData {
   std::map<int, InternalTrajectoryState> trajectories_state;
 
   // Set of all initial trajectory poses.
+  // 存储指定trajectory_id的InitialTrajectoryPose
   std::map<int, PoseGraph::InitialTrajectoryPose> initial_trajectory_poses;
 
+  // 创建起来的约束
   std::vector<PoseGraphInterface::Constraint> constraints;
 };
 

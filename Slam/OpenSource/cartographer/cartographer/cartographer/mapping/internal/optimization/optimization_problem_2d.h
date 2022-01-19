@@ -125,9 +125,9 @@ class OptimizationProblem2D
       const NodeSpec2D& second_node_data) const;
 
   optimization::proto::OptimizationProblemOptions options_;
-  MapById<NodeId, NodeSpec2D> node_data_;
-  MapById<SubmapId, SubmapSpec2D> submap_data_;
-  std::map<std::string, transform::Rigid3d> landmark_data_;
+  MapById<NodeId, NodeSpec2D> node_data_; // 所有节点的相关信息：时间、local pose、 global pose、gravity alignment等
+  MapById<SubmapId, SubmapSpec2D> submap_data_; //存储submap的global pose
+  std::map<std::string, transform::Rigid3d> landmark_data_; //存储landmark的pose
   sensor::MapByTime<sensor::ImuData> empty_imu_data_;
   sensor::MapByTime<sensor::OdometryData> odometry_data_;
   sensor::MapByTime<sensor::FixedFramePoseData> fixed_frame_pose_data_;
