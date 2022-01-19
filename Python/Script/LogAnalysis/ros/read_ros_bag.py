@@ -73,7 +73,6 @@ if __name__ == '__main__':
         path = '/home/diwei/catkin_ws/src/robot_pose_ekf/bagfiles/'
         # bag = bagreader(path + 'oneloop/8309_2022-01-03-21-01-39.bag')
         bag = bagreader(path + 'oneloop/front_desk_1F_1_2022-01-03-21-04-03.bag')
-    # preview_data(bag)
 
     sf = draw_track_by_topic(bag, '/sf', 'gray', 'sf')
     draw_track_by_topic(bag, '/peter_motor_core/odom', 'blue', 'odom', sf)
@@ -82,7 +81,7 @@ if __name__ == '__main__':
         draw_track_by_topic(bag, '/robot_pose_ekf/odom', 'orange', 'ekf', sf)
         # else:
         # draw_track_by_topic(bag, '/robot_pose_ekf/odom', 'orange', 'ekf', odom)
-        draw_track_by_topic(bag, '/map_server/robot_pose', 'black', 'global', sf)
+        # draw_track_by_topic(bag, '/map_server/robot_pose', 'black', 'global', sf)
 
     # plt.axis([x.min(), x.max(), y.min(), y.max()])
     plt.xlim(x_range[0], x_range[1])
