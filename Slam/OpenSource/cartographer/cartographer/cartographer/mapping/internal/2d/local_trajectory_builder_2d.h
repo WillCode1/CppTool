@@ -49,7 +49,7 @@ class LocalTrajectoryBuilder2D {
   };
   struct MatchingResult {
     common::Time time;
-    transform::Rigid3d local_pose;
+    transform::Rigid3d local_pose;  // tracking坐标系下的位姿，需要乘以tracking frame in map的转换才能转到全局坐标系
     sensor::RangeData range_data_in_local;
     // 'nullptr' if dropped by the motion filter.
     std::unique_ptr<const InsertionResult> insertion_result;
@@ -102,9 +102,12 @@ class LocalTrajectoryBuilder2D {
   const proto::LocalTrajectoryBuilderOptions2D options_;
   ActiveSubmaps2D active_submaps_;  // 同时维护着两个submap
 
-  MotionFilter motion_filter_;
-  scan_matching::RealTimeCorrelativeScanMatcher2D real_time_correlative_scan_matcher_; //实时的扫描匹配，用的相关分析方法
-  scan_matching::CeresScanMatcher2D ceres_scan_matcher_;    // Ceres方法匹配
+  MotionFilter motion_filter_;  // 稀疏滤波，过滤关键帧
+  // 采用ceres优化匹配为cartographer 算法中前端核心匹配算法，而相关匹配和快速相关匹配则可作为第一步的预测匹配，可为优化匹配提供一个较好的初始值。
+  // 其中真正前端中相关匹配方法可以进行配置不使能。
+  // cartographer采用的相关匹配算法基本上可以认为是一种暴力搜索匹配算法，即采用当前的激光帧在已知的栅格地图上进行遍历匹配，获取相关性最高的位置，即置信度最高的位置。
+  scan_matching::RealTimeCorrelativeScanMatcher2D real_time_correlative_scan_matcher_; // CSM相关匹配器，实时的暴力搜索匹配
+  scan_matching::CeresScanMatcher2D ceres_scan_matcher_;    // 优化匹配器, Ceres方法匹配
 
   std::unique_ptr<PoseExtrapolator> extrapolator_;  // 轨迹推算器。融合IMU，里程计数据
 

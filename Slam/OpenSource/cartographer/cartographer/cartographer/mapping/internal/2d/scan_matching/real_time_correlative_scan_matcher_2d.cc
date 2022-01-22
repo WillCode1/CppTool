@@ -35,6 +35,7 @@ namespace mapping {
 namespace scan_matching {
 namespace {
 
+// TSDF: https://zhuanlan.zhihu.com/p/390276710
 float ComputeCandidateScore(const TSDF2D& tsdf,
                             const DiscreteScan2D& discrete_scan,
                             int x_index_offset, int y_index_offset) {
@@ -65,8 +66,7 @@ float ComputeCandidateScore(const ProbabilityGrid& probability_grid,
   for (const Eigen::Array2i& xy_index : discrete_scan) {
     const Eigen::Array2i proposed_xy_index(xy_index.x() + x_index_offset,
                                            xy_index.y() + y_index_offset);
-    const float probability =
-        probability_grid.GetProbability(proposed_xy_index);
+    const float probability = probability_grid.GetProbability(proposed_xy_index);
     candidate_score += probability;
   }
   candidate_score /= static_cast<float>(discrete_scan.size());
@@ -80,10 +80,12 @@ RealTimeCorrelativeScanMatcher2D::RealTimeCorrelativeScanMatcher2D(
     const proto::RealTimeCorrelativeScanMatcherOptions& options)
     : options_(options) {}
 
+// 暴力匹配搜索候选解(num = theta * x * y)
 std::vector<Candidate2D>
 RealTimeCorrelativeScanMatcher2D::GenerateExhaustiveSearchCandidates(
     const SearchParameters& search_parameters) const {
   int num_candidates = 0;
+  // 先遍历所有角度，累加所有x*y
   for (int scan_index = 0; scan_index != search_parameters.num_scans;
        ++scan_index) {
     const int num_linear_x_candidates =
@@ -96,6 +98,7 @@ RealTimeCorrelativeScanMatcher2D::GenerateExhaustiveSearchCandidates(
   }
   std::vector<Candidate2D> candidates;
   candidates.reserve(num_candidates);
+  // 最外层表示角度
   for (int scan_index = 0; scan_index != search_parameters.num_scans;
        ++scan_index) {
     for (int x_index_offset = search_parameters.linear_bounds[scan_index].min_x;
@@ -135,12 +138,12 @@ double RealTimeCorrelativeScanMatcher2D::Match(
       grid.limits(), rotated_scans,
       Eigen::Translation2f(initial_pose_estimate.translation().x(),
                            initial_pose_estimate.translation().y()));
-  std::vector<Candidate2D> candidates =
-      GenerateExhaustiveSearchCandidates(search_parameters);
+  // 得到所有候选解
+  std::vector<Candidate2D> candidates = GenerateExhaustiveSearchCandidates(search_parameters);
+  // 为每一个解进行打分
   ScoreCandidates(grid, discrete_scans, search_parameters, &candidates);
-
-  const Candidate2D& best_candidate =
-      *std::max_element(candidates.begin(), candidates.end());
+  // 得到最好的解
+  const Candidate2D& best_candidate = *std::max_element(candidates.begin(), candidates.end());
   *pose_estimate = transform::Rigid2d(
       {initial_pose_estimate.translation().x() + best_candidate.x,
        initial_pose_estimate.translation().y() + best_candidate.y},
