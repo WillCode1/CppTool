@@ -67,7 +67,7 @@ if __name__ == '__main__':
     # is_test = False
 
     if is_test:
-        path = '/home/diwei/.ros/'
+        path = '/home/will/.ros/'
         bag = bagreader(path + 'ekf_pose_record.bag')
     else:
         path = '/home/diwei/catkin_ws/src/robot_pose_ekf/bagfiles/'

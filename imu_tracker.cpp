@@ -5,7 +5,7 @@
 
 namespace estimation
 {
-  ImuZeroDriftCompensation::ImuZeroDriftCompensation(Ctime time, const Eigen::Vector3d &filter_outlier_threshold)
+  ImuZeroDriftCompensation::ImuZeroDriftCompensation(const TimeSec& time, const Eigen::Vector3d &filter_outlier_threshold)
       : last_time_update_compensatoin_(time),
         filter_outlier_threshold_(filter_outlier_threshold),
         cur_angular_velocity_compensation_(Eigen::Vector3d::Zero()),
@@ -13,7 +13,7 @@ namespace estimation
   {
   }
 
-  void ImuZeroDriftCompensation::updateStateMachine(bool is_static_now)
+  void ImuZeroDriftCompensation::updateStateMachine(bool is_static_now, const TimeSec& time)
   {
     if (is_static_now)
     {
@@ -21,13 +21,13 @@ namespace estimation
       if (!last_is_static_)
       {
         record_for_calculate_angular_velocity_ = true;
-        time_for_start_static_ = std::chrono::steady_clock::now();
+        time_for_start_static_ = time;
       }
       // static and timeout(1 second)
-      else if (std::chrono::duration<double>(std::chrono::steady_clock::now() - time_for_start_static_).count() > 1.)
+      else if ((time - time_for_start_static_).count() > 1.)
       {
         need_update_zero_drift_compensation_ = true;
-        time_for_start_static_ = std::chrono::steady_clock::now();
+        time_for_start_static_ = time;
       }
 
       last_is_static_ = true;
@@ -42,27 +42,26 @@ namespace estimation
     }
   }
 
-  void ImuZeroDriftCompensation::calculateAndAddZeroDriftCompensation(Eigen::Quaterniond &orientation)
+  void ImuZeroDriftCompensation::calculateAndAddZeroDriftCompensation(Eigen::Quaterniond &orientation, const TimeSec& time)
   {
     if (record_for_calculate_angular_velocity_)
     {
-      prepareForCalculateAngularVelocityCompensation(orientation);
+      prepareForCalculateAngularVelocityCompensation(orientation, time);
       record_for_calculate_angular_velocity_ = false;
     }
 
     if (need_update_zero_drift_compensation_)
     {
-      updateZeroDriftAngularVelocityCompensation(orientation);
+      updateZeroDriftAngularVelocityCompensation(orientation, time);
       need_update_zero_drift_compensation_ = false;
     }
 
-    addZeroDriftCompensation(orientation);
+    addZeroDriftCompensation(orientation, time);
   }
 
-  bool ImuZeroDriftCompensation::filterIfOutlier(const Eigen::Quaterniond &orientation)
+  bool ImuZeroDriftCompensation::filterIfOutlier(const Eigen::Quaterniond &orientation, const TimeSec& time)
   {
-    const auto &time = std::chrono::steady_clock::now();
-    double delta_t = std::chrono::duration<double>(time - last_time_update_compensatoin_).count();  // seconds
+    double delta_t = (time - last_time_update_compensatoin_).count();  // seconds
 
     const auto &start = last_compensatoin_end_.matrix().eulerAngles(0, 1, 2);
     const auto &end = orientation.matrix().eulerAngles(0, 1, 2);
@@ -86,9 +85,9 @@ namespace estimation
     return true;
   }
 
-  void ImuZeroDriftCompensation::prepareForCalculateAngularVelocityCompensation(const Eigen::Quaterniond &orientation)
+  void ImuZeroDriftCompensation::prepareForCalculateAngularVelocityCompensation(const Eigen::Quaterniond &orientation, const TimeSec& time)
   {
-    time_start_statistic_ = std::chrono::steady_clock::now();
+    time_start_statistic_ = time;
     last_compensatoin_end_ = quat_start_statistic_ = orientation;
 
     if (debug_)
@@ -97,25 +96,24 @@ namespace estimation
     }
   }
 
-  void ImuZeroDriftCompensation::updateZeroDriftAngularVelocityCompensation(const Eigen::Quaterniond &orientation)
+  void ImuZeroDriftCompensation::updateZeroDriftAngularVelocityCompensation(const Eigen::Quaterniond &orientation, const TimeSec& time)
   {
-    const auto &time = std::chrono::steady_clock::now();
-    double delta_t = std::chrono::duration<double>(time - last_time_update_compensatoin_).count();  // seconds
+    double delta_t = (time - last_time_update_compensatoin_).count();  // seconds
 
     // 角速度乘以时间，然后转化成RotationnQuaternion,这是这段时间的姿态变化量
     const Eigen::Quaterniond zero_drift_compensation =
         AngleAxisVectorToRotationQuaternion(Eigen::Vector3d(cur_angular_velocity_compensation_ * delta_t));
     previous_zero_drift_compensation_ = (previous_zero_drift_compensation_ * zero_drift_compensation).normalized();
 
-    if (filterIfOutlier(orientation))
+    if (filterIfOutlier(orientation, time))
     {
-      prepareForCalculateAngularVelocityCompensation(orientation);
+      prepareForCalculateAngularVelocityCompensation(orientation, time);
     }
     else
     {
       const auto &start = quat_start_statistic_.matrix().eulerAngles(0, 1, 2);
       const auto &end = orientation.matrix().eulerAngles(0, 1, 2);
-      delta_t = std::chrono::duration<double>(time - time_start_statistic_).count();
+      delta_t = (time - time_start_statistic_).count();
       const auto &mean_imu_angular_velocity = (start - end) / delta_t;
 
       // only yaw
@@ -132,18 +130,14 @@ namespace estimation
     }
   }
 
-  void ImuZeroDriftCompensation::addZeroDriftCompensation(Eigen::Quaterniond &orientation)
+  void ImuZeroDriftCompensation::addZeroDriftCompensation(Eigen::Quaterniond &orientation, const TimeSec& time)
   {
-    const auto& time = std::chrono::steady_clock::now();
-    const double delta_t = std::chrono::duration<double>(time - last_time_update_compensatoin_).count();  // seconds
+    const double delta_t = (time - last_time_update_compensatoin_).count();  // seconds
 
     // 角速度乘以时间，然后转化成RotationnQuaternion,这是这段时间的姿态变化量
     const Eigen::Quaterniond zero_drift_compensation =
         AngleAxisVectorToRotationQuaternion(Eigen::Vector3d(cur_angular_velocity_compensation_ * delta_t));
-    // std::cout << "1 " << delta_t << std::endl;
-    // std::cout << "5 " << orientation.matrix().eulerAngles(2, 1, 0) << std::endl;
     orientation = (orientation * previous_zero_drift_compensation_ * zero_drift_compensation).normalized();
-    // std::cout << "6 " << orientation.matrix().eulerAngles(2, 1, 0) << std::endl;
   }
 
   /*
@@ -169,11 +163,10 @@ namespace estimation
       如果机器人移动缓慢，那么加速度测量影响因素直接来源于G/g：
       f=ma，a=f/m，m=G（重力）/g 。（9.8N/kg)
   */
-  ImuGravityCorrection::ImuGravityCorrection(const double imu_gravity_time_constant,
-                         const Ctime time)
-      : imu_gravity_time_constant_(imu_gravity_time_constant),
-        time_(time),
-        last_linear_acceleration_time_(Ctime::min()),
+  ImuGravityCorrection::ImuGravityCorrection(const TimeSec& time, double imu_gravity_time_constant)
+      : time_(time),
+        imu_gravity_time_constant_(imu_gravity_time_constant),
+        last_linear_acceleration_time_(0),
         orientation_(Eigen::Quaterniond::Identity()),
         gravity_vector_(Eigen::Vector3d::UnitZ()), // 重力方向初始化为[0,0,1]
         imu_angular_velocity_(Eigen::Vector3d::Zero())
@@ -181,12 +174,12 @@ namespace estimation
   }
 
   // 把ImuTracker更新到指定时刻time，并把响应的orientation_,gravity_vector_和time_进行更新
-  void ImuGravityCorrection::Advance(const Ctime time)
+  void ImuGravityCorrection::Advance(const TimeSec& time)
   {
     if (time < time_)
       return;
     
-    const double delta_t = std::chrono::duration<double>(time - time_).count();  // seconds
+    const double delta_t = (time - time_).count();  // seconds
     // std::cout << delta_t << std::endl;
 
     // 角速度乘以时间，然后转化成RotationnQuaternion,这是这段时间的姿态变化量
@@ -195,11 +188,6 @@ namespace estimation
     orientation_ = (orientation_ * rotation).normalized();
     gravity_vector_ = rotation.conjugate() * gravity_vector_;
     time_ = time;
-  }
-
-  void ImuGravityCorrection::Advance()
-  {
-    Advance(std::chrono::steady_clock::now());
   }
 
   // 根据读数更新线加速度。这里的线加速度是经过重力校正的。
@@ -215,7 +203,7 @@ namespace estimation
   {
     // Update the 'gravity_vector_' with an exponential moving average using the 'imu_gravity_time_constant'.
     const double delta_t =
-        last_linear_acceleration_time_ > Ctime::min()
+        last_linear_acceleration_time_ > TimeSec(0)
             ? (time_ - last_linear_acceleration_time_).count()
             : std::numeric_limits<double>::infinity();
     last_linear_acceleration_time_ = time_;

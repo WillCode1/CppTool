@@ -6,7 +6,8 @@
 
 namespace estimation
 {
-  using Ctime = std::chrono::steady_clock::time_point;
+  using TimeSec = std::chrono::duration<double, std::ratio<1>>;
+  // using TimeSec = std::chrono::steady_clock::time_point;
 
   // Returns a quaternion representing the same rotation as the given 'angle_axis' vector.
   template <typename T>
@@ -32,31 +33,31 @@ namespace estimation
   class ImuZeroDriftCompensation
   {
   public:
-    ImuZeroDriftCompensation(Ctime time = std::chrono::steady_clock::now(),
-                             const Eigen::Vector3d &filter_outlier_threshold = Eigen::Vector3d(0.1, 0.1, 0.1));
-    void updateStateMachine(bool is_static_now);
-    void calculateAndAddZeroDriftCompensation(Eigen::Quaterniond& orientation);
+    ImuZeroDriftCompensation(const TimeSec& time,
+                             const Eigen::Vector3d &filter_outlier_threshold = Eigen::Vector3d(0.2, 0.2, 0.2));
+    void updateStateMachine(bool is_static_now, const TimeSec& time);
+    void calculateAndAddZeroDriftCompensation(Eigen::Quaterniond& orientation, const TimeSec& time);
 
   private:
-    bool filterIfOutlier(const Eigen::Quaterniond &orientation);
-    void prepareForCalculateAngularVelocityCompensation(const Eigen::Quaterniond& orientation);
-    void updateZeroDriftAngularVelocityCompensation(const Eigen::Quaterniond &orientation);
-    void addZeroDriftCompensation(Eigen::Quaterniond& orientation);
+    bool filterIfOutlier(const Eigen::Quaterniond &orientation, const TimeSec& time);
+    void prepareForCalculateAngularVelocityCompensation(const Eigen::Quaterniond& orientation, const TimeSec& time);
+    void updateZeroDriftAngularVelocityCompensation(const Eigen::Quaterniond &orientation, const TimeSec& time);
+    void addZeroDriftCompensation(Eigen::Quaterniond& orientation, const TimeSec& time);
 
   private:
-    bool debug_{true};
+    bool debug_{false};
     // state machine
     bool last_is_static_{false};
     bool record_for_calculate_angular_velocity_{false};       // record quat_start_statistic_
     bool need_update_zero_drift_compensation_{false};         // need update zero drift compensation
-    Ctime time_for_start_static_;
+    TimeSec time_for_start_static_;
 
-    Ctime time_start_statistic_;                              // 开始统计时间
+    TimeSec time_start_statistic_;                            // 开始统计时间
     Eigen::Quaterniond quat_start_statistic_;                 // 静止时，开始角度
     Eigen::Quaterniond last_compensatoin_end_;                // 上次补偿终点
     Eigen::Vector3d filter_outlier_threshold_;                // 过滤异常值阈值
 
-    Ctime last_time_update_compensatoin_;                     // 上次补偿时间
+    TimeSec last_time_update_compensatoin_;                   // 上次补偿时间
     Eigen::Vector3d cur_angular_velocity_compensation_;       // 当前补偿的角速度
     Eigen::Quaterniond previous_zero_drift_compensation_;     // 累计的零漂补偿角度
   };
@@ -72,11 +73,10 @@ namespace estimation
   class ImuGravityCorrection
   {
   public:
-    ImuGravityCorrection(double imu_gravity_time_constant = 0.3f, Ctime time = std::chrono::steady_clock::now());
+    ImuGravityCorrection(const TimeSec& time, double imu_gravity_time_constant = 0.3f);
 
     // Advances to the given 'time' and updates the orientation to reflect this.
-    void Advance(Ctime time);
-    void Advance();
+    void Advance(const TimeSec& time);
 
     // Updates from an IMU reading (in the IMU frame).
     // 根据传感器读数更新传感器的最新状态，得到经过重力校正的线加速度、角速度等。
@@ -84,15 +84,15 @@ namespace estimation
     void AddImuAngularVelocityObservation(const Eigen::Vector3d &imu_angular_velocity);
 
     // Query the current time.
-    Ctime time() const { return time_; }
+    TimeSec time() const { return time_; }
 
     // Query the current orientation estimate.
     Eigen::Quaterniond orientation() const { return orientation_; }
 
   private:
     const double imu_gravity_time_constant_; // align重力的时间间隔
-    Ctime time_;
-    Ctime last_linear_acceleration_time_;
+    TimeSec time_;
+    TimeSec last_linear_acceleration_time_;
     Eigen::Quaterniond orientation_;       // 当前姿态
     Eigen::Vector3d gravity_vector_;       // 当前重力方向
     Eigen::Vector3d imu_angular_velocity_; // 角速度

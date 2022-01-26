@@ -203,6 +203,17 @@ typename Rigid3<FloatType>::Vector operator*(
     return rigid.quaternion() * point + rigid.translation();
 }
 
+template <typename T>
+std::ostream& operator<<(std::ostream& os,
+                         const Rigid3<T>& pose3) {
+    char buf[200] = {0};
+    sprintf(buf, "{ t: [%f, %f, %f], q: [%f, %f, %f] }",
+            pose3.translation().x(), pose3.translation().y(), pose3.translation().z(),
+            pose3.eulerAngle().x(), pose3.eulerAngle().y(), pose3.eulerAngle().z());
+    os << buf;
+    return os;
+}
+
 using Rigid3d = Rigid3<double>;
 using Rigid3f = Rigid3<float>;
 
