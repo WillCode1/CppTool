@@ -7,7 +7,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import math
 from Script.LogAnalysis.Tool import matrix_tool as mt
-from Script.LogAnalysis.Tool import angle_tool as at
 
 
 def cal_yaw(quat_w, quat_z):
@@ -45,11 +44,6 @@ def draw_track_by_topic(ros_bag, topic: str, color: str, label: str, reference=N
         b = cal_yaw(data['pose.pose.orientation.w'][0], data['pose.pose.orientation.z'][0])
         rotation = mt.rotation_matrix2d(a - b)
         coord = mt.coordinate_transformations_matrix2d(coord, rotation)
-
-        print(label, at.radian2angle(2 * math.acos(data['pose.pose.orientation.w'][0])),
-              at.radian2angle(2 * math.acos(reference['pose.pose.orientation.w'][0])),
-              at.radian2angle(2 * math.acos(reference['pose.pose.orientation.w'][0]) +
-                              2 * math.acos(data['pose.pose.orientation.w'][0])))
 
         trans_vector = np.array([reference['pose.pose.position.x'][0],
                                  reference['pose.pose.position.y'][0]]) - coord[0]

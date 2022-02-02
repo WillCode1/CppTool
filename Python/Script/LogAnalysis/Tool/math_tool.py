@@ -9,7 +9,11 @@ def normalize_theta(theta_matrix):
 
 
 def linear_interpolation(x1, y1, x2, y2, x):
-    return y1 + (x-x1)*(y2-y1)/(x2-x1)
+    if x == x1:
+        t = 0
+    else:
+        t = (x - x1) / (x2 - x1)
+    return y1 + t * (y2 - y1)
 
 
 # 插值计算
@@ -45,8 +49,10 @@ def interpolation(interpolate_data: np.array, target_x: np.array, mode="linear")
         time_index = np.argwhere(interpolate_data[:, 0] > res[index, 0])
         interpolation_right = np.min(time_index)
 
-        res[index, 1] = interpolation_func(interpolate_data[interpolation_left, 0], interpolate_data[interpolation_left, 1],
-                                           interpolate_data[interpolation_right, 0], interpolate_data[interpolation_right, 1],
+        res[index, 1] = interpolation_func(interpolate_data[interpolation_left, 0],
+                                           interpolate_data[interpolation_left, 1],
+                                           interpolate_data[interpolation_right, 0],
+                                           interpolate_data[interpolation_right, 1],
                                            res[index, 0])
     return res
 
