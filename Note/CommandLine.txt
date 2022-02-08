@@ -93,6 +93,7 @@ rosbag play <bagfile_name>
 rostest --text <bagname> <*.test/*.launch>
 
 rosrun rviz rviz
+rosrun rqt_bag rqt_bag 8445_2022-01-23-09-59-42.bag
 =====================================
 git push https://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@github.com/WillCode1/CppTool.git
 
