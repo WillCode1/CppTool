@@ -152,7 +152,7 @@ public:
         return euler;
     }
 
-    double &NormalizeAngle(double &theta, double min, double max)
+    static double &NormalizeAngle(double &theta, double min, double max)
     {
         while (theta >= max)
             theta -= 2 * M_PI;
@@ -160,11 +160,11 @@ public:
             theta += 2 * M_PI;
         return theta;
     }
-    void Normalize(const EulerAngle &target)
+    void Normalize()
     {
-        NormalizeAngle(target(2), roll_min, roll_max);
-        NormalizeAngle(target(1), pitch_min, pitch_max);
-        NormalizeAngle(target(0), yaw_min, yaw_max);
+        NormalizeAngle(euler_(2), roll_min, roll_max);
+        NormalizeAngle(euler_(1), pitch_min, pitch_max);
+        NormalizeAngle(euler_(0), yaw_min, yaw_max);
     }
 
 private:
@@ -207,7 +207,7 @@ template <typename T>
 std::ostream& operator<<(std::ostream& os,
                          const Rigid3<T>& pose3) {
     char buf[200] = {0};
-    sprintf(buf, "{ t: [%f, %f, %f], q: [%f, %f, %f] }",
+    sprintf(buf, "{ t: [%f, %f, %f], r: [%f, %f, %f] }",
             pose3.translation().x(), pose3.translation().y(), pose3.translation().z(),
             pose3.eulerAngle().x(), pose3.eulerAngle().y(), pose3.eulerAngle().z());
     os << buf;
