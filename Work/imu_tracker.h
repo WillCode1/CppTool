@@ -33,29 +33,40 @@ namespace estimation
   class ImuZeroDriftCompensation
   {
   public:
-    ImuZeroDriftCompensation(const TimeSec& time,
-                             const Eigen::Vector3d &filter_outlier_threshold = Eigen::Vector3d(0.2, 0.2, 0.2));
+    ImuZeroDriftCompensation(const TimeSec &time, bool imu_debug = false);
     void updateStateMachine(bool is_static_now, const TimeSec& time);
     void calculateAndAddZeroDriftCompensation(Eigen::Quaterniond& orientation, const TimeSec& time);
+    void setFilterOutlierThreshold(const Eigen::Vector3d& threshold);
+    void setFilterRandomErrorThreshold(const Eigen::Vector3d& threshold);
+    const Eigen::Vector3d &getTotalCompensationRadianAbs() const { return total_compensation_radian_abs_; }
+    void setStaticTimeout(const double &static_timeout) { static_timeout_ = static_timeout; }
 
   private:
     bool filterIfOutlier(const Eigen::Quaterniond &orientation, const TimeSec& time);
+    void filterRandomError(Eigen::Vector3d &cur_angular_velocity_compensation);
     void prepareForCalculateAngularVelocityCompensation(const Eigen::Quaterniond& orientation, const TimeSec& time);
     void updateZeroDriftAngularVelocityCompensation(const Eigen::Quaterniond &orientation, const TimeSec& time);
     void addZeroDriftCompensation(Eigen::Quaterniond& orientation, const TimeSec& time);
+    Eigen::Quaterniond calculateZeroDriftCompensation(const Eigen::Vector3d& angular_velocity_compensation, const double& delta_time);
 
   private:
+    // for test
     bool debug_{false};
+    bool first_time_{true};
+    Eigen::Vector3d total_compensation_radian_abs_;
+
     // state machine
     bool last_is_static_{false};
     bool record_for_calculate_angular_velocity_{false};       // record quat_start_statistic_
     bool need_update_zero_drift_compensation_{false};         // need update zero drift compensation
+    double static_timeout_;
     TimeSec time_for_start_static_;
 
     TimeSec time_start_statistic_;                            // 开始统计时间
     Eigen::Quaterniond quat_start_statistic_;                 // 静止时，开始角度
     Eigen::Quaterniond last_compensatoin_end_;                // 上次补偿终点
     Eigen::Vector3d filter_outlier_threshold_;                // 过滤异常值阈值
+    Eigen::Vector3d filter_random_error_threshold_;           // 排除只是随机误差的阈值
 
     TimeSec last_time_update_compensatoin_;                   // 上次补偿时间
     Eigen::Vector3d cur_angular_velocity_compensation_;       // 当前补偿的角速度
@@ -73,7 +84,10 @@ namespace estimation
   class ImuGravityCorrection
   {
   public:
-    ImuGravityCorrection(const TimeSec& time, double imu_gravity_time_constant = 0.3f);
+    ImuGravityCorrection(const TimeSec& time, const Eigen::Quaterniond& orientation, double imu_gravity_time_constant = 0.3f);
+
+    void Initialize(const TimeSec& time, const Eigen::Vector3d &imu_linear_acceleration, const Eigen::Vector3d &imu_angular_velocity);
+    void Update(const TimeSec& time, const Eigen::Vector3d &imu_linear_acceleration, const Eigen::Vector3d &imu_angular_velocity);
 
     // Advances to the given 'time' and updates the orientation to reflect this.
     void Advance(const TimeSec& time);

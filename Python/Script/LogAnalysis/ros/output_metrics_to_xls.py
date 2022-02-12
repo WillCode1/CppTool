@@ -19,6 +19,8 @@ def init_excel(sheet):
     sheet.write(1, 31, xlwt.Formula('SUMIF(C8:C146,R2,AF8:AF146)'))
     sheet.write(1, 32, xlwt.Formula('AC2/AE2'))
     sheet.write(1, 33, xlwt.Formula('AD2/AF2'))
+    sheet.write(1, 38, '=MAXIFS(AM8:AM146,C8:C146,R2)')
+    sheet.write(1, 39, '=MAXIFS(AN8:AN146,C8:C146,R2)')
 
     sheet.write(2, 18, xlwt.Formula('SUMIF(C8:C146,R3,S8:S146)'))
     sheet.write(2, 19, xlwt.Formula('SUMIF(C8:C146,R3,T8:T146)'))
@@ -33,6 +35,8 @@ def init_excel(sheet):
     sheet.write(2, 31, xlwt.Formula('SUMIF(C8:C146,R3,AF8:AF146)'))
     sheet.write(2, 32, xlwt.Formula('AC3/AE3'))
     sheet.write(2, 33, xlwt.Formula('AD3/AF3'))
+    sheet.write(2, 38, '=MAXIFS(AM8:AM146,C8:C146,R3)')
+    sheet.write(2, 39, '=MAXIFS(AN8:AN146,C8:C146,R3)')
 
 
 def write2xls(bm_list, src_name, dst_name):
@@ -73,6 +77,10 @@ def write2xls(bm_list, src_name, dst_name):
         sheet.write(bm.index, 29, float(bm.metrics['ekf']["total_ang_err"]))
         sheet.write(bm.index, 31, float(bm.metrics['ekf']["run_ang"]))
         sheet.write(bm.index, 33, float(bm.metrics['ekf']["mean_ang_err"]))
+
+        i = str(bm.index + 1)
+        sheet.write(bm.index, 38, xlwt.Formula('IF(AC' + i + '>S' + i + ',AC' + i + '-S' + i + ',0)'))
+        sheet.write(bm.index, 39, xlwt.Formula('IF(AD' + i + '>T' + i + ',AD' + i + '-T' + i + ',0)'))
 
     workbook.save(dst_name)
 
@@ -129,7 +137,7 @@ def check_file(file_path):
     bm_list = []
     for index in range(0, len(all_line)):
         if re.match(r'(\[0m\[ INFO] \[)([0-9]+).([0-9]+)(]: )', all_line[index]) is not None:
-            if all_line[index].find("test bag file:") != -1:
+            if all_line[index].find("test bag") != -1:
                 in_bag = True
                 bm = BagMetrics(all_line[index][all_line[index].rfind('/') + 1: all_line[index].rfind('.bag') + 4])
             elif all_line[index].find("one bag end!") != -1:
@@ -169,4 +177,4 @@ def check_file(file_path):
 
 if __name__ == '__main__':
     bm_list = check_file('/home/will/catkin_ws/log1.txt')
-    write2xls(bm_list, '/home/will/Desktop/rosbag_优化场景对比.xls', 'new_res.xls')
+    write2xls(bm_list, '/home/will/Desktop/rosbag_优化场景对比.xls', 'new_res1.xls')

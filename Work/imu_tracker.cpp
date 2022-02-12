@@ -1,18 +1,33 @@
 #include "robot_pose_ekf/imu_tracker.h"
 #include <limits>
 #include <iostream>
+#include <ros/ros.h>
 
 
 namespace estimation
 {
-  ImuZeroDriftCompensation::ImuZeroDriftCompensation(const TimeSec& time, const Eigen::Vector3d &filter_outlier_threshold)
+  ImuZeroDriftCompensation::ImuZeroDriftCompensation(const TimeSec &time, bool imu_debug)
       : last_time_update_compensatoin_(time),
-        filter_outlier_threshold_(filter_outlier_threshold),
+        debug_(imu_debug),
+        static_timeout_(1),
+        total_compensation_radian_abs_(Eigen::Vector3d::Zero()),
+        filter_outlier_threshold_(Eigen::Vector3d(0.2, 0.2, 0.2)),
+        filter_random_error_threshold_(Eigen::Vector3d(0.001, 0.001, 0.001)),
         cur_angular_velocity_compensation_(Eigen::Vector3d::Zero()),
         previous_zero_drift_compensation_(Eigen::Quaterniond::Identity())
   {
   }
 
+  void ImuZeroDriftCompensation::setFilterOutlierThreshold(const Eigen::Vector3d &threshold)
+  {
+    filter_outlier_threshold_ = threshold;
+  }
+  
+  void ImuZeroDriftCompensation::setFilterRandomErrorThreshold(const Eigen::Vector3d &threshold)
+  {
+    filter_random_error_threshold_ = threshold;
+  }
+  
   void ImuZeroDriftCompensation::updateStateMachine(bool is_static_now, const TimeSec& time)
   {
     if (is_static_now)
@@ -24,7 +39,7 @@ namespace estimation
         time_for_start_static_ = time;
       }
       // static and timeout(1 second)
-      else if ((time - time_for_start_static_).count() > 1.)
+      else if ((time - time_for_start_static_).count() > static_timeout_ || (time - time_for_start_static_).count() > 0.2 && first_time_)
       {
         need_update_zero_drift_compensation_ = true;
         time_for_start_static_ = time;
@@ -61,28 +76,58 @@ namespace estimation
 
   bool ImuZeroDriftCompensation::filterIfOutlier(const Eigen::Quaterniond &orientation, const TimeSec& time)
   {
-    double delta_t = (time - last_time_update_compensatoin_).count();  // seconds
+    // 与最新时间比较，避免一开始是运动的
+    double delta_t = (time - std::max(time_start_statistic_, last_time_update_compensatoin_)).count();  // seconds
 
+    // 计算最近1秒内的平均漂移
     const auto &start = last_compensatoin_end_.matrix().eulerAngles(0, 1, 2);
     const auto &end = orientation.matrix().eulerAngles(0, 1, 2);
     last_compensatoin_end_ = orientation;
 
     const auto &cur_imu_angular_velocity = (start - end) / delta_t;
-    // std::cout << "3 " << cur_imu_angular_velocity << std::endl;
 
+    if (debug_)
+    {
+      ROS_INFO("filterIfOutlier ang_vel wat: [%f, %f, %f]",
+               cur_imu_angular_velocity.x(), cur_imu_angular_velocity.y(), cur_imu_angular_velocity.z());
+      ROS_INFO("filterIfOutlier ang_vel pre: [%f, %f, %f]",
+               cur_angular_velocity_compensation_.x(), cur_angular_velocity_compensation_.y(), cur_angular_velocity_compensation_.z());
+    }
+
+    bool need_filter = true;
     if (std::abs(cur_imu_angular_velocity.x() - cur_angular_velocity_compensation_.x()) < filter_outlier_threshold_.x() &&
         std::abs(cur_imu_angular_velocity.y() - cur_angular_velocity_compensation_.y()) < filter_outlier_threshold_.y() &&
         std::abs(cur_imu_angular_velocity.z() - cur_angular_velocity_compensation_.z()) < filter_outlier_threshold_.z())
     {
-      return false;
+      need_filter = false;
     }
 
     if (debug_)
     {
-      std::cout << "3 " << cur_imu_angular_velocity << std::endl;
-      std::cout << "=======================================================" << std::endl;
+      ROS_INFO_COND(need_filter, "filterIfOutlier!");
+      ROS_INFO("=======================================================");
     }
-    return true;
+
+    return need_filter;
+  }
+
+  void ImuZeroDriftCompensation::filterRandomError(Eigen::Vector3d &cur_angular_velocity_compensation)
+  {
+    if (std::abs(cur_angular_velocity_compensation.x()) < filter_random_error_threshold_.x())
+    {
+      cur_angular_velocity_compensation.x() = 0;
+      ROS_INFO_COND(debug_, "filterRandomError x!");
+    }
+    if (std::abs(cur_angular_velocity_compensation.y()) < filter_random_error_threshold_.y())
+    {
+      cur_angular_velocity_compensation.y() = 0;
+      ROS_INFO_COND(debug_, "filterRandomError y!");
+    }
+    if (std::abs(cur_angular_velocity_compensation.z()) < filter_random_error_threshold_.z())
+    {
+      cur_angular_velocity_compensation.z() = 0;
+      ROS_INFO_COND(debug_, "filterRandomError z!");
+    }
   }
 
   void ImuZeroDriftCompensation::prepareForCalculateAngularVelocityCompensation(const Eigen::Quaterniond &orientation, const TimeSec& time)
@@ -92,17 +137,14 @@ namespace estimation
 
     if (debug_)
     {
-      std::cout << "prepareForCalculateAngularVelocityCompensation!" << std::endl;
+      ROS_INFO("reset of statistic status!");
     }
   }
 
   void ImuZeroDriftCompensation::updateZeroDriftAngularVelocityCompensation(const Eigen::Quaterniond &orientation, const TimeSec& time)
   {
-    double delta_t = (time - last_time_update_compensatoin_).count();  // seconds
-
-    // 角速度乘以时间，然后转化成RotationnQuaternion,这是这段时间的姿态变化量
-    const Eigen::Quaterniond zero_drift_compensation =
-        AngleAxisVectorToRotationQuaternion(Eigen::Vector3d(cur_angular_velocity_compensation_ * delta_t));
+    double delta_since_last_update = (time - last_time_update_compensatoin_).count();  // seconds
+    const Eigen::Quaterniond& zero_drift_compensation = calculateZeroDriftCompensation(cur_angular_velocity_compensation_, delta_since_last_update);
     previous_zero_drift_compensation_ = (previous_zero_drift_compensation_ * zero_drift_compensation).normalized();
 
     if (filterIfOutlier(orientation, time))
@@ -111,33 +153,49 @@ namespace estimation
     }
     else
     {
+      // 使用从静止后的平均漂移
       const auto &start = quat_start_statistic_.matrix().eulerAngles(0, 1, 2);
       const auto &end = orientation.matrix().eulerAngles(0, 1, 2);
-      delta_t = (time - time_start_statistic_).count();
-      const auto &mean_imu_angular_velocity = (start - end) / delta_t;
+      const auto &delta_statistic = (time - time_start_statistic_).count();
+      const auto &mean_imu_angular_velocity = (start - end) / delta_statistic;
 
       // only yaw
       cur_angular_velocity_compensation_.z() = mean_imu_angular_velocity.z();
-      // cur_angular_velocity_compensation_ = mean_imu_angular_velocity;
+
+      // 过滤随机误差，避免放大
+      filterRandomError(cur_angular_velocity_compensation_);
     }
 
     last_time_update_compensatoin_ = time;
 
+    ROS_INFO_COND(first_time_ && delta_since_last_update > 2 * static_timeout_, "Maybe dont stop at first!");
+    ROS_WARN_COND(first_time_ && delta_since_last_update > 2 * static_timeout_, "Maybe dont stop at first!");
+    ROS_INFO_COND(debug_ || first_time_, "Time since last compensation and new ang_vel compensation: %f(s), [%f, %f, %f]", delta_since_last_update,
+                  cur_angular_velocity_compensation_.x(), cur_angular_velocity_compensation_.y(), cur_angular_velocity_compensation_.z());
+    if (first_time_)
+    {
+      first_time_ = false;
+    }
+
     if (debug_)
     {
-      std::cout << "2 " << cur_angular_velocity_compensation_ << std::endl;
-      std::cout << "Update zero drift angular velocity compensation!" << std::endl;
+      ROS_INFO("Update zero drift angular velocity compensation!");
     }
   }
 
   void ImuZeroDriftCompensation::addZeroDriftCompensation(Eigen::Quaterniond &orientation, const TimeSec& time)
   {
     const double delta_t = (time - last_time_update_compensatoin_).count();  // seconds
-
-    // 角速度乘以时间，然后转化成RotationnQuaternion,这是这段时间的姿态变化量
-    const Eigen::Quaterniond zero_drift_compensation =
-        AngleAxisVectorToRotationQuaternion(Eigen::Vector3d(cur_angular_velocity_compensation_ * delta_t));
+    const Eigen::Quaterniond& zero_drift_compensation = calculateZeroDriftCompensation(cur_angular_velocity_compensation_, delta_t);
     orientation = (orientation * previous_zero_drift_compensation_ * zero_drift_compensation).normalized();
+  }
+
+  Eigen::Quaterniond ImuZeroDriftCompensation::calculateZeroDriftCompensation(const Eigen::Vector3d &angular_velocity_compensation, const double &delta_time)
+  {
+    // 角速度乘以时间，然后转化成RotationnQuaternion,这是这段时间的姿态变化量
+    const auto &compensation_aux = Eigen::Vector3d(angular_velocity_compensation * delta_time);
+    total_compensation_radian_abs_ += compensation_aux.cwiseAbs();
+    return AngleAxisVectorToRotationQuaternion(compensation_aux);
   }
 
   /*
@@ -163,14 +221,28 @@ namespace estimation
       如果机器人移动缓慢，那么加速度测量影响因素直接来源于G/g：
       f=ma，a=f/m，m=G（重力）/g 。（9.8N/kg)
   */
-  ImuGravityCorrection::ImuGravityCorrection(const TimeSec& time, double imu_gravity_time_constant)
+  ImuGravityCorrection::ImuGravityCorrection(const TimeSec& time, const Eigen::Quaterniond& orientation, double imu_gravity_time_constant)
       : time_(time),
         imu_gravity_time_constant_(imu_gravity_time_constant),
         last_linear_acceleration_time_(0),
-        orientation_(Eigen::Quaterniond::Identity()),
+        orientation_(orientation),
         gravity_vector_(Eigen::Vector3d::UnitZ()), // 重力方向初始化为[0,0,1]
         imu_angular_velocity_(Eigen::Vector3d::Zero())
   {
+  }
+
+  void ImuGravityCorrection::Initialize(const TimeSec &time, const Eigen::Vector3d &imu_linear_acceleration, const Eigen::Vector3d &imu_angular_velocity)
+  {
+    AddImuLinearAccelerationObservation(imu_linear_acceleration);
+    AddImuAngularVelocityObservation(imu_angular_velocity);
+    Advance(time);
+  }
+  
+  void ImuGravityCorrection::Update(const TimeSec &time, const Eigen::Vector3d &imu_linear_acceleration, const Eigen::Vector3d &imu_angular_velocity)
+  {
+    Advance(time);
+    AddImuLinearAccelerationObservation(imu_linear_acceleration);
+    AddImuAngularVelocityObservation(imu_angular_velocity);
   }
 
   // 把ImuTracker更新到指定时刻time，并把响应的orientation_,gravity_vector_和time_进行更新
@@ -186,6 +258,7 @@ namespace estimation
     const Eigen::Quaterniond rotation =
         AngleAxisVectorToRotationQuaternion(Eigen::Vector3d(imu_angular_velocity_ * delta_t));
     orientation_ = (orientation_ * rotation).normalized();
+    // 1.先用角速度积分计算重力方向
     gravity_vector_ = rotation.conjugate() * gravity_vector_;
     time_ = time;
   }
@@ -208,10 +281,12 @@ namespace estimation
             : std::numeric_limits<double>::infinity();
     last_linear_acceleration_time_ = time_;
     const double alpha = 1. - std::exp(-delta_t / imu_gravity_time_constant_);
+    // 2.再综合线速度修正重力方向
     gravity_vector_ = (1. - alpha) * gravity_vector_ + alpha * imu_linear_acceleration;
-    // Change the 'orientation_' so that it agrees with the current 'gravity_vector_'.
+    // 3.计算修正重力方向与步骤1结果的角度差
     const Eigen::Quaterniond rotation = 
         Eigen::Quaterniond::FromTwoVectors(gravity_vector_, orientation_.conjugate() * Eigen::Vector3d::UnitZ());
+    // 4.修正姿态
     orientation_ = (orientation_ * rotation).normalized();
 
     assert((orientation_ * gravity_vector_).z() > 0.);
