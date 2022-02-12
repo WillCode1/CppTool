@@ -49,5 +49,16 @@ namespace cpp11 {
 			auto res = std::search(vec.begin(), vec.end(), s.begin(), s.end());
 			res = std::search_n(vec.begin(), vec.end(), 1, 1);
 		}
+
+        void LowerAndUpperBound()
+        {
+            std::vector<int> num = { 1,2,4,7,15,34 };
+            std::sort(num.begin(), num.end());
+            auto iter1 = lower_bound(num.begin(), num.end(), 7);    //返回数组中第一个大于或等于被查数的值 
+            auto iter2 = upper_bound(num.begin(), num.end(), 7);    //返回数组中第一个大于被查数的值
+            //std::sort(num.begin(), num.end(), greater<int>());
+            //auto iter3 = lower_bound(num.begin(), num.end(), 8);    //返回数组中第一个大于或等于被查数的值 
+            //auto iter4 = upper_bound(num.begin(), num.end(), 8);    //返回数组中第一个大于被查数的值
+        }
 	};
 }

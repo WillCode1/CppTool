@@ -8,7 +8,7 @@ using namespace Eigen;
 void LeastSquareMethod()
 {
     //¶Ô·½³ÌAx=b
-    MatrixXf A = MatrixXf::Random(3, 2);
+    MatrixXf A = MatrixXf::Random(3, 3);
     VectorXf b = VectorXf::Random(3);
     std::cout << "Here is the matrix A:\n" << A << std::endl;
     std::cout << "Here is the right hand side b:\n" << b << std::endl;
