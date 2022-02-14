@@ -95,9 +95,7 @@ namespace estimation
     }
 
     bool need_filter = true;
-    if (std::abs(cur_imu_angular_velocity.x() - cur_angular_velocity_compensation_.x()) < filter_outlier_threshold_.x() &&
-        std::abs(cur_imu_angular_velocity.y() - cur_angular_velocity_compensation_.y()) < filter_outlier_threshold_.y() &&
-        std::abs(cur_imu_angular_velocity.z() - cur_angular_velocity_compensation_.z()) < filter_outlier_threshold_.z())
+    if (std::abs(cur_imu_angular_velocity.z() - cur_angular_velocity_compensation_.z()) < filter_outlier_threshold_.z())
     {
       need_filter = false;
     }
@@ -113,16 +111,6 @@ namespace estimation
 
   void ImuZeroDriftCompensation::filterRandomError(Eigen::Vector3d &cur_angular_velocity_compensation)
   {
-    if (std::abs(cur_angular_velocity_compensation.x()) < filter_random_error_threshold_.x())
-    {
-      cur_angular_velocity_compensation.x() = 0;
-      ROS_INFO_COND(debug_, "filterRandomError x!");
-    }
-    if (std::abs(cur_angular_velocity_compensation.y()) < filter_random_error_threshold_.y())
-    {
-      cur_angular_velocity_compensation.y() = 0;
-      ROS_INFO_COND(debug_, "filterRandomError y!");
-    }
     if (std::abs(cur_angular_velocity_compensation.z()) < filter_random_error_threshold_.z())
     {
       cur_angular_velocity_compensation.z() = 0;
@@ -221,46 +209,46 @@ namespace estimation
       如果机器人移动缓慢，那么加速度测量影响因素直接来源于G/g：
       f=ma，a=f/m，m=G（重力）/g 。（9.8N/kg)
   */
-  ImuGravityCorrection::ImuGravityCorrection(const TimeSec& time, const Eigen::Quaterniond& orientation, double imu_gravity_time_constant)
-      : time_(time),
+  ImuGravityCorrection::ImuGravityCorrection(const TimeSec& time, double imu_gravity_time_constant)
+      : last_advance_time_(time),
         imu_gravity_time_constant_(imu_gravity_time_constant),
-        last_linear_acceleration_time_(0),
-        orientation_(orientation),
-        gravity_vector_(Eigen::Vector3d::UnitZ()), // 重力方向初始化为[0,0,1]
-        imu_angular_velocity_(Eigen::Vector3d::Zero())
+        last_gyroscope_orientation_(Eigen::Quaterniond::Identity()),
+        orientation_(Eigen::Quaterniond::Identity()),
+        gravity_vector_(Eigen::Vector3d::UnitZ()) // 重力方向初始化为[0,0,1]
   {
   }
 
-  void ImuGravityCorrection::Initialize(const TimeSec &time, const Eigen::Vector3d &imu_linear_acceleration, const Eigen::Vector3d &imu_angular_velocity)
+  void ImuGravityCorrection::Advance(const TimeSec &time, const Eigen::Quaterniond &orientation, const Eigen::Vector3d &imu_linear_acceleration, bool keep_original_yaw)
   {
-    AddImuLinearAccelerationObservation(imu_linear_acceleration);
-    AddImuAngularVelocityObservation(imu_angular_velocity);
-    Advance(time);
-  }
-  
-  void ImuGravityCorrection::Update(const TimeSec &time, const Eigen::Vector3d &imu_linear_acceleration, const Eigen::Vector3d &imu_angular_velocity)
-  {
-    Advance(time);
-    AddImuLinearAccelerationObservation(imu_linear_acceleration);
-    AddImuAngularVelocityObservation(imu_angular_velocity);
-  }
-
-  // 把ImuTracker更新到指定时刻time，并把响应的orientation_,gravity_vector_和time_进行更新
-  void ImuGravityCorrection::Advance(const TimeSec& time)
-  {
-    if (time < time_)
+    if (time < last_advance_time_)
       return;
-    
-    const double delta_t = (time - time_).count();  // seconds
-    // std::cout << delta_t << std::endl;
 
-    // 角速度乘以时间，然后转化成RotationnQuaternion,这是这段时间的姿态变化量
-    const Eigen::Quaterniond rotation =
-        AngleAxisVectorToRotationQuaternion(Eigen::Vector3d(imu_angular_velocity_ * delta_t));
-    orientation_ = (orientation_ * rotation).normalized();
-    // 1.先用角速度积分计算重力方向
+    auto rotation1 = AddImuAngularVelocityObservation(orientation);
+    auto rotation2 = AddImuLinearAccelerationObservation(time, imu_linear_acceleration);
+    if (keep_original_yaw)
+    {
+      KeepOriginalYaw(orientation);
+    }
+
+    if (false)
+    {
+      auto tmp = RotationMatrix2YPR((rotation1 * rotation2).matrix());
+      ROS_INFO("change = (%f, %f, %f)", tmp.x(), tmp.y(), tmp.z());
+    }
+
+    assert((orientation_ * gravity_vector_).z() > 0.);
+    assert((orientation_ * gravity_vector_).normalized().z() > 0.99);
+  }
+
+  // 把ImuTracker更新到指定时刻time，并把响应的orientation_, gravity_vector_和time_进行更新
+  Eigen::Quaterniond ImuGravityCorrection::AddImuAngularVelocityObservation(const Eigen::Quaterniond &orientation)
+  {
+    // 1.先用陀螺仪计算重力方向
+    auto rotation = last_gyroscope_orientation_.inverse() * orientation;
+    last_gyroscope_orientation_ = orientation;
     gravity_vector_ = rotation.conjugate() * gravity_vector_;
-    time_ = time;
+    orientation_ = orientation_ * rotation;
+    return rotation;
   }
 
   // 根据读数更新线加速度。这里的线加速度是经过重力校正的。
@@ -272,29 +260,30 @@ namespace estimation
     3),gravity_vector_=(1-alpha)*gv_+alpha*imu_line;
     4),更新orientation_
   */
-  void ImuGravityCorrection::AddImuLinearAccelerationObservation(const Eigen::Vector3d &imu_linear_acceleration)
+  Eigen::Quaterniond ImuGravityCorrection::AddImuLinearAccelerationObservation(const TimeSec &time, const Eigen::Vector3d &imu_linear_acceleration)
   {
     // Update the 'gravity_vector_' with an exponential moving average using the 'imu_gravity_time_constant'.
     const double delta_t =
-        last_linear_acceleration_time_ > TimeSec(0)
-            ? (time_ - last_linear_acceleration_time_).count()
-            : std::numeric_limits<double>::infinity();
-    last_linear_acceleration_time_ = time_;
+        last_advance_time_ > TimeSec(0) ? (time - last_advance_time_).count() : std::numeric_limits<double>::infinity();
+    last_advance_time_ = time;
     const double alpha = 1. - std::exp(-delta_t / imu_gravity_time_constant_);
     // 2.再综合线速度修正重力方向
     gravity_vector_ = (1. - alpha) * gravity_vector_ + alpha * imu_linear_acceleration;
     // 3.计算修正重力方向与步骤1结果的角度差
-    const Eigen::Quaterniond rotation = 
-        Eigen::Quaterniond::FromTwoVectors(gravity_vector_, orientation_.conjugate() * Eigen::Vector3d::UnitZ());
+    auto rotation = Eigen::Quaterniond::FromTwoVectors(gravity_vector_, orientation_.conjugate() * Eigen::Vector3d::UnitZ());
     // 4.修正姿态
     orientation_ = (orientation_ * rotation).normalized();
-
-    assert((orientation_ * gravity_vector_).z() > 0.);
-    assert((orientation_ * gravity_vector_).normalized().z() > 0.99);
+    return rotation;
   }
 
-  void ImuGravityCorrection::AddImuAngularVelocityObservation(const Eigen::Vector3d &imu_angular_velocity)
+  void ImuGravityCorrection::KeepOriginalYaw(const Eigen::Quaterniond &original)
   {
-    imu_angular_velocity_ = imu_angular_velocity;
+    // recover original yaw
+    auto euler = RotationMatrix2YPR(original.matrix());
+    auto euler_cor = RotationMatrix2YPR(orientation_.matrix());
+    Eigen::AngleAxisd roll(euler_cor(2), Eigen::Vector3d::UnitX());
+    Eigen::AngleAxisd pitch(euler_cor(1), Eigen::Vector3d::UnitY());
+    Eigen::AngleAxisd yaw(euler(0), Eigen::Vector3d::UnitZ());
+    orientation_ = yaw * pitch * roll;
   }
 }

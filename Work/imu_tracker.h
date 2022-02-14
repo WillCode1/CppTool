@@ -26,6 +26,22 @@ namespace estimation
     return Eigen::Quaternion<T>(w, quaternion_xyz.x(), quaternion_xyz.y(), quaternion_xyz.z());
   }
 
+  static Eigen::Vector3d RotationMatrix2YPR(const Eigen::Matrix3d &rotation)
+  {
+    Eigen::Vector3d n = rotation.col(0);
+    Eigen::Vector3d o = rotation.col(1);
+    Eigen::Vector3d a = rotation.col(2);
+
+    Eigen::Vector3d ypr(3);
+    const double &y = atan2(n(1), n(0));
+    const double &p = atan2(-n(2), n(0) * cos(y) + n(1) * sin(y));
+    const double &r = atan2(a(0) * sin(y) - a(1) * cos(y), -o(0) * sin(y) + o(1) * cos(y));
+    ypr(0) = y;
+    ypr(1) = p;
+    ypr(2) = r;
+    return ypr;
+  }
+
   /*
       维护robot状态
       静止时,更新imu零漂情况；运动时,补偿
@@ -84,32 +100,31 @@ namespace estimation
   class ImuGravityCorrection
   {
   public:
-    ImuGravityCorrection(const TimeSec& time, const Eigen::Quaterniond& orientation, double imu_gravity_time_constant = 0.3f);
-
-    void Initialize(const TimeSec& time, const Eigen::Vector3d &imu_linear_acceleration, const Eigen::Vector3d &imu_angular_velocity);
-    void Update(const TimeSec& time, const Eigen::Vector3d &imu_linear_acceleration, const Eigen::Vector3d &imu_angular_velocity);
+    ImuGravityCorrection(const TimeSec& time, double imu_gravity_time_constant = 0.3f);
 
     // Advances to the given 'time' and updates the orientation to reflect this.
-    void Advance(const TimeSec& time);
+    void Advance(const TimeSec &time, const Eigen::Quaterniond &orientation, const Eigen::Vector3d &imu_linear_acceleration, bool keep_original_yaw = false);
 
     // Updates from an IMU reading (in the IMU frame).
     // 根据传感器读数更新传感器的最新状态，得到经过重力校正的线加速度、角速度等。
-    void AddImuLinearAccelerationObservation(const Eigen::Vector3d &imu_linear_acceleration);
-    void AddImuAngularVelocityObservation(const Eigen::Vector3d &imu_angular_velocity);
+    Eigen::Quaterniond AddImuAngularVelocityObservation(const Eigen::Quaterniond &orientation);
+    Eigen::Quaterniond AddImuLinearAccelerationObservation(const TimeSec &time, const Eigen::Vector3d &imu_linear_acceleration);
+
+    // keep original yaw
+    void KeepOriginalYaw(const Eigen::Quaterniond &original);
 
     // Query the current time.
-    TimeSec time() const { return time_; }
+    TimeSec time() const { return last_advance_time_; }
 
     // Query the current orientation estimate.
     Eigen::Quaterniond orientation() const { return orientation_; }
 
   private:
     const double imu_gravity_time_constant_; // align重力的时间间隔
-    TimeSec time_;
-    TimeSec last_linear_acceleration_time_;
+    TimeSec last_advance_time_;
+    Eigen::Quaterniond last_gyroscope_orientation_; // 上次陀螺仪姿态
     Eigen::Quaterniond orientation_;       // 当前姿态
     Eigen::Vector3d gravity_vector_;       // 当前重力方向
-    Eigen::Vector3d imu_angular_velocity_; // 角速度
   };
 }
 
