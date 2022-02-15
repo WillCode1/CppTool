@@ -45,6 +45,7 @@ namespace estimation
   /*
       维护robot状态
       静止时,更新imu零漂情况；运动时,补偿
+      只补偿yaw
    */
   class ImuZeroDriftCompensation
   {
@@ -52,8 +53,8 @@ namespace estimation
     ImuZeroDriftCompensation(const TimeSec &time, bool imu_debug = false);
     void updateStateMachine(bool is_static_now, const TimeSec& time);
     void calculateAndAddZeroDriftCompensation(Eigen::Quaterniond& orientation, const TimeSec& time);
-    void setFilterOutlierThreshold(const Eigen::Vector3d& threshold);
-    void setFilterRandomErrorThreshold(const Eigen::Vector3d& threshold);
+    void setFilterOutlierThreshold(const double& threshold);
+    void setFilterRandomErrorThreshold(const double& threshold);
     const Eigen::Vector3d &getTotalCompensationRadianAbs() const { return total_compensation_radian_abs_; }
     void setStaticTimeout(const double &static_timeout) { static_timeout_ = static_timeout; }
 
@@ -81,8 +82,8 @@ namespace estimation
     TimeSec time_start_statistic_;                            // 开始统计时间
     Eigen::Quaterniond quat_start_statistic_;                 // 静止时，开始角度
     Eigen::Quaterniond last_compensatoin_end_;                // 上次补偿终点
-    Eigen::Vector3d filter_outlier_threshold_;                // 过滤异常值阈值
-    Eigen::Vector3d filter_random_error_threshold_;           // 排除只是随机误差的阈值
+    double filter_outlier_threshold_;                         // 过滤异常值阈值
+    double filter_random_error_threshold_;                    // 排除只是随机误差的阈值
 
     TimeSec last_time_update_compensatoin_;                   // 上次补偿时间
     Eigen::Vector3d cur_angular_velocity_compensation_;       // 当前补偿的角速度
@@ -103,7 +104,7 @@ namespace estimation
     ImuGravityCorrection(const TimeSec& time, double imu_gravity_time_constant = 0.3f);
 
     // Advances to the given 'time' and updates the orientation to reflect this.
-    void Advance(const TimeSec &time, const Eigen::Quaterniond &orientation, const Eigen::Vector3d &imu_linear_acceleration, bool keep_original_yaw = false);
+    void Advance(const TimeSec &time, const Eigen::Quaterniond &orientation, const Eigen::Vector3d &imu_linear_acceleration);
 
     // Updates from an IMU reading (in the IMU frame).
     // 根据传感器读数更新传感器的最新状态，得到经过重力校正的线加速度、角速度等。

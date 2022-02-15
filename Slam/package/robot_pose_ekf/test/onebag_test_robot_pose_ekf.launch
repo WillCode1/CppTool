@@ -1,0 +1,48 @@
+<launch>
+  <!-- use sim time -->
+  <!-- <param name="use_sim_time" value="true"/> -->
+
+  <!-- Robot pose ekf -->
+  <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf" output="screen">
+    <param name="base_footprint_frame" value="base_link"/>
+    <param name="freq" value="30.0"/>
+    <param name="sensor_timeout" value="1.0"/>
+    <param name="odom_used" value="true"/>
+    <param name="imu_used" value="true"/>
+    <param name="lo_used" value="true"/>
+    <param name="vo_used" value="false"/>
+    <param name="gps_used" value="false"/>
+
+    <param name="zero_drift_compensation" value="true"/>
+    <param name="correct_imu_by_gravity" value="true"/>
+    
+    <param name="ues_costmap_tracker" value="true"/>
+    <param name="dynamic_obstacle_judged_vel" value="0.01"/>
+    <param name="dynamic_scene_judged_num" value="5"/>
+
+    <param name="test_mode" value="false"/>
+    <param name="imu_debug" value="false"/>
+
+    <param name="output_frame" value="odom"/>
+    <remap from="odom" to="/peter_motor_core/odom" />
+    <remap from="lo" to="/odom_rf2o" />
+  </node>
+
+  <node pkg="rf2o_laser_odometry" type="rf2o_laser_odometry_node" name="rf2o_laser_odometry">
+    <param name="laser_scan_topic" value="/scan"/>        # topic where the lidar scans are being published
+    <param name="odom_topic" value="/odom_rf2o" />        # topic where tu publish the odometry estimations
+    <param name="publish_tf" value="false" />             # wheter or not to publish the tf::transform (base->odom)
+    <param name="base_frame_id" value="base_link"/>       # frame_id (tf) of the mobile robot base. A tf transform from the laser_frame to the base_frame is mandatory
+    <param name="odom_frame_id" value="odom" />           # frame_id (tf) to publish the odometry estimations    
+    <param name="init_pose_from_topic" value="" />        # (Odom topic) Leave empty to start at point (0,0)
+    <param name="freq" value="15"/>                       # Execution frequency.
+    <param name="min_coeff_threshold" value="0.7"/>       # Drop lo min coeff threshold.
+    <param name="verbose" value="false" />                # verbose
+  </node>
+
+  <node pkg="rosbag" name="rosbag2" type="record" args="-O ekf_pose_record.bag -a" />
+  <node pkg="rosbag" name="rosbag1" type="play" args="--clock --hz 100 -d .4 /odom_rf2o:=/faker /home/will/bagfiles/test/8301_2022-01-24-12-27-40.bag" />
+
+<!-- /odom_rf2o:=/faker -->
+  <!-- <test test-name="test_robot_pose_ekf" pkg="robot_pose_ekf" type="test_robot_pose_ekf" time-limit="120" /> -->
+</launch>

@@ -11,19 +11,19 @@ namespace estimation
         debug_(imu_debug),
         static_timeout_(1),
         total_compensation_radian_abs_(Eigen::Vector3d::Zero()),
-        filter_outlier_threshold_(Eigen::Vector3d(0.2, 0.2, 0.2)),
-        filter_random_error_threshold_(Eigen::Vector3d(0.001, 0.001, 0.001)),
+        filter_outlier_threshold_(0.2),
+        filter_random_error_threshold_(0.001),
         cur_angular_velocity_compensation_(Eigen::Vector3d::Zero()),
         previous_zero_drift_compensation_(Eigen::Quaterniond::Identity())
   {
   }
 
-  void ImuZeroDriftCompensation::setFilterOutlierThreshold(const Eigen::Vector3d &threshold)
+  void ImuZeroDriftCompensation::setFilterOutlierThreshold(const double &threshold)
   {
     filter_outlier_threshold_ = threshold;
   }
   
-  void ImuZeroDriftCompensation::setFilterRandomErrorThreshold(const Eigen::Vector3d &threshold)
+  void ImuZeroDriftCompensation::setFilterRandomErrorThreshold(const double &threshold)
   {
     filter_random_error_threshold_ = threshold;
   }
@@ -95,7 +95,7 @@ namespace estimation
     }
 
     bool need_filter = true;
-    if (std::abs(cur_imu_angular_velocity.z() - cur_angular_velocity_compensation_.z()) < filter_outlier_threshold_.z())
+    if (std::abs(cur_imu_angular_velocity.z() - cur_angular_velocity_compensation_.z()) < filter_outlier_threshold_)
     {
       need_filter = false;
     }
@@ -111,7 +111,7 @@ namespace estimation
 
   void ImuZeroDriftCompensation::filterRandomError(Eigen::Vector3d &cur_angular_velocity_compensation)
   {
-    if (std::abs(cur_angular_velocity_compensation.z()) < filter_random_error_threshold_.z())
+    if (std::abs(cur_angular_velocity_compensation.z()) < filter_random_error_threshold_)
     {
       cur_angular_velocity_compensation.z() = 0;
       ROS_INFO_COND(debug_, "filterRandomError z!");
@@ -218,17 +218,14 @@ namespace estimation
   {
   }
 
-  void ImuGravityCorrection::Advance(const TimeSec &time, const Eigen::Quaterniond &orientation, const Eigen::Vector3d &imu_linear_acceleration, bool keep_original_yaw)
+  void ImuGravityCorrection::Advance(const TimeSec &time, const Eigen::Quaterniond &orientation, const Eigen::Vector3d &imu_linear_acceleration)
   {
     if (time < last_advance_time_)
       return;
 
     auto rotation1 = AddImuAngularVelocityObservation(orientation);
     auto rotation2 = AddImuLinearAccelerationObservation(time, imu_linear_acceleration);
-    if (keep_original_yaw)
-    {
-      KeepOriginalYaw(orientation);
-    }
+    KeepOriginalYaw(orientation);
 
     if (false)
     {
