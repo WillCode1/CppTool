@@ -86,7 +86,7 @@ public:
     static long unsigned int nNextId;
     long int mnFirstKFid;
     long int mnFirstFrame;
-    int nObs;
+    int nObs;   //记录被观测的次数
 
     // Variables used by the tracking
     float mTrackProjX;

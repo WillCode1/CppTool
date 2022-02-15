@@ -57,7 +57,19 @@ Frame::Frame(const Frame &frame)
         SetPose(frame.mTcw);
 }
 
-
+//https://zhuanlan.zhihu.com/p/84201110
+/*
+    const cv::Mat &imLeft, //左目图像
+    const cv::Mat &imRight, //右目图像
+    const double &timeStamp, //时间戳
+    ORBextractor* extractorLeft, //左目特征提取
+    ORBextractor* extractorRight, //右目特征提取
+    ORBVocabulary* voc, //词袋数据
+    cv::Mat &K, //相机内参
+    cv::Mat &distCoef, //图像校正参数
+    const float &bf, // bf=双目基线 * fx
+    const float &thDepth //这是深度值的阈值，按照特征点深度值大于或小于这个值，把他们分为close和far两类
+ */
 Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeStamp, ORBextractor* extractorLeft, ORBextractor* extractorRight, ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth)
     :mpORBvocabulary(voc),mpORBextractorLeft(extractorLeft),mpORBextractorRight(extractorRight), mTimeStamp(timeStamp), mK(K.clone()),mDistCoef(distCoef.clone()), mbf(bf), mThDepth(thDepth),
      mpReferenceKF(static_cast<KeyFrame*>(NULL))
@@ -85,8 +97,11 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
     if(mvKeys.empty())
         return;
 
+    // 对特征点进行畸变校正
     UndistortKeyPoints();
 
+    // 计算双目间的匹配, 匹配成功的特征点会计算其深度
+    // 深度存放在mvuRight 和 mvDepth 中
     ComputeStereoMatches();
 
     mvpMapPoints = vector<MapPoint*>(N,static_cast<MapPoint*>(NULL));    
@@ -113,6 +128,7 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
 
     mb = mbf/fx;
 
+    //把特征点划分到网格中，这种的好处是可以设置网格内特征点上限，从而使特征点分布更均匀
     AssignFeaturesToGrid();
 }
 
@@ -142,6 +158,7 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeSt
 
     UndistortKeyPoints();
 
+    //根据像素坐标获取深度信息，如果深度存在则保存下来，这里还计算了假想右图的对应特征点的横坐标
     ComputeStereoFromRGBD(imDepth);
 
     mvpMapPoints = vector<MapPoint*>(N,static_cast<MapPoint*>(NULL));
@@ -263,7 +280,7 @@ void Frame::UpdatePoseMatrices()
     mRcw = mTcw.rowRange(0,3).colRange(0,3);
     mRwc = mRcw.t();
     mtcw = mTcw.rowRange(0,3).col(3);
-    mOw = -mRcw.t()*mtcw;
+    mOw = -mRcw.t()*mtcw;   //计算光心三维坐标
 }
 
 bool Frame::isInFrustum(MapPoint *pMP, float viewingCosLimit)
@@ -302,11 +319,11 @@ bool Frame::isInFrustum(MapPoint *pMP, float viewingCosLimit)
     if(dist<minDistance || dist>maxDistance)
         return false;
 
-   // Check viewing angle
+    // Check viewing angle
+    // 计算当前视角和平均视角夹角的余弦值, 若小于cos(60), 即夹角大于60度则返回
+    // 每一个地图都有其平均视角，是从能够观测到地图点的帧位姿中计算出
     cv::Mat Pn = pMP->GetNormal();
-
     const float viewCos = PO.dot(Pn)/dist;
-
     if(viewCos<viewingCosLimit)
         return false;
 
@@ -314,9 +331,10 @@ bool Frame::isInFrustum(MapPoint *pMP, float viewingCosLimit)
     const int nPredictedLevel = pMP->PredictScale(dist,this);
 
     // Data used by the tracking
+    // 如果在视野范围内，在tracking中会被用到，此处要把用到的量赋值
     pMP->mbTrackInView = true;
     pMP->mTrackProjX = u;
-    pMP->mTrackProjXR = u - mbf*invz;
+    pMP->mTrackProjXR = u - mbf*invz;   //该3D点投影到双目右侧相机上的横坐标
     pMP->mTrackProjY = v;
     pMP->mnTrackScaleLevel= nPredictedLevel;
     pMP->mTrackViewCos = viewCos;
@@ -324,6 +342,7 @@ bool Frame::isInFrustum(MapPoint *pMP, float viewingCosLimit)
     return true;
 }
 
+//其作用是找到在 以x, y为中心,边长为2r的方形内且在[minLevel, maxLevel]的特征点
 vector<size_t> Frame::GetFeaturesInArea(const float &x, const float  &y, const float  &r, const int minLevel, const int maxLevel) const
 {
     vector<size_t> vIndices;
@@ -663,6 +682,7 @@ void Frame::ComputeStereoFromRGBD(const cv::Mat &imDepth)
     }
 }
 
+// 其作用是将特征点坐标反投影到3D地图点（世界坐标），在已知深度的情况下，则可确定二维像素点对应的尺度，最后获得3D中点坐标
 cv::Mat Frame::UnprojectStereo(const int &i)
 {
     const float z = mvDepth[i];

@@ -23,6 +23,7 @@
 
 #include<mutex>
 
+//https://zhuanlan.zhihu.com/p/84024378
 namespace ORB_SLAM2
 {
 
@@ -98,6 +99,7 @@ KeyFrame* MapPoint::GetReferenceKeyFrame()
 void MapPoint::AddObservation(KeyFrame* pKF, size_t idx)
 {
     unique_lock<mutex> lock(mMutexFeatures);
+    //如果已经存在观测关系，就返回
     if(mObservations.count(pKF))
         return;
     mObservations[pKF]=idx;
@@ -204,6 +206,7 @@ void MapPoint::Replace(MapPoint* pMP)
         }
         else
         {
+            //如果在就删除关键帧和老的MapPoint之间的对应关系
             pKF->EraseMapPointMatch(mit->second);
         }
     }
@@ -239,6 +242,11 @@ float MapPoint::GetFoundRatio()
     return static_cast<float>(mnFound)/mnVisible;
 }
 
+/*
+    由于一个MapPoint会被许多相机观测到，因此在插入关键帧后，需要判断是否更新当前点的最适合的描述子。
+    最好的描述子与其他描述子应该具有最小的平均距离，因此先获得当前点的所有描述子，然后计算描述子之间的两两距离，
+    对所有距离取平均，最后找离这个中值距离最近的描述子。
+ */
 void MapPoint::ComputeDistinctiveDescriptors()
 {
     // Retrieve all observed descriptors
@@ -327,6 +335,11 @@ bool MapPoint::IsInKeyFrame(KeyFrame *pKF)
     return (mObservations.count(pKF));
 }
 
+/*
+    由于图像提取描述子是使用金字塔分层提取，所以计算法向量和深度可以知道该MapPoint在对应的关键帧的金字塔哪一层可以提取到。
+    明确了目的，下一步就是方法问题，所谓的法向量，就是也就是说相机光心指向地图点的方向，
+    计算这个方向方法很简单，只需要用地图点的三维坐标减去相机光心的三维坐标就可以。
+ */
 void MapPoint::UpdateNormalAndDepth()
 {
     map<KeyFrame*,size_t> observations;
@@ -362,6 +375,12 @@ void MapPoint::UpdateNormalAndDepth()
     const float levelScaleFactor =  pRefKF->mvScaleFactors[level];
     const int nLevels = pRefKF->mnScaleLevels;
 
+    //深度范围：地图点到参考帧（只有一帧）相机中心距离，乘上参考帧中描述子获取金字塔放大尺度得到最大距离mfMaxDistance;
+    //最大距离除以整个金字塔最高层的放大尺度得到最小距离mfMinDistance.
+    //通常说来，距离较近的地图点，将在金字塔较高的地方提出，
+    //距离较远的地图点，在金字塔层数较低的地方提取出（金字塔层数越低，分辨率越高，才能识别出远点）
+    //因此，通过地图点的信息（主要对应描述子），我们可以获得该地图点对应的金字塔层级
+    //从而预测该地图点在什么范围内能够被观测到
     {
         unique_lock<mutex> lock3(mMutexPos);
         mfMaxDistance = dist*levelScaleFactor;
@@ -382,6 +401,10 @@ float MapPoint::GetMaxDistanceInvariance()
     return 1.2f*mfMaxDistance;
 }
 
+/*
+    其中currentDist是当前距离，pKF是关键帧
+    该函数的作用是预测特征点在pKF金字塔哪一层可以找到
+ */
 int MapPoint::PredictScale(const float &currentDist, KeyFrame* pKF)
 {
     float ratio;
