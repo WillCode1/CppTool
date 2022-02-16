@@ -16,6 +16,9 @@
     <ClInclude Include="Pose.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="EigenRotation.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

@@ -161,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h" />
+    <ClInclude Include="EigenRotation.h" />
     <ClInclude Include="MatrixAndVector.h" />
     <ClInclude Include="Pose.h" />
   </ItemGroup>
