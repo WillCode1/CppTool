@@ -4,3 +4,8 @@
 *.iml
 *.xml
 *.gz
+*.xls
+*.xls#
+/Work/.idea
+/Work/Eigen_Tool/cmake-build-debug
+
