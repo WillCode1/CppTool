@@ -177,4 +177,4 @@ def check_file(file_path):
 
 if __name__ == '__main__':
     bm_list = check_file('/home/will/catkin_ws/log1.txt')
-    write2xls(bm_list, '/home/will/Desktop/rosbag_优化场景对比.xls', 'new_res1.xls')
+    write2xls(bm_list, '/home/will/Desktop/rosbag_优化场景对比.xls', 'new_res.xls')

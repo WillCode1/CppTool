@@ -8,7 +8,7 @@
 #include <ctime>
 #include <iostream>
 #include <Eigen/Dense>
-#include "Timer.hpp"
+#include "../Utility/Timer.hpp"
 
 using namespace Eigen;
 

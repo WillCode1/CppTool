@@ -1,4 +1,4 @@
-#include "robot_pose_ekf/imu_tracker.h"
+#include "imu_tracker.h"
 #include <limits>
 #include <iostream>
 #include <ros/ros.h>
@@ -22,12 +22,12 @@ namespace estimation
   {
     filter_outlier_threshold_ = threshold;
   }
-  
+
   void ImuZeroDriftCompensation::setFilterRandomErrorThreshold(const double &threshold)
   {
     filter_random_error_threshold_ = threshold;
   }
-  
+
   void ImuZeroDriftCompensation::updateStateMachine(bool is_static_now, const TimeSec& time)
   {
     if (is_static_now)
