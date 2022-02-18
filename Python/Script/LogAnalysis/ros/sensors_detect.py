@@ -13,7 +13,10 @@ import numpy as np
 import collections
 import matplotlib.pyplot as plt
 import sys
+<<<<<<< HEAD
 
+=======
+>>>>>>> 751c591c263adc203ac4efd2276231cc88191d6d
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -52,7 +55,10 @@ class SensorsDetect(object):
         self.imus = []
         self.sfs = []
         self.los = []
+<<<<<<< HEAD
         self.ekfs = []
+=======
+>>>>>>> 751c591c263adc203ac4efd2276231cc88191d6d
         # self.imu_raw = []
         # self.motor_current = []
         self.hist = collections.defaultdict(list)
@@ -106,13 +112,19 @@ class SensorsDetect(object):
         sf_topic = ""
         odom_topic = ""
         lo_topic = ""
+<<<<<<< HEAD
         ekf_topic = ""
+=======
+>>>>>>> 751c591c263adc203ac4efd2276231cc88191d6d
         if mtype == "run":
             odom_topic = '/peter_motor_core/odom'
             imu_topic = '/imu'
             sf_topic = '/sf'
             lo_topic = '/odom_rf2o'
+<<<<<<< HEAD
             ekf_topic = "/robot_pose_ekf/odom"
+=======
+>>>>>>> 751c591c263adc203ac4efd2276231cc88191d6d
         elif mtype == "wt":
             odom_topic = '/water_uavcan_master/odom'
             imu_topic = '/water_imu_driver/imu'
@@ -127,7 +139,10 @@ class SensorsDetect(object):
         assert odom_topic != ""
         assert sf_topic != ""
         assert lo_topic != ""
+<<<<<<< HEAD
         assert ekf_topic != ""
+=======
+>>>>>>> 751c591c263adc203ac4efd2276231cc88191d6d
         b = rosbag.Bag(path)
         duration = b.get_end_time() - b.get_start_time()
         start_time = b.get_start_time() + float(tfrom)
@@ -172,6 +187,7 @@ class SensorsDetect(object):
                         msg.pose.pose.position.x, msg.pose.pose.position.y, msg.pose.pose.position.z,
                         msg.header.stamp.secs, msg.header.stamp.nsecs, self.los, lo_topic)
 
+<<<<<<< HEAD
                 if topic.endswith(ekf_topic):
                     self.ekfs = self.process_xy(
                         msg.pose.pose.orientation.x, msg.pose.pose.orientation.y,
@@ -179,6 +195,8 @@ class SensorsDetect(object):
                         msg.pose.pose.position.x, msg.pose.pose.position.y, msg.pose.pose.position.z,
                         msg.header.stamp.secs, msg.header.stamp.nsecs, self.ekfs, ekf_topic)
 
+=======
+>>>>>>> 751c591c263adc203ac4efd2276231cc88191d6d
                 # if topic.endswith('/water_uavcan_master/motor_status'):
                 # stamp = msg.motor[0].header.stamp.secs + float(msg.motor[0].header.stamp.nsecs) / 1e9
                 # self.motor_current.append([stamp, msg.motor[0].current, msg.motor[1].current])
@@ -195,14 +213,20 @@ class SensorsDetect(object):
         sfs = np.asarray(self.sfs)
         imus = np.asarray(self.imus)  # format: [stamp, angle_diff, curr_yaw, curr_pitch, curr_roll]
         los = np.asarray(self.los)
+<<<<<<< HEAD
         ekfs = np.asarray(self.ekfs)
+=======
+>>>>>>> 751c591c263adc203ac4efd2276231cc88191d6d
         n = 180.0 / math.pi
 
         odomss = self.sum_diff(odoms)
         imuss = self.sum_diff(imus)
         sfss = self.sum_diff(sfs)
         loss = self.sum_diff(los)
+<<<<<<< HEAD
         ekfss = self.sum_diff(ekfs)
+=======
+>>>>>>> 751c591c263adc203ac4efd2276231cc88191d6d
 
         plt.figure()
         plt.subplot(2, 1, 1)
@@ -215,8 +239,11 @@ class SensorsDetect(object):
         plt.plot(sfss[:, 0] - sfss[0, 0], np.asarray(n * sfss[:, 1]), 'black', label='sf-orientation', linewidth=2)
         if len(loss) != 0:
             plt.plot(loss[:, 0] - loss[0, 0], np.asarray(n * loss[:, 1]), 'y', label='lo-orientation', linewidth=2)
+<<<<<<< HEAD
         if len(ekfss) != 0:
             plt.plot(ekfss[:, 0] - ekfss[0, 0], np.asarray(n * ekfss[:, 1]), 'g', label='ekf-orientation', linewidth=2)
+=======
+>>>>>>> 751c591c263adc203ac4efd2276231cc88191d6d
         plt.xlabel('time_stamp(s)')
         plt.legend()
         plt.grid()
@@ -227,8 +254,11 @@ class SensorsDetect(object):
         plt.plot(sfss[:, 0] - sfss[0, 0], np.asarray(sfss[:, 2]), 'black', label='sf-positionx', linewidth=0.5)
         if len(loss) != 0:
             plt.plot(loss[:, 0] - loss[0, 0], np.asarray(loss[:, 2]), 'y', label='lo-positionx', linewidth=0.5)
+<<<<<<< HEAD
         if len(ekfss) != 0:
             plt.plot(ekfss[:, 0] - ekfss[0, 0], np.asarray(ekfss[:, 2]), 'g', label='ekf-positionx', linewidth=0.5)
+=======
+>>>>>>> 751c591c263adc203ac4efd2276231cc88191d6d
         plt.xlabel('time_stamp(s)')
 
         plt.legend()
