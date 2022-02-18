@@ -2,6 +2,17 @@ import numpy as np
 import math
 
 
+def getRPY(w, x, y, z):
+    roll = math.atan2(2 * (w * x + y * z), 1 - 2 * (x * x + y * y))
+    pitch = math.asin(2 * (w * y - z * x))
+    yaw = math.atan2(2 * (w * z + x * y), 1 - 2 * (z * z + y * y))
+
+    roll = roll * 180 / math.pi
+    pitch = pitch * 180 / math.pi
+    yaw = yaw * 180 / math.pi
+    return roll, pitch, yaw
+
+
 def normalize_theta(theta_matrix):
     theta_matrix = np.where(theta_matrix > math.pi, theta_matrix - 2 * math.pi, theta_matrix)
     theta_matrix = np.where(theta_matrix < -math.pi, theta_matrix + 2 * math.pi, theta_matrix)

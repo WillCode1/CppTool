@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 # 声明一个 cmake 工程
-project(Eigen_Tool)
+project(Eigen_Example)
 
 # 设置编译模式
 set(CMAKE_BUILD_TYPE "Debug")
@@ -15,14 +15,4 @@ find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIRS})
 
 # 添加一个可执行程序
-add_executable(EigenTool main.cpp)
-
-# 添加hello库
-#add_library(hello libHelloSLAM.cpp)
-# 共享库
-#add_library(hello_shared SHARED libHelloSLAM.cpp)
-
-# 添加可执行程序调用hello库中函数
-#add_executable(useHello useHello.cpp)
-# 将库文件链接到可执行程序上
-#target_link_libraries(useHello hello_shared)
+add_executable(EigenExample main.cpp Pose.cpp SolveMatrix.cpp)
