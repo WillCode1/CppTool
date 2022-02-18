@@ -1,5 +1,5 @@
 #pragma once
-#include "Eigen/Dense"
+#include <Eigen/Dense>
 using namespace std;
 using namespace Eigen;
 
@@ -216,5 +216,3 @@ std::ostream& operator<<(std::ostream& os,
 
 using Rigid3d = Rigid3<double>;
 using Rigid3f = Rigid3<float>;
-
-void testPose3d();

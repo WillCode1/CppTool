@@ -1,6 +1,5 @@
 #include "Eigen/Dense"
 #include <iostream>
-#include "Pose.h"
 using namespace std;
 using namespace Eigen;
 

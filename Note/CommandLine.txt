@@ -92,8 +92,11 @@ rosbag play <bagfile_name>
 
 <node pkg="rosbag" name="rosbag2" type="record" args="-O ekf_pose.bag -a" />
 <node pkg="rosbag" name="rosbag1" type="play" args="--clock --hz 100 -d .4 $(find robot_pose_ekf)/test/ekf_test2_indexed.bag" />
-  
+
 rostest --text <bagname> <*.test/*.launch>
+
+source /opt/ros/melodic/setup.bash
+rosrun map_server map_server map.yaml
 
 rosrun rviz rviz
 rosrun rqt_bag rqt_bag 8445_2022-01-23-09-59-42.bag

@@ -1,4 +1,5 @@
 #include <iostream>
+#include "Pose.h"
 #include "EigenRotation.h"
 
 using namespace Eigen_Tool;
