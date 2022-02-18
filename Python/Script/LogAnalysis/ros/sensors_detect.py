@@ -13,7 +13,6 @@ import numpy as np
 import collections
 import matplotlib.pyplot as plt
 import sys
-
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -196,6 +195,7 @@ class SensorsDetect(object):
         imus = np.asarray(self.imus)  # format: [stamp, angle_diff, curr_yaw, curr_pitch, curr_roll]
         los = np.asarray(self.los)
         ekfs = np.asarray(self.ekfs)
+
         n = 180.0 / math.pi
 
         odomss = self.sum_diff(odoms)
@@ -217,6 +217,7 @@ class SensorsDetect(object):
             plt.plot(loss[:, 0] - loss[0, 0], np.asarray(n * loss[:, 1]), 'y', label='lo-orientation', linewidth=2)
         if len(ekfss) != 0:
             plt.plot(ekfss[:, 0] - ekfss[0, 0], np.asarray(n * ekfss[:, 1]), 'g', label='ekf-orientation', linewidth=2)
+
         plt.xlabel('time_stamp(s)')
         plt.legend()
         plt.grid()
@@ -229,6 +230,7 @@ class SensorsDetect(object):
             plt.plot(loss[:, 0] - loss[0, 0], np.asarray(loss[:, 2]), 'y', label='lo-positionx', linewidth=0.5)
         if len(ekfss) != 0:
             plt.plot(ekfss[:, 0] - ekfss[0, 0], np.asarray(ekfss[:, 2]), 'g', label='ekf-positionx', linewidth=0.5)
+
         plt.xlabel('time_stamp(s)')
 
         plt.legend()
