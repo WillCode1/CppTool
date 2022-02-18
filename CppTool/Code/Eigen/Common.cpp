@@ -3,7 +3,41 @@
 #include <iostream>
 using namespace std;
 using namespace Eigen;
+#include <chrono>
 
+class Timer {
+    using CalculatePrecision = std::chrono::microseconds;
+    using ClockType = std::chrono::steady_clock;
+public:
+    void start() {
+        t_last_ = t_start_ = std::chrono::steady_clock::now();
+    }
+
+    void reset() {
+        start();
+    }
+
+    void elapsedByStart() {
+        auto t_end = ClockType::now();
+        auto start = std::chrono::time_point_cast<CalculatePrecision>(t_start_).time_since_epoch().count();
+        auto end = std::chrono::time_point_cast<CalculatePrecision>(t_end).time_since_epoch().count();
+        auto ms = 0.001 * (end - start);
+        std::cout << "total by start:" << ms << "ms\n";
+    }
+
+    void elapsedByLast() {
+        auto t_end = ClockType::now();
+        auto last = std::chrono::time_point_cast<CalculatePrecision>(t_last_).time_since_epoch().count();
+        auto end = std::chrono::time_point_cast<CalculatePrecision>(t_end).time_since_epoch().count();
+        auto ms = 0.001 * (end - last);
+        t_last_ = t_end;
+        std::cout << "total by last:" << ms << "ms\n";
+    }
+
+private:
+    std::chrono::time_point<ClockType> t_start_;
+    std::chrono::time_point<ClockType> t_last_;
+};
 
 void LeastSquareMethod()
 {
@@ -12,7 +46,7 @@ void LeastSquareMethod()
     VectorXf b = VectorXf::Random(3);
     std::cout << "Here is the matrix A:\n" << A << std::endl;
     std::cout << "Here is the right hand side b:\n" << b << std::endl;
-    
+
     /*
       总结
         当矩阵A为病态矩阵时，通过常规表达式求解时效果不好。
@@ -29,4 +63,27 @@ void LeastSquareMethod()
     cout << "********** QR decomposition ********************" << endl;
     //colPivHouseholderQr方法:fast
     cout << "The solution using the QR decomposition is:\n" << A.colPivHouseholderQr().solve(b) << endl;
+}
+
+void RankOfMatrix()
+{
+    Matrix3d A = Matrix3d::Random(3, 3);
+    std::cout << "A:\n" << A << std::endl;
+
+    Timer t;
+    t.start();
+    for (auto i = 0; i < 1000; ++i)
+    {
+        JacobiSVD<Eigen::MatrixXd> svd(A);
+        auto res = svd.rank();
+        //std::cout << "rank:\n" << svd.rank() << std::endl;
+    }
+    t.elapsedByLast();
+
+    for (auto i = 0; i < 1000; ++i)
+    {
+        SelfAdjointEigenSolver<MatrixXd> es(A);
+        //std::cout << "eigenvalues:\n" << es.eigenvalues().minCoeff() << std::endl;
+    }
+    t.elapsedByLast();
 }

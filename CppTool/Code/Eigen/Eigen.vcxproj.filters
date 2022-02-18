@@ -3,7 +3,6 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Common.cpp" />
-    <ClCompile Include="MatrixAndVector.cpp" />
     <ClCompile Include="Pose.cpp" />
   </ItemGroup>
   <ItemGroup>
