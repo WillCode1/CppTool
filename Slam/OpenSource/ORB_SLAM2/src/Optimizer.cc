@@ -37,7 +37,7 @@
 namespace ORB_SLAM2
 {
 
-
+// https://zhuanlan.zhihu.com/p/84466670
 void Optimizer::GlobalBundleAdjustemnt(Map* pMap, int nIterations, bool* pbStopFlag, const unsigned long nLoopKF, const bool bRobust)
 {
     vector<KeyFrame*> vpKFs = pMap->GetAllKeyFrames();
