@@ -17,31 +17,6 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 
-# class Orientation(object):
-#    def __init__(self, x, y, z, w) -> None:
-#        self.x = x
-#        self.y = y
-#        self.z = z
-#        self.w = w
-#
-# class Position(object):
-#    def __init__(self, x, y, z) -> None:
-#        self.x = x
-#        self.y = y
-#        self.z = z
-#
-# class Stamp(object):
-#    def __init__(self, secs, nsecs) -> None:
-#        self.secs = secs
-#        self.nsecs = nsecs
-#
-# class Pose(object):
-#    def __init__(self, ori, pos, stamp) -> None:
-#        self.ori = ori
-#        self.pos = pos
-#        self.stamp = stamp
-
-
 class SensorsDetect(object):
 
     def __init__(self, path, mtype, tfrom, tto):
@@ -79,7 +54,8 @@ class SensorsDetect(object):
             angle_diff = self.normalize_angle(curr_yaw - lists[-1][3])
             pos_diff_dx = px - lists[-1][6]
             pos_diff_dy = py - lists[-1][7]
-            pos_diff = sqrt(pos_diff_dx * pos_diff_dx + pos_diff_dy * pos_diff_dy)
+            pos_diff = sqrt(pos_diff_dx * pos_diff_dx + pos_diff_dy * pos_diff_dy) + lists[-1][2]
+            # pos_diff = sqrt(pos_diff_dx * pos_diff_dx + pos_diff_dy * pos_diff_dy)
             delta_stamp = stamp - lists[-1][0]
             lists.append([stamp, angle_diff, pos_diff, curr_yaw, curr_pitch, curr_roll, px, py])
             self.hist[nid].append(delta_stamp)
@@ -153,9 +129,6 @@ class SensorsDetect(object):
                         msg.orientation.x, msg.orientation.y,
                         msg.orientation.z, msg.orientation.w, 0, 0, 0,
                         msg.header.stamp.secs, msg.header.stamp.nsecs, self.imus, imu_topic)
-                    # self.imu_raw = self.format_imudata(msg.angular_velocity.x, msg.angular_velocity.y,
-                    # msg.angular_velocity.z, msg.linear_acceleration.x, msg.linear_acceleration.y, msg.linear_acceleration.z,
-                    # msg.header.stamp.secs, msg.header.stamp.nsecs, self.imu_raw)
 
                 if topic.endswith(sf_topic):
                     self.sfs = self.process_xy(
