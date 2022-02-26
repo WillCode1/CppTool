@@ -44,6 +44,8 @@ namespace ORB_SLAM2
 {
 
 // https://zhuanlan.zhihu.com/p/84865395
+// Tracking类的主要功能是初始化、更新当前帧位姿、跟踪关键帧和局部地图、重定位等。
+
 Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer, Map *pMap, KeyFrameDatabase* pKFDB, const string &strSettingPath, const int sensor):
     mState(NO_IMAGES_YET), mSensor(sensor), mbOnlyTracking(false), mbVO(false), mpORBVocabulary(pVoc),
     mpKeyFrameDB(pKFDB), mpInitializer(static_cast<Initializer*>(NULL)), mpSystem(pSys), mpViewer(NULL),
@@ -561,6 +563,17 @@ void Tracking::StereoInitialization()
     }
 }
 
+/*
+    作用：单目相机的初始化过程，通过将最初的两帧之间进行对极约束和全局BA优化，得到较为准确的初始值
+    1）当第一次进入该方法的时候，没有先前的帧数据，将当前帧保存为初始帧和最后一帧，并初始化一个初始化器。
+    2）第二次进入该方法的时候，已经有初始化器了。
+    3）利用ORB匹配器，对当前帧和初始帧进行匹配，对应关系小于100个时失败。
+    4）利用八点法的对极约束，启动两个线程分别计算单应矩阵和基础矩阵，并通过score判断用单应矩阵回复运动轨迹还是使用基础矩阵回复运动轨迹。
+    5）将初始帧和当前帧创建为关键帧，并创建地图点MapPoint
+    6）通过全局BundleAdjustment优化相机位姿和关键点坐标
+    7）设置单位深度并缩放初试基线和地图点。
+    8）其他变量的初始化。
+ */
 void Tracking::MonocularInitialization()
 {
 
@@ -754,7 +767,14 @@ void Tracking::CheckReplacedInLastFrame()
     }
 }
 
-
+/*
+    作用：按照关键帧来进行Track，从关键帧中查找Bow相近的帧，进行匹配优化位姿
+    1）按照关键帧进行Track的方法和运动模式恢复相机运动位姿的方法接近。首先求解当前帧的BOW向量。
+    2）再搜索当前帧和关键帧之间的关键点匹配关系，如果这个匹配关系小于15对的话，就Track失败了。
+    3）接着将当前帧的位置假定到上一帧的位置那里
+    4）并通过最小二乘法优化相机的位姿。
+    5）最后依然是抛弃无用的杂点，当match数大于等于10的时候，返回true成功。
+ */
 bool Tracking::TrackReferenceKeyFrame()
 {
     // Compute Bag of Words vector
@@ -865,6 +885,13 @@ void Tracking::UpdateLastFrame()
     }
 }
 
+/*
+    作用：按照运动模式来进行Track，按照上一帧的速度与位姿作为初始，进行投影优化
+    1）先通过上一帧的位姿和速度预测当前帧相机的位姿
+    2）通过PnP方法估计相机位姿，再将上一帧的地图点投影到当前固定大小范围的帧平面上，如果匹配点少，那么扩大两倍的采点范围。
+    3）然后进行一次BA算法，通过最小二乘法优化相机的位姿。
+    4）优化位姿之后，对当前帧的关键点和地图点，抛弃无用的杂点，剩下的点供下一次操作使用。
+ */
 bool Tracking::TrackWithMotionModel()
 {
     ORBmatcher matcher(0.9,true);
@@ -928,6 +955,17 @@ bool Tracking::TrackWithMotionModel()
     return nmatchesMap>=10;
 }
 
+/*
+    作用：通过投影，从已经生成的地图点中找到更多的对应关系，精确结果
+    1） 更新Covisibility Graph， 更新局部关键帧
+    2） 根据局部关键帧，更新局部地图点，接下来运行过滤函数 isInFrustum
+    3） 将地图点投影到当前帧上，超出图像范围的舍弃
+    4） 当前视线方向v和地图点云平均视线方向n, 舍弃n*v<cos(60)的点云
+    5） 舍弃地图点到相机中心距离不在一定阈值内的点
+    6） 计算图像的尺度因子 isInFrustum 函数结束
+    7） 进行非线性最小二乘优化
+    8） 更新地图点的统计量
+ */
 bool Tracking::TrackLocalMap()
 {
     // We have an estimation of the camera pose and some map points tracked in the frame.
@@ -974,7 +1012,13 @@ bool Tracking::TrackLocalMap()
         return true;
 }
 
-
+/*
+    作用：判断是否需要生成新的关键帧，确定关键帧的标准
+    1） 在上一次进行重定位之后，过了20帧数据，或关键帧数小于20个，不满足不能生成
+    2） 在上一个关键帧插入之后，过了20帧，或 局部建图是空闲状态，不满足不能生成。
+    3） 当前帧跟踪到大于若干个点，不满足不能生成
+    4） 当前帧的跟踪点数小于90%的参考关键帧跟踪点数，并且当前帧跟踪点数大于15，不满足不能生成
+ */
 bool Tracking::NeedNewKeyFrame()
 {
     if(mbOnlyTracking)
@@ -1339,6 +1383,13 @@ void Tracking::UpdateLocalKeyFrames()
     }
 }
 
+/*
+    作用：重定位，从之前的关键帧中找出与当前帧之间拥有充足匹配点的候选帧，利用Ransac迭代，通过PnP求解位姿。
+    1）先计算当前帧的BOW值，并从关键帧数据库中查找候选的匹配关键帧
+    2）构建PnP求解器，标记杂点，准备好每个关键帧和当前帧的匹配点集
+    3）用PnP算法求解位姿，进行若干次P4P Ransac迭代，并使用非线性最小二乘优化，直到发现一个有充足inliers支持的相机位置。
+    4）返回成功或失败
+ */
 bool Tracking::Relocalization()
 {
     // Compute Bag of Words Vector

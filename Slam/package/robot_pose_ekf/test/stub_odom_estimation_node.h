@@ -118,7 +118,7 @@ public:
             if (my_filter_.isInitialized())
             {
                 bool diagnostics = true;
-                if (my_filter_.update(odom_active_, imu_active_, gps_active_, vo_active_, lo_active_, filter_stamp_, diagnostics))
+                if (my_filter_.update(odom_active_, imu_active_, gps_active_, vo_active_, lo_active_, correct_imu_by_gravity_, filter_stamp_, diagnostics))
                 {
                     is_update = true;
                     my_filter_.getEstimate(odom_fuse);

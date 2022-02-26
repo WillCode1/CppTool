@@ -29,152 +29,153 @@
 #include <sensor_msgs/LaserScan.h>
 
 // Eigen headers
-#include <Eigen/Dense>
-#include <Eigen/Geometry>
-#include <unsupported/Eigen/MatrixFunctions>
+#include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/Geometry>
+#include <eigen3/unsupported/Eigen/MatrixFunctions>
 
-namespace rf2o
+namespace rf2o {
+
+template <typename T>
+inline T sign(const T x) { return x<T(0) ? -1:1; }
+
+template <typename Derived>
+inline typename Eigen::MatrixBase<Derived>::Scalar
+getYaw(const Eigen::MatrixBase<Derived>& r)
 {
+  return std::atan2( r(1, 0), r(0, 0) );
+}
 
-    template <typename T>
-    inline T sign(const T x) { return x < T(0) ? -1 : 1; }
+template<typename T>
+inline Eigen::Matrix<T, 3, 3> matrixRollPitchYaw(const T roll,
+                                                 const T pitch,
+                                                 const T yaw)
+{
+  const Eigen::AngleAxis<T> ax = Eigen::AngleAxis<T>(roll,  Eigen::Matrix<T, 3, 1>::UnitX());
+  const Eigen::AngleAxis<T> ay = Eigen::AngleAxis<T>(pitch, Eigen::Matrix<T, 3, 1>::UnitY());
+  const Eigen::AngleAxis<T> az = Eigen::AngleAxis<T>(yaw,   Eigen::Matrix<T, 3, 1>::UnitZ());
 
-    template <typename Derived>
-    inline typename Eigen::MatrixBase<Derived>::Scalar
-    getYaw(const Eigen::MatrixBase<Derived> &r)
-    {
-        return std::atan2(r(1, 0), r(0, 0));
-    }
+  return (az * ay * ax).toRotationMatrix().matrix();
+}
 
-    template <typename T>
-    inline Eigen::Matrix<T, 3, 3> matrixRollPitchYaw(const T roll,
-                                                     const T pitch,
-                                                     const T yaw)
-    {
-        const Eigen::AngleAxis<T> ax = Eigen::AngleAxis<T>(roll, Eigen::Matrix<T, 3, 1>::UnitX());
-        const Eigen::AngleAxis<T> ay = Eigen::AngleAxis<T>(pitch, Eigen::Matrix<T, 3, 1>::UnitY());
-        const Eigen::AngleAxis<T> az = Eigen::AngleAxis<T>(yaw, Eigen::Matrix<T, 3, 1>::UnitZ());
+template<typename T>
+inline Eigen::Matrix<T, 3, 3> matrixYaw(const T yaw)
+{
+  return matrixRollPitchYaw<T>(0, 0, yaw);
+}
 
-        return (az * ay * ax).toRotationMatrix().matrix();
-    }
+class CLaserOdometry2D
+{
+public:
 
-    template <typename T>
-    inline Eigen::Matrix<T, 3, 3> matrixYaw(const T yaw)
-    {
-        return matrixRollPitchYaw<T>(0, 0, yaw);
-    }
+  using Scalar = float;
 
-    class CLaserOdometry2D
-    {
-    public:
-        using Scalar = float;
+  using Pose2d = Eigen::Isometry2d;
+  using Pose3d = Eigen::Isometry3d;
+  using MatrixS31 = Eigen::Matrix<Scalar, 3, 1>;
+  using IncrementCov = Eigen::Matrix<Scalar, 3, 3>;
 
-        using Pose2d = Eigen::Isometry2d;
-        using Pose3d = Eigen::Isometry3d;
-        using MatrixS31 = Eigen::Matrix<Scalar, 3, 1>;
-        using IncrementCov = Eigen::Matrix<Scalar, 3, 3>;
+  CLaserOdometry2D();
+  virtual ~CLaserOdometry2D() = default;
 
-        CLaserOdometry2D();
-        virtual ~CLaserOdometry2D() = default;
+  void init(const sensor_msgs::LaserScan& scan,
+            const geometry_msgs::Pose& initial_robot_pose);
 
-        void init(const sensor_msgs::LaserScan &scan,
-                  const geometry_msgs::Pose &initial_robot_pose);
+  bool is_initialized();
 
-        bool is_initialized();
+  bool odometryCalculation(const sensor_msgs::LaserScan& scan);
 
-        bool odometryCalculation(const sensor_msgs::LaserScan &scan);
+  void setLaserPose(const Pose3d& laser_pose);
 
-        void setLaserPose(const Pose3d &laser_pose);
+  const Pose3d& getIncrement() const;
 
-        const Pose3d &getIncrement() const;
+  const IncrementCov& getIncrementCovariance() const;
 
-        const IncrementCov &getIncrementCovariance() const;
+  Pose3d& getPose();
+  const Pose3d& getPose() const;
 
-        Pose3d &getPose();
-        const Pose3d &getPose() const;
+protected:
 
-    protected:
-        bool verbose, module_initialized, first_laser_scan;
+  bool verbose, module_initialized, first_laser_scan;
+  double min_coeff_threshold;
 
-        // Internal Data
-        // 下面一堆vector就是激光金字塔，总共5层
-        std::vector<Eigen::MatrixXf> range;         // 当前帧的所有激光距离
-        std::vector<Eigen::MatrixXf> range_old;     // 上一帧的距离
-        std::vector<Eigen::MatrixXf> range_inter;   // 上一帧和当前帧的均值
-        std::vector<Eigen::MatrixXf> range_warped;  // 每一层warp之后的距离
-        std::vector<Eigen::MatrixXf> xx;        // 笛卡尔坐标
-        std::vector<Eigen::MatrixXf> xx_inter;
-        std::vector<Eigen::MatrixXf> xx_old;
-        std::vector<Eigen::MatrixXf> xx_warped;
-        std::vector<Eigen::MatrixXf> yy;
-        std::vector<Eigen::MatrixXf> yy_inter;
-        std::vector<Eigen::MatrixXf> yy_old;
-        std::vector<Eigen::MatrixXf> yy_warped;
-        std::vector<Eigen::MatrixXf> transformations;   // 每一层相对于上一层的变换
+  // Internal Data
+  std::vector<Eigen::MatrixXf> range;
+  std::vector<Eigen::MatrixXf> range_old;
+  std::vector<Eigen::MatrixXf> range_inter;
+  std::vector<Eigen::MatrixXf> range_warped;
+  std::vector<Eigen::MatrixXf> xx;
+  std::vector<Eigen::MatrixXf> xx_inter;
+  std::vector<Eigen::MatrixXf> xx_old;
+  std::vector<Eigen::MatrixXf> xx_warped;
+  std::vector<Eigen::MatrixXf> yy;
+  std::vector<Eigen::MatrixXf> yy_inter;
+  std::vector<Eigen::MatrixXf> yy_old;
+  std::vector<Eigen::MatrixXf> yy_warped;
+  std::vector<Eigen::MatrixXf> transformations;
 
-        Eigen::MatrixXf range_wf;   // 当前帧所有点距离
-        Eigen::MatrixXf dtita;      // (19)中Rα(α)
-        Eigen::MatrixXf dt;         // (3)中Rt
-        Eigen::MatrixXf rtita;      // (19)中d(α)
-        Eigen::MatrixXf normx, normy, norm_ang;
-        Eigen::MatrixXf weights;    // 对应(14)
-        Eigen::MatrixXi null;       // 每个点的距离是否为null
+  Eigen::MatrixXf range_wf;
+  Eigen::MatrixXf dtita;
+  Eigen::MatrixXf dt;
+  Eigen::MatrixXf rtita;
+  Eigen::MatrixXf normx, normy, norm_ang;
+  Eigen::MatrixXf weights;
+  Eigen::MatrixXi null;
 
-        Eigen::MatrixXf A, Aw;      // 对应(8)，建立Ax=B，Aw是IRLS每次迭代
-        Eigen::MatrixXf B, Bw;
+  Eigen::MatrixXf A,Aw;
+  Eigen::MatrixXf B,Bw;
 
-        MatrixS31 Var; //3 unknowns: vx, vy, w
-        IncrementCov cov_odo;       // 每层进行IRLS后的协方差
+  MatrixS31 Var;	//3 unknowns: vx, vy, w
+  IncrementCov cov_odo;
 
-        //std::string LaserVarName;				//Name of the topic containing the scan lasers \laser_scan
-        float fps;  //In Hz
-        float fovh; //Horizontal FOV
-        unsigned int cols;                  // 总共多少点
-        unsigned int cols_i;                // 当前层多少点
-        unsigned int width;
-        unsigned int ctf_levels;
-        unsigned int image_level, level;
-        unsigned int num_valid_range;       // 有效点数
-        unsigned int iter_irls;
-        float g_mask[5];
+  //std::string LaserVarName;				//Name of the topic containing the scan lasers \laser_scan
+  float fps;								//In Hz
+  float fovh;								//Horizontal FOV
+  unsigned int cols;
+  unsigned int cols_i;
+  unsigned int width;
+  unsigned int ctf_levels;
+  unsigned int image_level, level;
+  unsigned int num_valid_range;
+  unsigned int iter_irls;
+  float g_mask[5];
 
-        double lin_speed, ang_speed;
+  double lin_speed, ang_speed;
 
-        ros::WallDuration m_runtime;
-        ros::Time last_odom_time, current_scan_time;
+  ros::WallDuration	m_runtime;
+  ros::Time last_odom_time, current_scan_time;
 
-        // Kai就是两帧之间的变换 带level的就是金字塔两层之前的
-        MatrixS31 kai_abs_;
-        MatrixS31 kai_loc_;                 // vx, vy, w
-        MatrixS31 kai_loc_old_;
-        MatrixS31 kai_loc_level_;
+  MatrixS31 kai_abs_;
+  MatrixS31 kai_loc_;
+  MatrixS31 kai_loc_old_;
+  MatrixS31 kai_loc_level_;
 
-        Pose3d last_increment_;
-        Pose3d laser_pose_on_robot_;
-        Pose3d laser_pose_on_robot_inv_;
-        Pose3d laser_pose_;
-        Pose3d laser_oldpose_;
-        Pose3d robot_pose_;
-        Pose3d robot_oldpose_;
+  Pose3d last_increment_;
+  Pose3d laser_pose_on_robot_;
+  Pose3d laser_pose_on_robot_inv_;
+  Pose3d laser_pose_;
+  Pose3d laser_oldpose_;
+  Pose3d robot_pose_;
+  Pose3d robot_oldpose_;
 
-        bool test;
-        std::vector<double> last_m_lin_speeds;
-        std::vector<double> last_m_ang_speeds;
+  bool test;
+  std::vector<double> last_m_lin_speeds;
+  std::vector<double> last_m_ang_speeds;
 
-        // Methods
-        void createImagePyramid();
-        void calculateCoord();
-        void performWarping();
-        void calculaterangeDerivativesSurface();
-        void computeNormals();
-        void computeWeights();
-        void findNullPoints();
-        void solveSystemOneLevel();
-        void solveSystemNonLinear();
-        bool filterLevelSolution();
-        void PoseUpdate();
-        void Reset(const Pose3d &ini_pose /*, CObservation2DRangeScan scan*/);
-    };
+  // Methods
+  void createImagePyramid();
+  void calculateCoord();
+  void performWarping();
+  void calculaterangeDerivativesSurface();
+  void computeNormals();
+  void computeWeights();
+  void findNullPoints();
+  void solveSystemOneLevel();
+  void solveSystemNonLinear();
+  bool filterLevelSolution();
+  void PoseUpdate();
+  void dealWithLidarDegradation();
+  void Reset(const Pose3d& ini_pose/*, CObservation2DRangeScan scan*/);
+};
 
 } /* namespace rf2o */
 

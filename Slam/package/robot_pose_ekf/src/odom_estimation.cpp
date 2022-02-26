@@ -202,7 +202,8 @@ namespace estimation
   }
 
   // update filter
-  bool OdomEstimation::update(bool odom_active, bool imu_active, bool gps_active, bool vo_active, bool lo_active, const Time &filter_time, bool &diagnostics_res)
+  bool OdomEstimation::update(bool odom_active, bool imu_active, bool gps_active, bool vo_active, bool lo_active,
+                              bool odom_2d_projection, const Time &filter_time, bool &diagnostics_res)
   {
     // only update filter when it is initialized
     if (!filter_initialized_)
@@ -314,9 +315,16 @@ namespace estimation
       if (lo_initialized_)
       {
         // convert absolute lo measurements to relative lo measurements in horizontal plane
-        Transform lo_rel_frame = Transform(tf::createQuaternionFromYaw(filter_estimate_old_vec_(6)),
-                                           filter_estimate_old_.getOrigin()) *
-                                 lo_meas_old_.inverse() * lo_meas_;
+        auto increment = lo_meas_old_.inverse() * lo_meas_;
+        if (imu_active && odom_2d_projection)
+        {
+          double tmp, pitch;
+          imu_meas_.getBasis().getEulerYPR(tmp, pitch, tmp);
+          // ROS_INFO("lo pre = (%f, %f, %f)", increment.getOrigin().x(), increment.getOrigin().y(), increment.getOrigin().z());
+          increment.setOrigin(increment.getOrigin() * std::cos(pitch));
+          // ROS_INFO("lo res = (%f, %f, %f), cos(pitch) = %f", increment.getOrigin().x(), increment.getOrigin().y(), increment.getOrigin().z(), std::cos(pitch));
+        }
+        Transform lo_rel_frame = Transform(tf::createQuaternionFromYaw(filter_estimate_old_vec_(6)), filter_estimate_old_.getOrigin()) * increment;
         ColumnVector lo_rel(6);
         decomposeTransform(lo_rel_frame, lo_rel(1), lo_rel(2), lo_rel(3), lo_rel(4), lo_rel(5), lo_rel(6));
         angleOverflowCorrect(lo_rel(6), filter_estimate_old_vec_(6));

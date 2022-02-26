@@ -260,6 +260,7 @@ public:
       map_end_ = tmp;
       metrics_.addGlobalTrajectoryPose(pose->pose);
       ROS_ERROR_COND(map_end_.distance2d(tmp) > 0.01 && havenot_change_coord_flag, "Have not change coord!");
+      // std::cout << map_end_.translation_ << std::endl;
     }
 
     if (floor_num_ != pose->floor)

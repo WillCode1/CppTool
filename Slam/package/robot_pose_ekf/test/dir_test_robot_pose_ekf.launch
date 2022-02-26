@@ -14,8 +14,8 @@
     <param name="zero_drift_compensation" value="true"/>
     <param name="correct_imu_by_gravity" value="true"/>
 
-    <param name="ues_costmap_tracker" value="true"/>
-    <param name="dynamic_obstacle_judged_vel" value="0.01"/>
+    <param name="ues_costmap_tracker" value="false"/>
+    <param name="dynamic_obstacle_judged_vel" value="0.35"/>
     <param name="dynamic_scene_judged_num" value="5"/>
 
     <param name="test_mode" value="false"/>
@@ -36,9 +36,9 @@
     <param name="verbose" value="false" />                # verbose
 
 <!-- testcase -->
-    <param name="test_path" value="/home/will/bagfiles/bags_lo/" />
+    <!-- <param name="test_path" value="/home/will/bagfiles/bags_lo/" /> -->
     <!-- <param name="test_path" value="/home/will/bagfiles/test/" /> -->
-    <!-- <param name="test_path" value="/home/will/bagfiles/bags_lo/costmap_obstacles/" /> -->
+    <param name="test_path" value="/home/will/bagfiles/test/HOTYC04SZ202101153683684/" />
     <param name="bag_path" value="/home/will/bagfiles/test/HOTYC05SZ202110140151668/suc/270_2022-01-26-13-23-38.bag" />
   </node>
 </launch>

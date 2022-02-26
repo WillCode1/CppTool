@@ -349,7 +349,13 @@ namespace estimation
         imu_active_ = true;
         imu_initializing_ = false;
         ROS_INFO("Imu sensor activated");
+      }
+      else
+        ROS_DEBUG("Waiting to activate IMU, because IMU measurements are still %f sec in the future.",
+                  (imu_init_stamp_ - filter_stamp_).toSec());
 
+      if (imu_active_)
+      {
         if (zero_drift_compensation_ && !imu_zero_drift_compensation_)
         {
           imu_zero_drift_compensation_ = std::make_unique<ImuZeroDriftCompensation>(TimeSec(imu->header.stamp.toSec()), imu_debug_);
@@ -361,9 +367,6 @@ namespace estimation
           ROS_INFO("Correct imu by gravity activated");
         }
       }
-      else
-        ROS_DEBUG("Waiting to activate IMU, because IMU measurements are still %f sec in the future.",
-                  (imu_init_stamp_ - filter_stamp_).toSec());
     }
 
     if (debug_)
@@ -402,12 +405,12 @@ namespace estimation
     {
       SymmetricMatrix measNoiseLo_Cov(6);
       measNoiseLo_Cov = 0;
-      measNoiseLo_Cov(1, 1) = pow(0.0088, 2);
-      measNoiseLo_Cov(2, 2) = pow(0.0088, 2);
+      measNoiseLo_Cov(1, 1) = max(pow(0.01, 2), lo_covariance_(1, 1));
+      measNoiseLo_Cov(2, 2) = max(pow(0.01, 2), lo_covariance_(2, 2));
       measNoiseLo_Cov(3, 3) = 10000;
       measNoiseLo_Cov(4, 4) = 10000;
       measNoiseLo_Cov(5, 5) = 10000;
-      measNoiseLo_Cov(6, 6) = pow(0.1, 2);
+      measNoiseLo_Cov(6, 6) = max(pow(0.1, 2), lo_covariance_(6, 6));
       lo_covariance_ = measNoiseLo_Cov;
     }
 
@@ -576,6 +579,11 @@ namespace estimation
   /// callback function for check dynamic scene
   void OdomEstimationNode::costmapTrackerCallback(const costmap_tracker::ObstacleArrayMsg::ConstPtr &obstacles)
   {
+    if (!ues_costmap_tracker_)
+    {
+      return;
+    }
+
     int dynamic_obstacle_cnt = 0;
     Eigen::Vector3d linear;
 
@@ -589,9 +597,9 @@ namespace estimation
       }
     }
 
-    is_dynamic_scene_ = dynamic_obstacle_cnt > dynamic_scene_judged_num_;
+    // is_dynamic_scene_ = dynamic_obstacle_cnt > dynamic_scene_judged_num_;
 
-    ROS_INFO_COND(true && is_dynamic_scene_, "Dynamic scene detected! Num = %d", dynamic_obstacle_cnt);
+    ROS_INFO_COND(true, "Dynamic scene detected! Num = %d", dynamic_obstacle_cnt);
   }
 
   // filter loop
@@ -667,7 +675,7 @@ namespace estimation
       if (my_filter_.isInitialized())
       {
         bool diagnostics = true;
-        if (my_filter_.update(odom_active_, imu_active_, gps_active_, vo_active_, lo_active_, filter_stamp_, diagnostics))
+        if (my_filter_.update(odom_active_, imu_active_, gps_active_, vo_active_, lo_active_, correct_imu_by_gravity_, filter_stamp_, diagnostics))
         {
           // output most recent estimate and relative covariance
           my_filter_.getEstimate(output_);

@@ -94,9 +94,12 @@ TEST_F(TestEKF, closed_loop_trajectory_method1)
 #if 1
 TEST_F(TestEKF, long_corridor_method2)
 {
-  std::string bag_path = "/home/will/bagfiles/test/8301_2022-01-24-12-27-40.bag";
+  std::string bag_path = "/home/will/bagfiles/test/HOTYC04SZ202101153683684/suc/1101_2022-02-16-12-06-37.bag";
 
   WaitForBagFinished(bag_path);
+
+  // map_end_.translation_ += Vector3d(-0.42, -0.76, 0);
+  // map_end_.translation_ += Vector3d(-0.72, -0.3, 0);
 
   evaluateError("odom", Trans2DstSysTarget(odom_start_, map_start_, odom_end_), map_end_, run_dis_odom_, run_angle_odom_);
   evaluateError("lo", Trans2DstSysTarget(lo_start_, map_start_, lo_end_), map_end_, run_dis_lo_, run_angle_lo_);

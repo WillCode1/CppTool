@@ -283,6 +283,11 @@ void Frame::UpdatePoseMatrices()
     mOw = -mRcw.t()*mtcw;   //计算光心三维坐标
 }
 
+/*
+    1） 将地图点投影到当前帧上，超出图像范围的舍弃
+    2） 当前视线方向v和地图点云平均视线方向n, 舍弃n*v<cos(viewingCosLimit)的点云
+    3） 舍弃地图点到相机中心距离不在一定阈值内的点
+ */
 bool Frame::isInFrustum(MapPoint *pMP, float viewingCosLimit)
 {
     pMP->mbTrackInView = false;
@@ -316,6 +321,7 @@ bool Frame::isInFrustum(MapPoint *pMP, float viewingCosLimit)
     const cv::Mat PO = P-mOw;
     const float dist = cv::norm(PO);
 
+    // 舍弃地图点到相机中心距离不在一定阈值内的点
     if(dist<minDistance || dist>maxDistance)
         return false;
 

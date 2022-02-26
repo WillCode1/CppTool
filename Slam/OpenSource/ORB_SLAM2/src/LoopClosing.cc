@@ -101,6 +101,14 @@ bool LoopClosing::CheckNewKeyFrames()
     return(!mlpLoopKeyFrameQueue.empty());
 }
 
+/*
+    1. DetectLoop：检测闭环
+    它的主要流程包括：
+    1）如果地图中的关键帧数小于10，那么不进行闭环检测
+    2）获取共视关键帧，并计算他们和当前关键帧之间的BoW分数，求得最低分
+    3）通过上一步计算出的最低分数到数据库中查找出候选关键帧，这一步相当于是找到了曾经到过此处的关键帧们
+    4）对候选关键帧集进行连续性检测
+ */
 bool LoopClosing::DetectLoop()
 {
     {
@@ -229,6 +237,16 @@ bool LoopClosing::DetectLoop()
     return false;
 }
 
+/*
+    2. ComputeSim3：计算两帧之间的相对位姿
+    主要流程包括：
+    1）对每一个闭环帧，通过BoW的matcher方法进行第一次匹配，匹配闭环帧和当前关键帧之间的匹配关系，如果对应关系少于20个，则丢弃，否则构造一个Sim3求解器并保存起来。
+    2）对上一步得到的每一个满足条件的闭环帧，通过RANSAC迭代，求解Sim3。
+    3）通过返回的Sim3进行第二次匹配。
+    4）使用非线性最小二乘法优化Sim3.
+    5）使用非线性最小二乘法优化Sim3.
+    6）使用投影得到更多的匹配点，如果匹配点数量充足，则接受该闭环。
+ */
 bool LoopClosing::ComputeSim3()
 {
     // For each consistent loop candidate we try to compute a Sim3
@@ -400,6 +418,14 @@ bool LoopClosing::ComputeSim3()
 
 }
 
+/*
+    3. CorrectLoop：根据闭环做校正
+    主要流程包括：
+    1）如果有全局BA运算在运行的话，终止之前的BA运算。
+    2）使用传播法计算每一个关键帧正确的Sim3变换值
+    3）优化图
+    4）全局BA优化
+ */
 void LoopClosing::CorrectLoop()
 {
     cout << "Loop detected!" << endl;

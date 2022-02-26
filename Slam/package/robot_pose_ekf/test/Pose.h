@@ -167,7 +167,8 @@ public:
         NormalizeAngle(euler_(0), yaw_min, yaw_max);
     }
 
-private:
+// private:
+public:
     Vector translation_;
     Quaternion quat_;
     EulerAngle euler_;

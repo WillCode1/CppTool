@@ -16,8 +16,8 @@
     <param name="zero_drift_compensation" value="true"/>
     <param name="correct_imu_by_gravity" value="true"/>
     
-    <param name="ues_costmap_tracker" value="true"/>
-    <param name="dynamic_obstacle_judged_vel" value="0.01"/>
+    <param name="ues_costmap_tracker" value="false"/>
+    <param name="dynamic_obstacle_judged_vel" value="0.35"/>
     <param name="dynamic_scene_judged_num" value="5"/>
 
     <param name="test_mode" value="false"/>
@@ -41,7 +41,7 @@
   </node>
 
   <node pkg="rosbag" name="rosbag2" type="record" args="-O ekf_pose_record.bag -a" />
-  <node pkg="rosbag" name="rosbag1" type="play" args="--clock --hz 100 -d .4 /odom_rf2o:=/faker /home/will/bagfiles/test/8301_2022-01-24-12-27-40.bag" />
+  <node pkg="rosbag" name="rosbag1" type="play" args="--clock --hz 100 -d .4 /odom_rf2o:=/faker /home/will/bagfiles/test/HOTYC04SZ202101153683684/suc/1101_2022-02-16-12-06-37.bag" />
 
 <!-- /odom_rf2o:=/faker -->
   <!-- <test test-name="test_robot_pose_ekf" pkg="robot_pose_ekf" type="test_robot_pose_ekf" time-limit="120" /> -->
