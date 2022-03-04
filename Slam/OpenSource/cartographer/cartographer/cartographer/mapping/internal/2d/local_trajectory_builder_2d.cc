@@ -182,17 +182,25 @@ LocalTrajectoryBuilder2D::AddRangeData(const std::string& sensor_id,
     accumulated_range_data_ = sensor::RangeData{{}, {}, {}};
   }
 
+  /*
+    https://blog.csdn.net/jiajiading/article/details/108854097
+    畸变基本步骤简单总结：
+    1.获取每一帧点云每个点的时间戳；
+    2.代入估计器估计出每个原点时间戳的位置；
+    3.将每个点对应估计的原点坐标进行转换至世界坐标系；
+    注意：在做畸变校准时，需要注意激光雷达旋转方向，考虑时间间隔递增的方向，否则结果会更加不准确；
+   */
   // Drop any returns below the minimum range and convert returns beyond the
   // maximum range into misses.
   // 遍历每一个点云，丢弃任何低于最小范围的返回值，并将超过最大范围的返回值转换为未命中。
   for (size_t i = 0; i < synchronized_data.ranges.size(); ++i) {
     // 获取第i帧点云
     const sensor::TimedRangefinderPoint& hit = synchronized_data.ranges[i].point_time;
-    // 第i帧点云的原点
+    // 第i帧点云的原点, 提取此点云对应的原点坐标pose，并进行畸变矫正
     const Eigen::Vector3f origin_in_local =
         range_data_poses[i] *
         synchronized_data.origins.at(synchronized_data.ranges[i].origin_index);
-    // 将hit集转变成在Local坐标系下
+    // 将hit集转变成在Local坐标系下, 对此点进行畸变矫正，并转换为pose，不包含时间戳
     sensor::RangefinderPoint hit_in_local = range_data_poses[i] * sensor::ToRangefinderPoint(hit);
     // 局部坐标系下由hit点到origin的射线
     const Eigen::Vector3f delta = hit_in_local.position - origin_in_local;
