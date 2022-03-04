@@ -1,0 +1,25 @@
+ekf：
+--->xt = A*xt-1 + B*ut + εt
+--->zt = C*xt + δ
+--->1.控制更新 2.计算K卡尔曼增益 3.测量更新
+
+icp：https://blog.csdn.net/electech6/article/details/95235145
+amcl：https://blog.csdn.net/weixin_38145317/article/details/82852580
+PnP：https://www.cnblogs.com/yepeichu/p/12670818.html
+P3P/EPnP：
+--->利用三角形相似性质，求解2组3个投影点在相机坐标系下的3D坐标
+--->最后把问题转换成求解两组三维匹配点的位姿估计问题（ICP）
+--->ICP又分利用SVD分解和Bundle Adjustment两种方式，但是本质上并无区别，毕竟SVD也是构建非线性最小二乘问题
+BA：非线性优化
+Cartographer：https://blog.csdn.net/weixin_36976685/article/details/84994701?spm=1001.2014.3001.5502
+cartographer前端两种匹配：https://blog.csdn.net/xiaoma_bk/article/details/85046905
+orb-slam2：https://www.cnblogs.com/yepeichu/p/11602502.html
+rf2o：前提静态场景 https://zhuanlan.zhihu.com/p/51010526
+
+非线性优化方法
+--->一阶
+--->二阶牛顿法
+--->高斯牛顿法：比牛顿法快，稳定性差、不准确、不收敛
+--->列文伯格-马夸尔特方法：增加信赖域，拉格朗日对偶乘子，更稳定、准确（相当于条件选择一阶或二阶法）
+
+
