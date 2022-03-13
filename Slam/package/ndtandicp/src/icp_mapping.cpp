@@ -208,14 +208,12 @@ void icp_mapping::points_callback(const sensor_msgs::PointCloud2::ConstPtr& inpu
 
   br_.sendTransform(tf::StampedTransform(transform, input->header.stamp, "map", "base_link"));
 
-  // 如果当前帧和上一帧的平移超过了min_add_scan_shift_,那么更新地图,并更新previous帧,发布地图
-  // .否则,previous帧不变
+  // 如果当前帧和上一帧的平移超过了min_add_scan_shift_,那么更新地图,并更新previous帧,发布地图.否则,previous帧不变
   double shift = sqrt(pow(current_pose_.x - previous_pose_.x, 2.0) + pow(current_pose_.y - previous_pose_.y, 2.0));
   if (shift >= min_add_scan_shift_)
   {
     map_ += *transformed_scan_ptr;
-    previous_pose_.x = current_pose_.x;previous_pose_.y = current_pose_.y;previous_pose_.z = current_pose_.z;
-    previous_pose_.roll = current_pose_.roll;previous_pose_.pitch = current_pose_.pitch;previous_pose_.yaw = current_pose_.yaw;
+    previous_pose_ = current_pose_;
     icp.setInputTarget(map_ptr);
 
     sensor_msgs::PointCloud2::Ptr map_msg_ptr(new sensor_msgs::PointCloud2);
