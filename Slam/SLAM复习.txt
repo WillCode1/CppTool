@@ -18,6 +18,11 @@ KD树构建的复杂度为O(log(m))，查找的复杂度为O(mlog(n))，所以�
 2.pl-icp：二阶收敛精度高，先找到最近两点并连线，最小化线之间误差
 
 ndt：https://zhuanlan.zhihu.com/p/96908474
+1）划分网格
+2）计算各网格的PDF
+3）对每个点云数据，找到对应的网格点，并根据PDF和评分函数计算结果
+4）根据结果更新g和H，计算新的步长
+5）判断是否收敛或达到迭代次数，是则跳出，否则继续步骤3-5
 
 amcl：https://blog.csdn.net/weixin_38145317/article/details/82852580
 PnP：https://www.cnblogs.com/yepeichu/p/12670818.html

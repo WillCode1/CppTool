@@ -39,6 +39,7 @@ lio_sam:
   imuRPYWeight: 0.01
 
   # Extrinsics (lidar -> IMU)
+  # 其实不能这样写，应该写成IMU->Lidar
   extrinsicTrans: [0.0, 0.0, 0.0]
   extrinsicRot: [-1, 0, 0,
                   0, 1, 0,
