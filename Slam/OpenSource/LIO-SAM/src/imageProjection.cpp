@@ -456,7 +456,7 @@ public:
         tf::Matrix3x3(orientation).getRPY(roll, pitch, yaw);
 
         // Initial guess used in mapOptimization
-       // 用当前激光帧起始时刻的imu里程计，初始化lidar位姿，后面用于mapOptmization
+        // 用当前激光帧起始时刻的imu里程计，初始化lidar位姿，后面用于mapOptmization
         cloudInfo.initialGuessX = startOdomMsg.pose.pose.position.x;
         cloudInfo.initialGuessY = startOdomMsg.pose.pose.position.y;
         cloudInfo.initialGuessZ = startOdomMsg.pose.pose.position.z;
@@ -487,6 +487,7 @@ public:
         // 如果起止时刻对应imu里程计的方差不等，返回
         if (int(round(startOdomMsg.pose.covariance[0])) != int(round(endOdomMsg.pose.covariance[0])))
             return;
+#if 1
         //感觉之后计算的信息并没有被用到
         Eigen::Affine3f transBegin = pcl::getTransformation(startOdomMsg.pose.pose.position.x, startOdomMsg.pose.pose.position.y, startOdomMsg.pose.pose.position.z, roll, pitch, yaw);
 
@@ -502,7 +503,7 @@ public:
  
         // 给定的转换中，提取XYZ以及欧拉角,通过tranBt 获得增量值  后续去畸变用到
         pcl::getTranslationAndEulerAngles(transBt, odomIncreX, odomIncreY, odomIncreZ, rollIncre, pitchIncre, yawIncre);
-
+#endif
         odomDeskewFlag = true;
     }
 
@@ -533,7 +534,6 @@ public:
             *rotYCur = imuRotY[imuPointerFront];
             *rotZCur = imuRotZ[imuPointerFront];
         } else {
-            //
             // 前后时刻插值计算当前时刻的旋转增量
             //此时front的时间是大于当前pointTime时间，back=front-1刚好小于当前pointTime时间，前后时刻插值计算
             int imuPointerBack = imuPointerFront - 1;
@@ -550,7 +550,7 @@ public:
 
     void findPosition(double relTime, float *posXCur, float *posYCur, float *posZCur)
     {
-        // // 如果传感器移动速度较慢，例如人行走的速度，那么可以认为激光在一帧时间范围内，平移量小到可以忽略不计
+        // 如果传感器移动速度较慢，例如人行走的速度，那么可以认为激光在一帧时间范围内，平移量小到可以忽略不计
         *posXCur = 0; *posYCur = 0; *posZCur = 0;
 
         // If the sensor moves relatively slow, like walking speed, positional deskew seems to have little benefits. Thus code below is commented.
@@ -569,7 +569,7 @@ public:
      * 激光运动畸变校正
      * 利用当前帧起止时刻之间的imu数据计算旋转增量，imu里程计数据计算平移增量，进而将每一时刻激光点位置变换到第一个激光点坐标系下，进行运动补偿
     */
-   //relTime:laserCloudIn->points[i].time
+    //relTime:laserCloudIn->points[i].time
     PointType deskewPoint(PointType *point, double relTime)
     {
          //这个来源于上文的时间戳通道和imu可用判断，没有或是不可用则返回点
@@ -582,6 +582,7 @@ public:
         //二者相加即可得到当前点的准确时刻
         double pointTime = timeScanCur + relTime;
 
+        // 求解关于旋转和平移的运动畸变
         //根据时间戳插值获取imu计算的旋转量与位置量（注意imu计算的相对于起始时刻的旋转增量）
         float rotXCur, rotYCur, rotZCur;
         findRotation(pointTime, &rotXCur, &rotYCur, &rotZCur);
@@ -739,7 +740,7 @@ public:
         cloudInfo.cloud_deskewed  = publishCloud(&pubExtractedCloud, extractedCloud, cloudHeader.stamp, lidarFrame);
         //发布自定义cloud_info信息
         pubLaserCloudInfo.publish(cloudInfo);
- 
+
         //pubExtractedCloud发布的只有点云信息，而pubLaserCloudInfo发布的为自定义的很多信息
     }
 };
