@@ -261,10 +261,10 @@ public:
 
     IMUPreintegration()
     {
-        //订阅imu原始数据，用下面因子图优化的结果，施加两帧之间的imu预计分量，预测每一时刻（imu频率）的imu里程计
+        //订阅imu原始数据，用下面因子图优化的结果，施加两帧之间的imu预积分量，预测每一时刻（imu频率）的imu里程计
         // imuTopic name: "imu_correct"
         subImu = nh.subscribe<sensor_msgs::Imu>(imuTopic, 2000, &IMUPreintegration::imuHandler, this, ros::TransportHints().tcpNoDelay());
-        // 订阅激光里程计，来自mapOptimization，用两帧之间的imu预计分量构建因子图，
+        // 订阅激光里程计，来自mapOptimization，用两帧之间的imu预积分量构建因子图，
         // 优化当前帧位姿（这个位姿仅用于更新每时刻的imu里程计，以及下一次因子图优化）
         subOdometry = nh.subscribe<nav_msgs::Odometry>("lio_sam/mapping/odometry_incremental", 5, &IMUPreintegration::odometryHandler, this, ros::TransportHints().tcpNoDelay());
 
@@ -280,8 +280,7 @@ public:
         //对于速度的积分误差？这块暂时不太理解
         p->integrationCovariance = gtsam::Matrix33::Identity(3, 3) * pow(1e-4, 2); // error committed in integrating position from velocities
         //假设没有初始的bias
-        gtsam::imuBias::ConstantBias prior_imu_bias((gtsam::Vector(6) << 0, 0, 0, 0, 0, 0).finished());
-        ; // assume zero initial bias
+        gtsam::imuBias::ConstantBias prior_imu_bias((gtsam::Vector(6) << 0, 0, 0, 0, 0, 0).finished()); // assume zero initial bias
 
         // 噪声先验
         // Diagonal对角线矩阵
@@ -320,6 +319,7 @@ public:
         doneFirstOpt = false;
         systemInitialized = false;
     }
+
     // 订阅的是激光里程计,"lio_sam/mapping/odometry_incremental"
     void odometryHandler(const nav_msgs::Odometry::ConstPtr &odomMsg)
     {
@@ -596,8 +596,7 @@ public:
 
     /**
      * 订阅imu原始数据
-     * 1、用上一帧激光里程计时刻对应的状态、偏置，
-     * 施加从该时刻开始到当前时刻的imu预计分量，得到当前时刻的状态，也就是imu里程计
+     * 1、用上一帧激光里程计时刻对应的状态、偏置，施加从该时刻开始到当前时刻的imu预计分量，得到当前时刻的状态，也就是imu里程计
      * 2、imu里程计位姿转到lidar系，发布里程计
      */
     void imuHandler(const sensor_msgs::Imu::ConstPtr &imu_raw)
