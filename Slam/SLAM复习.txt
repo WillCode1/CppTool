@@ -85,6 +85,6 @@ C. GPS因子
 1.曲率计算
 2.markOccludedPoints
 3.imu预积分(位姿、速度、bias)
-
+4.pcl::KdTreeFLANN<PointType>
 
 
