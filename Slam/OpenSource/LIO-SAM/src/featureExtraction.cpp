@@ -141,6 +141,7 @@ public:
         // mark occluded points and parallel beam points
         for (int i = 5; i < cloudSize - 6; ++i)
         {
+            // 1.occluded points
             // 当前点和下一个点的range值
             float depth1 = cloudInfo.pointRange[i];
             float depth2 = cloudInfo.pointRange[i + 1];
@@ -174,7 +175,8 @@ public:
                     cloudNeighborPicked[i + 6] = 1;
                 }
             }
-            // parallel beam
+
+            // 2.parallel beam
             // 用前后相邻点判断当前点所在平面是否与激光束方向平行
             // diff1和diff2是当前点距离前后两个点的距离
             float diff1 = std::abs(float(cloudInfo.pointRange[i - 1] - cloudInfo.pointRange[i]));

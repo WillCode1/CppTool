@@ -84,9 +84,7 @@ C. GPS因子
 
 由于在GPS信号一直存在的时候，持续添加GPS因子没有意义。因为漂移很缓慢。所以在实际操作过程中，我们只添加GPS因子当位姿估计协方差矩阵变得很大的时候。
 =========================================
-1.曲率计算
-2.markOccludedPoints
 3.imu预积分(位姿、速度、bias)
 4.pcl::KdTreeFLANN<PointType>
-
+5.LMOptimization
 
