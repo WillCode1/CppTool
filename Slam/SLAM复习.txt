@@ -85,3 +85,5 @@ C. GPS因子
 4.pcl::KdTreeFLANN<PointType>
 5.LMOptimization
 6.loopClosureThread要添加外部检测吗
+7.evo
+
