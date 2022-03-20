@@ -86,4 +86,5 @@ C. GPS因子
 5.LMOptimization
 6.loopClosureThread要添加外部检测吗
 7.evo
+8.LEGO-LOAM、FAST-LIO
 
