@@ -43,6 +43,10 @@ ndt：https://zhuanlan.zhihu.com/p/96908474
 4）根据结果更新g和H，计算新的步长
 5）判断是否收敛或达到迭代次数，是则跳出，否则继续步骤3-5
 
+kd-tree：表示k维空间中点集合
+--->pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
+--->kdtree.nearestKSearch();
+--->kdtree.radiusSearch();
 amcl：https://blog.csdn.net/weixin_38145317/article/details/82852580
 PnP：https://www.cnblogs.com/yepeichu/p/12670818.html
 P3P/EPnP：
@@ -100,7 +104,6 @@ C. GPS因子
 由于在GPS信号一直存在的时候，持续添加GPS因子没有意义。因为漂移很缓慢。所以在实际操作过程中，我们只添加GPS因子当位姿估计协方差矩阵变得很大的时候。
 =========================================
 3.imu预积分(位姿、速度、bias)
-4.pcl::KdTreeFLANN<PointType>
 5.LMOptimization：https://blog.csdn.net/weixin_37835423/article/details/111587379
 6.branch and bound
 8.LEGO-LOAM、FAST-LIO
