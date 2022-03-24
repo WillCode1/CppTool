@@ -10,10 +10,14 @@ slam技术栈
 --->非线性优化: 高斯牛顿法，LM
 3.后端优化
 --->滤波: ekf，pf
---->g2o,gtsam: BA,因子图
+--->g2o, Ceres: BA, 图优化, 位姿图
+--->gtsam: 因子图
+--->LOAM: map2map, 多次扫描的点云与现有地图进行匹配，消除LO增量中的误差
 4.回环检测
---->branch and bound，icp
+--->branch and bound + icp
 --->BOW
+--->里程计推算位置(LEGO-LOAM) + icp
+--->深度学习(SC-LEGO-LOAM)
 ====================
 ekf：
 --->xt = A*xt-1 + B*ut + εt
