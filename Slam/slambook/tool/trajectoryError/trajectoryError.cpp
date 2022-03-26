@@ -7,8 +7,8 @@
 using namespace Sophus;
 using namespace std;
 
-string groundtruth_file = "../../example/groundtruth.txt";
-string estimated_file = "../../example/estimated.txt";
+string groundtruth_file = "../../../tool/trajectoryError/groundtruth.txt";
+string estimated_file = "../../../tool/trajectoryError/estimated.txt";
 
 typedef vector<Sophus::SE3d, Eigen::aligned_allocator<Sophus::SE3d>> TrajectoryType;
 

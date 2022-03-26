@@ -1,5 +1,4 @@
 include_directories("/usr/include/eigen3")
-add_executable(coordinateTransform coordinateTransform.cpp)
 
 set(CMAKE_CXX_STANDARD 14)
 

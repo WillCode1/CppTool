@@ -3,7 +3,7 @@
 
 using namespace std;
 
-string image_file = "../../imageBasics/distorted.png";   // 请确保路径正确
+string image_file = "../../../camera/undistortImage/distorted.png";   // 请确保路径正确
 
 int main(int argc, char **argv) {
 
