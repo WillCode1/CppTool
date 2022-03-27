@@ -89,10 +89,10 @@ protected:
   Eigen::Vector3d _point;
 };
 
-string img1 = "../1.png";
-string img2 = "../2.png";
-string depth_img1 = "../1_depth.png";
-string depth_img2 = "../2_depth.png";
+string img1 = "../../keyPoint/1.png";
+string img2 = "../../keyPoint/2.png";
+string depth_img1 = "../../keyPoint/1_depth.png";
+string depth_img2 = "../../keyPoint/2_depth.png";
 
 int main(int argc, char **argv) {
   //-- 读取图像

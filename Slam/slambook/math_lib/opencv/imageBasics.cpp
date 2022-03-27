@@ -6,7 +6,7 @@ using namespace std;
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-string image_file = "../../../base/imageBasics/ubuntu.png";   // 请确保路径正确
+string image_file = "../../../math_lib/opencv/ubuntu.png";   // 请确保路径正确
 
 int main(int argc, char **argv) {
   // 读取argv[1]指定的图像

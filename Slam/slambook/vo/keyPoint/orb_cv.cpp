@@ -7,8 +7,8 @@
 using namespace std;
 using namespace cv;
 
-string first_file = "../1.png";
-string second_file = "../2.png";
+string first_file = "../../keyPoint/1.png";
+string second_file = "../../keyPoint/2.png";
 
 int main(int argc, char **argv) {
   //-- 读取图像
