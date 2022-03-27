@@ -10,12 +10,12 @@ slam技术栈
 --->非线性优化: 高斯牛顿法，LM
 3.后端优化
 --->滤波: ekf，pf
---->g2o, Ceres: BA, 图优化, 位姿图
+--->g2o, Ceres: BA, 图优化, 位姿图(控制BA规模: 共视图Covisibility graph, 滑动窗口法)
 --->gtsam: 因子图
 --->LOAM: map2map, 多次扫描的点云与现有地图进行匹配，消除LO增量中的误差
 4.回环检测
 --->branch and bound + icp
---->BOW
+--->DBoW2/DBoW3
 --->里程计推算位置(LEGO-LOAM) + icp
 --->深度学习(SC-LEGO-LOAM)
 ====================
@@ -66,11 +66,11 @@ rf2o：前提静态场景 https://zhuanlan.zhihu.com/p/51010526
 LIO-SAM：
 laser畸变校正：一帧激光中，首尾点云位姿差值，通过角度比例插值修正
 
-非线性优化方法
+非线性优化方法：https://zhuanlan.zhihu.com/p/101292765?utm_source=wechat_session
 --->一阶
 --->二阶牛顿法
---->高斯牛顿法：比牛顿法快，稳定性差、不准确、不收敛
---->列文伯格-马夸尔特方法：增加信赖域，拉格朗日对偶乘子，更稳定、准确（相当于条件选择一阶或二阶法）
+--->高斯牛顿法：比牛顿法快，矩阵H不满秩则无法迭代、不准确、不收敛(J(x)J^T(x)△x = -J(x)f(x) / H△x = g)
+--->列文伯格-马夸尔特方法：增加信赖域，解决H矩阵不满秩或非正定的情况（相当于条件选择一阶或二阶法(H+λI)△x = g)
 
 ============================
 LIO-SAM: https://zhuanlan.zhihu.com/p/153394930?from_voters_page=true
@@ -86,12 +86,11 @@ IMU和LiDAR的联合位姿估计已经被广泛研究，大致分为两类。
 5.LMOptimization：https://blog.csdn.net/weixin_37835423/article/details/111587379
 6.branch and bound: fast_correlative_scan_matcher_2d.cc
 7.LEGO-LOAM、FAST-LIO
-8.里程计定位
+8.里程计定位+位姿图
 --->imu预积分修正bias, 重力校正
 --->激光点云运动畸变矫正
 --->icp点到面、点到线，退化丢弃
 --->传感器数据融合ekf/eskf
 9.位姿图的实现是否需要之后最后一次计算特征点
---->预积分、因子图、特征图
 
 

@@ -9,7 +9,7 @@ using namespace Eigen;
 
 int main(int argc, char **argv) {
   double ar = 1.0, br = 2.0, cr = 1.0;         // 真实参数值
-  double ae = 2.0, be = -1.0, ce = 5.0;        // 估计参数值
+  double ae = 3.0, be = -5.0, ce = 5.0;        // 估计参数值
   int N = 100;                                 // 数据点
   double w_sigma = 1.0;                        // 噪声Sigma值
   double inv_sigma = 1.0 / w_sigma;
@@ -28,7 +28,6 @@ int main(int argc, char **argv) {
 
   chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
   for (int iter = 0; iter < iterations; iter++) {
-
     Matrix3d H = Matrix3d::Zero();             // Hessian = J^T W^{-1} J in Gauss-Newton
     Vector3d b = Vector3d::Zero();             // bias
     cost = 0;
@@ -41,6 +40,8 @@ int main(int argc, char **argv) {
       J[1] = -xi * exp(ae * xi * xi + be * xi + ce);  // de/db
       J[2] = -exp(ae * xi * xi + be * xi + ce);  // de/dc
 
+      // J(x)J^T(x)△x = -J(x)f(x)
+      // H△x = g
       H += inv_sigma * inv_sigma * J * J.transpose();
       b += -inv_sigma * inv_sigma * error * J;
 
@@ -54,8 +55,8 @@ int main(int argc, char **argv) {
       break;
     }
 
-    if (iter > 0 && cost >= lastCost) {
-      cout << "cost: " << cost << ">= last cost: " << lastCost << ", break." << endl;
+    if (iter > 10 && cost >= lastCost) {
+      cout << "times: " << iter << " cost: " << cost << ">= last cost: " << lastCost << ", break." << endl;
       break;
     }
 
@@ -73,6 +74,7 @@ int main(int argc, char **argv) {
   chrono::duration<double> time_used = chrono::duration_cast<chrono::duration<double>>(t2 - t1);
   cout << "solve time cost = " << time_used.count() << " seconds. " << endl;
 
+  cout << "real abc = " << ar << ", " << br << ", " << cr << endl;
   cout << "estimated abc = " << ae << ", " << be << ", " << ce << endl;
   return 0;
 }
