@@ -10,10 +10,13 @@
 /Work/Eigen_Example/cmake-build-debug/
 /Slam/slambook2/3rdparty/
 /Slam/slambook2
-/Slam/slambook/base/cmake-build-debug/
-/Slam/slambook/camera/cmake-build-debug
 /Slam/slambook/cmake-build-debug
 /Slam/slambook/math_lib/cmake-build-debug
 /Slam/slambook/tool/cmake-build-debug
 /Work/cmake-build-debug
-/Slam/slambook/vo/cmake-build-debug
+/Slam/slambook/1_camera/cmake-build-debug/
+/Slam/slambook/2_vo/cmake-build-debug/
+/Slam/slambook/3_backend/cmake-build-debug/
+/Slam/slambook/4_loop_closure/cmake-build-debug/
+/Slam/slambook/5_mapping/cmake-build-debug/
+/Slam/slambook/6_my_slam/cmake-build-debug/
