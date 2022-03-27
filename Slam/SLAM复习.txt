@@ -10,7 +10,8 @@ slam技术栈
 --->非线性优化: 高斯牛顿法，LM
 3.后端优化
 --->滤波: ekf，pf
---->g2o, Ceres: BA, 图优化, 位姿图(控制BA规模: 共视图Covisibility graph, 滑动窗口法)
+--->g2o, Ceres: BA, 图优化
+--->控制BA规模: 位姿图, 共视图Covisibility graph, 滑动窗口法
 --->gtsam: 因子图
 --->LOAM: map2map, 多次扫描的点云与现有地图进行匹配，消除LO增量中的误差
 4.回环检测
