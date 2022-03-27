@@ -1,3 +1,9 @@
+// 三角测量
+/*
+ * 2D-2D：对极几何（已知两张图像中一对匹配好的特征点）
+    (1)估计相机运动尺度：本质矩阵/基础矩阵、单应矩阵
+    (2)估计空间点深度：对极约束（计算尺度）+三角测量（标定深度，需要一定平移）
+ */
 #include <iostream>
 #include <opencv2/opencv.hpp>
 // #include "extra.h" // used in opencv2
@@ -35,8 +41,8 @@ inline cv::Scalar get_color(float depth) {
 // 像素坐标转相机归一化坐标
 Point2f pixel2cam(const Point2d &p, const Mat &K);
 
-string first_file = "../1.png";
-string second_file = "../2.png";
+string first_file = "../../keyPoint/1.png";
+string second_file = "../../keyPoint/2.png";
 
 int main(int argc, char **argv) {
   //-- 读取图像

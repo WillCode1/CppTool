@@ -84,7 +84,7 @@ IMU和LiDAR的联合位姿估计已经被广泛研究，大致分为两类。
 2.eskf: 估计imu误差
 3.imu预积分(位姿、速度、bias)
 5.LMOptimization：https://blog.csdn.net/weixin_37835423/article/details/111587379
-6.branch and bound
+6.branch and bound: fast_correlative_scan_matcher_2d.cc
 7.LEGO-LOAM、FAST-LIO
 8.里程计定位
 --->imu预积分修正bias, 重力校正

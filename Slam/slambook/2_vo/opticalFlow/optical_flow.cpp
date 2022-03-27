@@ -104,7 +104,6 @@ inline float GetPixelValue(const cv::Mat &img, float x, float y) {
 }
 
 int main(int argc, char **argv) {
-
     // images, note they are CV_8UC1, not CV_8UC3
     Mat img1 = imread(file_1, 0);
     Mat img2 = imread(file_2, 0);

@@ -1,3 +1,8 @@
+/*
+ * 3D-3D：ICP (已知一组配对好的3D点)
+    (1)ICP求解SVD
+    (2)BA
+ */
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/features2d/features2d.hpp>

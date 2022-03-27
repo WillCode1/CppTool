@@ -1,3 +1,8 @@
+/*
+ * 2D-2D：对极几何（已知两张图像中一对匹配好的特征点）
+    (1)估计相机运动尺度：本质矩阵/基础矩阵、单应矩阵
+    (2)估计空间点深度：对极约束（计算尺度）+三角测量（标定深度，需要一定平移）
+ */
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/features2d/features2d.hpp>

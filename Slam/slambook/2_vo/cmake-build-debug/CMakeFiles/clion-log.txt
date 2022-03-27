@@ -7,18 +7,6 @@ CMake Deprecation Warning at CMakeLists.txt:1 (cmake_minimum_required):
   CMake that the project does not need compatibility with older versions.
 
 
--- The C compiler identification is GNU 9.4.0
--- The CXX compiler identification is GNU 9.4.0
--- Detecting C compiler ABI info
--- Detecting C compiler ABI info - done
--- Check for working C compiler: /usr/bin/cc - skipped
--- Detecting C compile features
--- Detecting C compile features - done
--- Detecting CXX compiler ABI info
--- Detecting CXX compiler ABI info - done
--- Check for working CXX compiler: /usr/bin/c++ - skipped
--- Detecting CXX compile features
--- Detecting CXX compile features - done
 CMake Deprecation Warning at keyPoint/CMakeLists.txt:1 (cmake_minimum_required):
   Compatibility with CMake < 2.8.12 will be removed from a future version of
   CMake.
@@ -37,15 +25,6 @@ CMake Deprecation Warning at opticalFlow/CMakeLists.txt:1 (cmake_minimum_require
 
 
 -- Found OpenCV: /usr (found suitable version "4.2.0", minimum required is "4") 
--- Looking for pthread.h
--- Looking for pthread.h - found
--- Performing Test CMAKE_HAVE_LIBC_PTHREAD
--- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
--- Looking for pthread_create in pthreads
--- Looking for pthread_create in pthreads - not found
--- Looking for pthread_create in pthread
--- Looking for pthread_create in pthread - found
--- Found Threads: TRUE  
 -- Configuring done
 -- Generating done
 -- Build files have been written to: /home/will/CppTool/Slam/slambook/2_vo/cmake-build-debug

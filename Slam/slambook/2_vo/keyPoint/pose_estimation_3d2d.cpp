@@ -1,3 +1,10 @@
+/*
+ * https://blog.csdn.net/LittleEmperor/article/details/105212252
+    3D-2D：PnP（已知3D空间点及其投影位置）
+    (1)直接线性变换
+    (2)P3P、DLT、EPnP等
+    (3)BA(Bundle adjustment)：https://www.cnblogs.com/Jessica-jie/p/7739775.html
+ */
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/features2d/features2d.hpp>
