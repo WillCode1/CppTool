@@ -20,3 +20,6 @@
 /Slam/slambook/4_loop_closure/cmake-build-debug/
 /Slam/slambook/5_mapping/cmake-build-debug/
 /Slam/slambook/6_my_slam/cmake-build-debug/
+/Slam/slambook/.idea/
+/Slam/slambook/6_my_slam/bin
+/Slam/slambook/6_my_slam/lib
