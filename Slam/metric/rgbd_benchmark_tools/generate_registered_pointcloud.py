@@ -69,7 +69,7 @@ DATA binary
 '''%(len(points), pose[0], pose[1], pose[2], pose[6], pose[3], pose[4], pose[5]                         
 ,len(points),"".join(points)))
     file.close()
-    print "Saved %d points to '%s'"%(len(points),pcd_file)
+    print ("Saved %d points to '%s'"%(len(points),pcd_file))
 
 
 
@@ -89,7 +89,7 @@ end_header
 %s
 '''%(len(points),"".join(points)))
     file.close()
-    print "Saved %d points to '%s'"%(len(points),ply_file)
+    print ("Saved %d points to '%s'"%(len(points),ply_file))
 
 
 def generate_pointcloud(rgb_file,depth_file,transform,downsample,pcd=False):
@@ -181,7 +181,7 @@ if __name__ == '__main__':
           else:
             out_filename = "%s-%f.ply"%(os.path.splitext(args.output_file)[0],rgb_stamp)
           if os.path.exists(out_filename):
-            print "skipping existing cloud file ", out_filename
+            print ("skipping existing cloud file ", out_filename)
             continue
 
         rgb_file = rgb_list[rgb_stamp][0]
@@ -196,7 +196,7 @@ if __name__ == '__main__':
             write_ply(out_filename,points)
         else:
             all_points += points
-            print "Frame %d/%d, number of points so far: %d"%(frame+1,len(list),len(all_points))
+            print ("Frame %d/%d, number of points so far: %d"%(frame+1,len(list),len(all_points)))
 
     if not args.individual:
       write_ply(args.output_file,all_points)

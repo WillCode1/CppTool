@@ -91,13 +91,13 @@ def plot_traj(ax,stamps,traj,style,color,label):
     label -- plot legend
     
     """
-    stamps.sort()
-    interval = numpy.median([s-t for s,t in zip(stamps[1:],stamps[:-1])])
+    sorted(stamps)
+    interval = numpy.median([s-t for s,t in zip(list(stamps)[1:],list(stamps)[:-1])])
     x = []
     y = []
-    last = stamps[0]
+    last = list(stamps)[0]
     for i in range(len(stamps)):
-        if stamps[i]-last < 2*interval:
+        if list(stamps)[i]-last < 2*interval:
             x.append(traj[i][0])
             y.append(traj[i][1])
         elif len(x)>0:
@@ -105,7 +105,7 @@ def plot_traj(ax,stamps,traj,style,color,label):
             label=""
             x=[]
             y=[]
-        last= stamps[i]
+        last= list(stamps)[i]
     if len(x)>0:
         ax.plot(x,y,style,color=color,label=label)
             
@@ -141,25 +141,25 @@ if __name__=="__main__":
     second_xyz_aligned = rot * second_xyz + trans
     
     first_stamps = first_list.keys()
-    first_stamps.sort()
+    sorted(first_stamps)
     first_xyz_full = numpy.matrix([[float(value) for value in first_list[b][0:3]] for b in first_stamps]).transpose()
     
     second_stamps = second_list.keys()
-    second_stamps.sort()
+    sorted(second_stamps)
     second_xyz_full = numpy.matrix([[float(value)*float(args.scale) for value in second_list[b][0:3]] for b in second_stamps]).transpose()
     second_xyz_full_aligned = rot * second_xyz_full + trans
     
     if args.verbose:
-        print "compared_pose_pairs %d pairs"%(len(trans_error))
+        print ("compared_pose_pairs %d pairs"%(len(trans_error)))
 
-        print "absolute_translational_error.rmse %f m"%numpy.sqrt(numpy.dot(trans_error,trans_error) / len(trans_error))
-        print "absolute_translational_error.mean %f m"%numpy.mean(trans_error)
-        print "absolute_translational_error.median %f m"%numpy.median(trans_error)
-        print "absolute_translational_error.std %f m"%numpy.std(trans_error)
-        print "absolute_translational_error.min %f m"%numpy.min(trans_error)
-        print "absolute_translational_error.max %f m"%numpy.max(trans_error)
+        print ("absolute_translational_error.rmse %f m"%numpy.sqrt(numpy.dot(trans_error,trans_error) / len(trans_error)))
+        print ("absolute_translational_error.mean %f m"%numpy.mean(trans_error))
+        print ("absolute_translational_error.median %f m"%numpy.median(trans_error))
+        print ("absolute_translational_error.std %f m"%numpy.std(trans_error))
+        print ("absolute_translational_error.min %f m"%numpy.min(trans_error))
+        print ("absolute_translational_error.max %f m"%numpy.max(trans_error))
     else:
-        print "%f"%numpy.sqrt(numpy.dot(trans_error,trans_error) / len(trans_error))
+        print ("%f"%numpy.sqrt(numpy.dot(trans_error,trans_error) / len(trans_error)))
         
     if args.save_associations:
         file = open(args.save_associations,"w")

@@ -42,7 +42,8 @@ import argparse
 import sys
 import os
 from associate import *
-from evaluate import *
+from evaluate_ate import *
+from evaluate_rpe import *
 from generate_pointcloud import *
 from PIL import Image, ImageDraw
 
@@ -84,23 +85,23 @@ if __name__ == '__main__':
     pose_list = read_file_list(args.trajectory_file)
     traj = read_trajectory(args.trajectory_file)
 
-    matches = associate(image_list, pose_list,0,0.02)
+    matches = associate.associate(image_list, pose_list,0,0.02)
 
     stamps = image_list.keys()
-    stamps.sort()
+    sorted(stamps)
     
     matches_dict = dict(matches)
     for stamp in stamps:
         image_file = image_list[stamp][0]
         image = Image.open(image_file)
-        print "image stamp: %f"%stamp
+        print ("image stamp: %f"%stamp)
         
         if stamp in matches_dict: 
-            print "pose stamp: %f"%matches_dict[stamp]
+            print ("pose stamp: %f"%matches_dict[stamp])
             pose = traj[matches_dict[stamp]]
             
             stamps = traj.keys()
-            stamps.sort()
+            sorted(stamps)
         
             xy = []    
             draw = ImageDraw.Draw(image)
