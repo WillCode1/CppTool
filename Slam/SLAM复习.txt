@@ -18,7 +18,8 @@ slam技术栈
 --->branch and bound + icp
 --->DBoW2/DBoW3
 --->里程计推算位置(LEGO-LOAM) + icp
---->深度学习(SC-LEGO-LOAM)
+--->SC-LEGO-LOAM：Scan Context
+--->深度学习
 ====================
 ekf：
 --->xt = A*xt-1 + B*ut + εt
@@ -91,22 +92,10 @@ VIO相对于VO的好处：
 4.精度更高：VIO融合了两种传感器的信息，位姿估计的精度要更高。
 
 =========================================
-1.transformPointCloud
-2.eskf: 估计imu误差
-3.imu预积分(位姿、速度、bias)
 5.LMOptimization：https://blog.csdn.net/weixin_37835423/article/details/111587379
 6.branch and bound: fast_correlative_scan_matcher_2d.cc
 7.LEGO-LOAM、FAST-LIO
-8.自己实现的定位、建图包，里程计定位+位姿图
---->imu预积分修正bias, 重力校正
---->激光点云运动畸变矫正
---->icp点到面、点到线，退化丢弃
---->传感器数据融合ekf/eskf
+8.my localization
 9.my slam
---->LVI
---->轻量级改进，实时性，地图大小
---->动态场景，语义
---->稠密建图(视觉slam14讲12章)
 10.数学进阶
-
 
