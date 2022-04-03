@@ -1,0 +1,10 @@
+<launch>
+    <arg name="lidar_odometry_file" default="/home/luffy/work/data/KITTI_VELODYNE/final_class/gps.txt" />
+    <arg name="result_map_file" default="/home/luffy/work/data/KITTI_VELODYNE/final_class/result_map.pcd"/>
+
+    <node pkg="rviz"  type="rviz"  name="rviz"  args="-d $(find localization)/rviz/matching.rviz"></node>
+    <node pkg="localization"  type="mapping_node"  name="mapping_node"  output="screen">
+        <param name="lidar_odometry_file" value="$(arg lidar_odometry_file)" />
+        <param name="global_map_file" value="$(arg global_map_file)" />
+    </node>
+</launch>
