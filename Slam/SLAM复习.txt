@@ -48,10 +48,6 @@ ndt：https://zhuanlan.zhihu.com/p/96908474
 4）根据结果更新g和H，计算新的步长
 5）判断是否收敛或达到迭代次数，是则跳出，否则继续步骤3-5
 
-kd-tree：表示k维空间中点集合
---->pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
---->kdtree.nearestKSearch();
---->kdtree.radiusSearch();
 amcl：https://blog.csdn.net/weixin_38145317/article/details/82852580
 PnP：https://www.cnblogs.com/yepeichu/p/12670818.html
 P3P/EPnP：
@@ -71,7 +67,21 @@ laser畸变校正：一帧激光中，首尾点云位姿差值，通过角度比
 --->一阶
 --->二阶牛顿法
 --->高斯牛顿法：比牛顿法快，矩阵H不满秩则无法迭代、不准确、不收敛(J(x)J^T(x)△x = -J(x)f(x) / H△x = g)
---->列文伯格-马夸尔特方法：增加信赖域，解决H矩阵不满秩或非正定的情况（相当于条件选择一阶或二阶法(H+λI)△x = g)
+--->LM：增加信赖域，解决H矩阵不满秩或非正定的情况（相当于条件选择一阶或二阶法(H+λI)△x = g)
+
+点云处理：
+(1)点云滤波，去除NaN值得无效点云
+--->pcl::removeNaNFromPointCloud
+
+(2)点云下采样: pcl::VoxelGrid<PointType> downSizeFilter;
+--->downSizeFilter.setInputCloud(surfPointsLessFlatScan);
+--->downSizeFilter.setLeafSize(0.2, 0.2, 0.2);
+--->downSizeFilter.filter(surfPointsLessFlatScanDS);
+
+(3)kd-tree：表示k维空间中点集合
+--->pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
+--->kdtree.nearestKSearch();
+--->kdtree.radiusSearch();
 
 =========================================
 VIO相对于VO的好处：
@@ -97,6 +107,6 @@ VIO相对于VO的好处：
 --->轻量级改进，实时性，地图大小
 --->动态场景，语义
 --->稠密建图(视觉slam14讲12章)
-
+10.数学进阶
 
 
