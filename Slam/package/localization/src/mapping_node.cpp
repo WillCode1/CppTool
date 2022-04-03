@@ -33,18 +33,18 @@ int main(int argc, char **argv)
     string odometryFilePath = vm["lidar_odometry_file"].as<string>();
     string resultMapFile = vm["result_map_file"].as<string>();
 
-    LidarMapping pLidarMapping(mapping_node, "//kitti/velo/pointcloud", 1000000);
-    pLidarMapping.setOdometry(odometryFilePath);
+    LidarMapping lidarMapping(mapping_node, "//kitti/velo/pointcloud", 1000000);
+    lidarMapping.setOdometry(odometryFilePath);
 
     ros::Rate rate(1000);
     while (ros::ok())
     {
         ros::spinOnce();
-        pLidarMapping.runMapping();
+        lidarMapping.runMapping();
         rate.sleep();
     }
 
-    PointCloudXYZIPtr result_map = pLidarMapping.getMapCloud();
+    PointCloudXYZIPtr result_map = lidarMapping.getMapCloud();
     std::cout << "total map cloud size: " << result_map->size() << std::endl;
 
     pcl::io::savePCDFileBinary(resultMapFile, *result_map);

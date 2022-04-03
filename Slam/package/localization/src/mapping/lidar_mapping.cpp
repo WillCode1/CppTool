@@ -11,7 +11,7 @@ namespace localization_node
     LidarMapping::LidarMapping(ros::NodeHandle &nh, std::string topic_name, size_t buffer_size)
         : nh_(nh)
     {
-        lidar_cloud_subscriber_ = nh_.subscribe(topic_name, buffer_size, &LidarMapping::msgCallBackHandler, this);
+        lidar_cloud_subscriber_ = nh_.subscribe(topic_name, buffer_size, &LidarMapping::cloudHandler, this);
         map_cloud_ptr_ = boost::shared_ptr<PointCloudXYZI>(new PointCloudXYZI());
         lidar_imu_tran_ = Eigen::Isometry3f::Identity();
         init_calibrate_ = false;
@@ -23,7 +23,7 @@ namespace localization_node
         std::cout << "Lidar Mapping Deconstructed()" << std::endl;
     }
 
-    void LidarMapping::msgCallBackHandler(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg_ptr)
+    void LidarMapping::cloudHandler(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg_ptr)
     {
         CloudData cloud_data;
         cloud_data.timestamp = cloud_msg_ptr->header.stamp.toSec();

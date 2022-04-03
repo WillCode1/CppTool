@@ -11,7 +11,7 @@ namespace localization_node
     LidarMatching::LidarMatching(ros::NodeHandle &nh, std::string topic_name, size_t buffer_size)
         : nh_(nh), ndt_ptr_(new pcl::NormalDistributionsTransform<pointXYZI, pointXYZI>())
     {
-        lidar_cloud_subscriber_ = nh_.subscribe(topic_name, buffer_size, &LidarMatching::msgCallBackHandler, this);
+        lidar_cloud_subscriber_ = nh_.subscribe(topic_name, buffer_size, &LidarMatching::cloudHandler, this);
         global_map_pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/global_map", 100);
         local_map_pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/local_map", 100);
         current_scan_pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/current_scan", 100);
@@ -40,7 +40,7 @@ namespace localization_node
         std::cout << "Lidar Matching Deconstructed()" << std::endl;
     }
 
-    void LidarMatching::msgCallBackHandler(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg_ptr)
+    void LidarMatching::cloudHandler(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg_ptr)
     {
         CloudData cloud_data;
         cloud_data.timestamp = cloud_msg_ptr->header.stamp.toSec();
@@ -101,10 +101,7 @@ namespace localization_node
         return edge_;
     }
 
-    PointCloudXYZIPtr LidarMatching::boxFilter(
-        PointCloudXYZIPtr input_cloud,
-        vector<float> origin,
-        float box_size)
+    PointCloudXYZIPtr LidarMatching::boxFilter(PointCloudXYZIPtr input_cloud, vector<float> origin, float box_size)
     {
         PointCloudXYZIPtr cropCloud(new PointCloudXYZI());
         pcl::CropBox<pointXYZI> cropBoxFilter;
@@ -173,7 +170,7 @@ namespace localization_node
         pcl::transformPointCloud(*cloud_data.sweepCloudPtr, *current_sweep_cloud_, cloud_pose);
 
         step_pose = last_pose.inverse() * cloud_pose;
-        predict_pose = cloud_pose * step_pose;
+        predict_pose = predict_pose * step_pose;
         last_pose = cloud_pose;
 
         std::vector<float> curEdge = getEdge();

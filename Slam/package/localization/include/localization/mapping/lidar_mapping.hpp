@@ -45,7 +45,7 @@ namespace localization_node
 
     private:
         PointCloudXYZIPtr matchingMap(PointCloudXYZIPtr sweepCloud, OdomPoint curOdom);
-        void msgCallBackHandler(const sensor_msgs::PointCloud2::ConstPtr & cloud_msg_ptr);
+        void cloudHandler(const sensor_msgs::PointCloud2::ConstPtr & cloud_msg_ptr);
         std::vector<string> splitLineData(const std::string& str, const std::string& delim);
 
     private:

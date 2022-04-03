@@ -46,7 +46,7 @@ namespace localization_node
         std::deque<OdomPoint> getLocatePose();
 
     private:
-        void msgCallBackHandler(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg_ptr);
+        void cloudHandler(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg_ptr);
         std::vector<string> splitLineData(const std::string &str, const std::string &delim);
         PointCloudXYZIPtr boxFilter(PointCloudXYZIPtr input_cloud, vector<float> origin, float box_size);
         vector<float> calculateEdge(vector<float> origin, float box_size);

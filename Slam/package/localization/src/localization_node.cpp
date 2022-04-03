@@ -13,23 +13,10 @@
 using namespace std;
 using namespace localization_node;
 
-namespace bpo = boost::program_options;
-
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "subscriber_node");
     ros::NodeHandle matching_node("~");
-
-    // bpo::options_description opts("all options");
-    // bpo::variables_map vm;
-
-    // opts.add_options()
-    // ("lidar_odometry_file", bpo::value<string>(), "the lidar odometry file path");
-
-    // opts.add_options()
-    // ("global_map_file", bpo::value<string>(), "the global map file path");
-
-    // bpo::store(bpo::parse_command_line(argc, argv, opts), vm);
 
     string odometryFilePath, globalMapFile;
 
@@ -39,11 +26,11 @@ int main(int argc, char **argv)
         std::cout << "parameter init successful" << std::endl;
     }
 
-    LidarMatching pLidarMatching(matching_node, "/kitti/velo/pointcloud", 1000000);
-    pLidarMatching.setOdometry(odometryFilePath);
+    LidarMatching lidarMatching(matching_node, "/kitti/velo/pointcloud", 1000000);
+    lidarMatching.setOdometry(odometryFilePath);
 
     std::cout << "start load global map cloud" << std::endl;
-    pLidarMatching.InitGlobalMap(globalMapFile);
+    lidarMatching.InitGlobalMap(globalMapFile);
     std::cout << "load gloab map cloud finished" << std::endl;
 
     // NDT Parameter
@@ -52,17 +39,17 @@ int main(int argc, char **argv)
     float trans_eps = 0.01;
     int max_iter = 30;
 
-    pLidarMatching.InitNDTRegistration(res, step_size, trans_eps, max_iter);
+    lidarMatching.InitNDTRegistration(res, step_size, trans_eps, max_iter);
 
     ros::Rate rate(200);
     while (ros::ok())
     {
         ros::spinOnce();
-        pLidarMatching.runMatching();
+        lidarMatching.runMatching();
         rate.sleep();
     }
 
-    std::deque<OdomPoint> locate_pose = pLidarMatching.getLocatePose();
+    std::deque<OdomPoint> locate_pose = lidarMatching.getLocatePose();
     std::cout << "final locate_pose size: " << locate_pose.size() << std::endl;
 
     string outFileName = "/home/luffy/work/data/KITTI_VELODYNE/final_class/locate_pose.txt";
