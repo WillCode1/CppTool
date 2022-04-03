@@ -48,7 +48,6 @@ namespace localization_node
         pcl::fromROSMsg(*cloud_msg_ptr, *(cloud_data.sweepCloudPtr));
         cloud_data_deque_.push_back(cloud_data);
         std::cout << "current cloud msg size: " << cloud_data_deque_.size() << std::endl;
-        return;
     }
 
     std::vector<string> LidarMatching::splitLineData(const std::string &str, const std::string &delim)
@@ -267,7 +266,6 @@ namespace localization_node
             }
             cloud_data_deque_.pop_front();
         }
-        return;
     }
 
     std::deque<OdomPoint> LidarMatching::getLocatePose()
@@ -333,7 +331,6 @@ namespace localization_node
             }
             lidar_odom_deque_.push_back(op);
         }
-        return;
     }
 
     void LidarMatching::InitGlobalMap(string cloud_file_name)
@@ -342,8 +339,6 @@ namespace localization_node
         std::cout << "load global map size: " << global_map_cloud_->size() << std::endl;
 
         init_global_map_ = true;
-
-        return;
     }
 
     void LidarMatching::InitNDTRegistration(float res, float step_size, float trans_eps, int max_iter)
@@ -354,8 +349,6 @@ namespace localization_node
         ndt_ptr_->setMaximumIterations(max_iter);
 
         std::cout << "Init NDT Registrarion finished" << std::endl;
-
-        return;
     }
 
     bool LidarMatching::ResetLocalMap(float x, float y, float z, float box_size)
@@ -400,8 +393,6 @@ namespace localization_node
         transform_.setRotation(tf::Quaternion(q.x(), q.y(), q.z(), q.w()));
         transform_.setOrigin(tf::Vector3(transform_matrix(0, 3), transform_matrix(1, 3), transform_matrix(2, 3)));
         broadcaster_.sendTransform(transform_);
-
-        return;
     }
 
     void LidarMatching::PublishCloudData(PointCloudXYZIPtr input_cloud, ros::Publisher cloud_pub, float sample_size)

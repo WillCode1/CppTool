@@ -31,7 +31,6 @@ namespace localization_node
         pcl::fromROSMsg(*cloud_msg_ptr, *(cloud_data.sweepCloudPtr));
         cloud_data_deque_.push_back(cloud_data);
         std::cout << "current cloud msg size: " << cloud_data_deque_.size() << std::endl;
-        return;
     }
 
     std::vector<string> LidarMapping::splitLineData(const std::string &str, const std::string &delim)
@@ -188,7 +187,6 @@ namespace localization_node
             }
             lidar_odom_deque_.push_back(op);
         }
-        return;
     }
 
     void LidarMapping::runMapping()
@@ -236,7 +234,6 @@ namespace localization_node
             }
             cloud_data_deque_.pop_front();
         }
-        return;
     }
 
     PointCloudXYZIPtr LidarMapping::getMapCloud()
