@@ -1,6 +1,8 @@
 王斌 15355414310
 will1234 dw940613
 ====================
+dot -T pdf gtsam_opt.dot -o graph.pdf
+
 slam技术栈
 1.标定: 
 2.前端里程计
