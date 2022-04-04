@@ -23,3 +23,6 @@
 /Slam/slambook/.idea/
 /Slam/slambook/6_my_slam/bin
 /Slam/slambook/6_my_slam/lib
+*.vscode
+/Slam/OpenSource/ORB_SLAM2
+
