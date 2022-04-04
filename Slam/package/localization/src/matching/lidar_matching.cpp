@@ -170,7 +170,7 @@ namespace localization_node
         pcl::transformPointCloud(*cloud_data.sweepCloudPtr, *current_sweep_cloud_, cloud_pose);
 
         step_pose = last_pose.inverse() * cloud_pose;
-        predict_pose = predict_pose * step_pose;
+        predict_pose = cloud_pose * step_pose;  // 直接假设下一帧位置
         last_pose = cloud_pose;
 
         std::vector<float> curEdge = getEdge();

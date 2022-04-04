@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     string odometryFilePath = vm["lidar_odometry_file"].as<string>();
     string resultMapFile = vm["result_map_file"].as<string>();
 
-    LidarMapping lidarMapping(mapping_node, "//kitti/velo/pointcloud", 1000000);
+    LidarMapping lidarMapping(mapping_node, "/kitti/velo/pointcloud", 1000000);
     lidarMapping.setOdometry(odometryFilePath);
 
     ros::Rate rate(1000);
