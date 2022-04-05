@@ -2,9 +2,9 @@
 #include <pcl/point_cloud.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/common/transforms.h>
-#include <pcl_conversions/pcl_conversions.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/registration/icp.h>
+
 using PointType = pcl::PointXYZI;
 struct PointXYZIRPYT
 {
@@ -119,7 +119,7 @@ namespace lio
                 pcl::PointCloud<PointType>::Ptr unused_result(new pcl::PointCloud<PointType>());
                 icp.align(*unused_result);
 
-                if (icp.hasConverged() == false || icp.getFitnessScore() > historyKeyframeFitnessScore)
+                if (!icp.hasConverged() || icp.getFitnessScore() > historyKeyframeFitnessScore)
                     return false;
 
                 return true;

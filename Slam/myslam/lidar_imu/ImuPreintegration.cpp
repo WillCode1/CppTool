@@ -1,4 +1,4 @@
-#include "utility2.h"
+#include "utility.h"
 #include <gtsam/geometry/Rot3.h>
 #include <gtsam/geometry/Pose3.h>
 #include <gtsam/slam/PriorFactor.h>
@@ -8,12 +8,9 @@
 #include <gtsam/navigation/CombinedImuFactor.h>
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
-#include <gtsam/nonlinear/Marginals.h>
 #include <gtsam/nonlinear/Values.h>
 #include <gtsam/inference/Symbol.h>
-
 #include <gtsam/nonlinear/ISAM2.h>
-#include <gtsam_unstable/nonlinear/IncrementalFixedLagSmoother.h>
 
 using gtsam::symbol_shorthand::B; // Bias  (ax,ay,az,gx,gy,gz)
 using gtsam::symbol_shorthand::V; // Vel   (xdot,ydot,zdot)
@@ -50,7 +47,7 @@ ImuData imuConverter(const ImuData &imu_in, const Eigen::Matrix3d& extRot, const
     return imu_out;
 }
 
-class IMUPreintegration
+class ImuPreintegration
 {
 public:
     float imuAccNoise = 0.01;
@@ -117,7 +114,7 @@ public:
     gtsam::Pose3 imu2Lidar;
     gtsam::Pose3 lidar2Imu;
 
-    IMUPreintegration()
+    ImuPreintegration()
     {
         extRot << -1, 0, 0,
             0, 1, 0,
@@ -205,7 +202,7 @@ public:
 
         // 0. initialize system
         // 0. 系统初始化，第一帧
-        if (systemInitialized == false)
+        if (!systemInitialized)
         {
             // 重置ISAM2优化器
             resetOptimization();
@@ -335,7 +332,7 @@ public:
         //注意后面容易被遮挡，imuIntegratorOpt_的值经过格式转换被传入preint_imu，
         //因此可以推测imuIntegratorOpt_中的integrateMeasurement函数应该就是一个简单的积分轮子，
         //传入数据和dt，得到一个积分量,数据会被存放在imuIntegratorOpt_中
-        const gtsam::PreintegratedImuMeasurements &preint_imu = dynamic_cast<const gtsam::PreintegratedImuMeasurements &>(*imuIntegratorOpt_);
+        const auto &preint_imu = dynamic_cast<const gtsam::PreintegratedImuMeasurements &>(*imuIntegratorOpt_);
         // 参数：前一帧位姿，前一帧速度，当前帧位姿，当前帧速度，前一帧偏置，预计分量
         gtsam::ImuFactor imu_factor(X(key - 1), V(key - 1), X(key), V(key), B(key - 1), preint_imu);
         graphFactors.add(imu_factor);
@@ -413,16 +410,15 @@ public:
             // integrate imu message from the beginning of this optimization
             // 计算预积分
             //利用imuQueImu中的数据进行预积分 主要区别旧在于上一行的更新了bias
-            for (int i = 0; i < (int)imuQueImu.size(); ++i)
+            for (auto & thisImu : imuQueImu)
             {
-                ImuData *thisImu = &imuQueImu[i];
-                double imuTime = thisImu->stamp;
+                double imuTime = thisImu.stamp;
                 double dt = (lastImuQT < 0) ? (1.0 / 500.0) : (imuTime - lastImuQT);
                 // 注意:加入的是这个用于传播的的预积分器imuIntegratorImu_,(之前用来计算的是imuIntegratorOpt_,）
                 //注意加入了上一步算出的dt
                 //结果被存放在imuIntegratorImu_中
-                imuIntegratorImu_->integrateMeasurement(gtsam::Vector3(thisImu->linear_acceleration.x(), thisImu->linear_acceleration.y(), thisImu->linear_acceleration.z()),
-                                                        gtsam::Vector3(thisImu->angular_velocity.x(), thisImu->angular_velocity.y(), thisImu->angular_velocity.z()), dt);
+                imuIntegratorImu_->integrateMeasurement(gtsam::Vector3(thisImu.linear_acceleration.x(), thisImu.linear_acceleration.y(), thisImu.linear_acceleration.z()),
+                                                        gtsam::Vector3(thisImu.angular_velocity.x(), thisImu.angular_velocity.y(), thisImu.angular_velocity.z()), dt);
                 lastImuQT = imuTime;
             }
         }
@@ -473,7 +469,7 @@ public:
 
         // 要求上一次imu因子图优化执行成功，确保更新了上一帧（激光里程计帧）的状态、偏置，预积分已经被重新计算
         // 这里需要先在odomhandler中优化一次后再进行该函数后续的工作
-        if (doneFirstOpt == false)
+        if (!doneFirstOpt)
             return;
 
         double imuTime = thisImu.stamp;

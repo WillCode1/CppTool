@@ -25,4 +25,5 @@
 /Slam/slambook/6_my_slam/lib
 *.vscode
 /Slam/OpenSource/ORB_SLAM2
-
+/Slam/myslam/cmake-build-debug
+/Slam/myslam/.idea
