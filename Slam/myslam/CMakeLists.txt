@@ -18,7 +18,7 @@ include_directories(
 )
 
 add_executable(myslam main.cpp
-        lidar_imu/LoopClosure.cpp
-        lidar_imu/ImuPreintegration.cpp
-        lidar_imu/EdgeAndSurfFeatureExtraction.cpp)
+		laser/EdgeAndSurfFeatureExtraction.cpp
+        laser/LoopClosure.cpp
+        imu/ImuPreintegration.cpp)
 target_link_libraries(myslam ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} gtsam)
