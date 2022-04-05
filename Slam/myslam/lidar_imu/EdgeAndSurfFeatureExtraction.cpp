@@ -23,7 +23,6 @@ struct by_value
 // 用来提取角点、平面点
 class FeatureExtraction
 {
-
 public:
     int N_SCAN;
     int Horizon_SCAN;
@@ -78,9 +77,7 @@ public:
     void initializationValue()
     {
         cloudSmoothness.resize(N_SCAN * Horizon_SCAN);
-
         downSizeFilter.setLeafSize(odometrySurfLeafSize, odometrySurfLeafSize, odometrySurfLeafSize);
-
         extractedCloud.reset(new pcl::PointCloud<PointType>());
         // cornerCloud.reset(new pcl::PointCloud<PointType>());
         // surfaceCloud.reset(new pcl::PointCloud<PointType>());
@@ -291,7 +288,6 @@ public:
                         // 同一条扫描线上后5个点标记一下，不再处理，避免特征聚集
                         for (int l = 1; l <= 5; l++)
                         {
-
                             int columnDiff = std::abs(int(pointColInd[ind + l] - pointColInd[ind + l - 1]));
                             if (columnDiff > 10)
                                 break;
@@ -301,7 +297,6 @@ public:
                         // 同一条扫描线上前5个点标记一下，不再处理，避免特征聚集
                         for (int l = -1; l >= -5; l--)
                         {
-
                             int columnDiff = std::abs(int(pointColInd[ind + l] - pointColInd[ind + l + 1]));
                             if (columnDiff > 10)
                                 break;
