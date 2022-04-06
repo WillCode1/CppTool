@@ -1,4 +1,5 @@
-#include "aw_mapping_robot/map_appender/scan2map.h"
+#include "scan2map.h"
+
 namespace aw
 {
     namespace mapping_robot
@@ -412,19 +413,11 @@ namespace aw
                 if (cloudKeyPoses3D->points.empty() == true)
                     return;
 
-                // if (loopClosureEnableFlag == true)
-                // {
-                //     extractForLoopClosure();
-                // } else {
-                //     extractNearby();
-                // }
-
                 extractNearby();
             }
 
             void Scan2Map::downsampleCurrentScan()
             {
-                // 
                 // Downsample cloud from current scan
                 laserCloudCornerLastDSNum = laserCloudCornerLastDS->size();
 
