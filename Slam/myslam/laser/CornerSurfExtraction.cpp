@@ -1,7 +1,8 @@
 #include "utility.h"
 #include <pcl/filters/voxel_grid.h>
 
-namespace lidar
+
+namespace laser
 {
     struct smoothness_t
     {
@@ -36,6 +37,11 @@ namespace lidar
         // pcl::PointCloud<PointType>::Ptr cornerCloud;
         // 当前激光帧平面点点云集合
         // pcl::PointCloud<PointType>::Ptr surfaceCloud;
+
+        std::vector<float> pointRange;
+        std::vector<int> pointColInd;
+        std::vector<int> startRingIndex;
+        std::vector<int> endRingIndex;
 
         pcl::VoxelGrid<PointType> downSizeFilter;
 
@@ -85,29 +91,67 @@ namespace lidar
             cloudCurvature = new float[N_SCAN * Horizon_SCAN];
             cloudNeighborPicked = new int[N_SCAN * Horizon_SCAN];
             cloudLabel = new int[N_SCAN * Horizon_SCAN];
+
+            startRingIndex.assign(N_SCAN, 0);
+            endRingIndex.assign(N_SCAN, 0);
+
+            pointColInd.assign(N_SCAN * Horizon_SCAN, 0);
+            pointRange.assign(N_SCAN * Horizon_SCAN, 0);
         }
 
         //接收imageProjection.cpp中发布的去畸变的点云，实时处理的回调函数
-        void laserCloudHandler(pcl::PointCloud<PointType>::Ptr cloud_deskewed, const std::vector<float> &pointRange,
-                               const std::vector<int> &pointColInd, const std::vector<int> &startRingIndex, const std::vector<int> &endRingIndex,
+        void laserCloudHandler(pcl::PointCloud<PointType>::Ptr cloud_deskewed, cv::Mat rangeMat,
                                pcl::PointCloud<PointType>::Ptr cornerCloud, pcl::PointCloud<PointType>::Ptr surfaceCloud)
         {
             // 获取的去畸变点云信息
             extractedCloud = cloud_deskewed;
 
+            cloudInfoExtraction(rangeMat);
+
             // 计算当前激光帧点云中每个点的曲率
-            calculateSmoothness(pointRange);
+            calculateSmoothness();
 
             // 标记属于遮挡、平行两种情况的点，不做特征提取
-            markOccludedPoints(pointRange, pointColInd);
+            markOccludedPoints();
 
             // 点云角点、平面点特征提取
             // 1、遍历扫描线，每根扫描线扫描一周的点云划分为6段，针对每段提取20个角点、不限数量的平面点，加入角点集合、平面点集合
             // 2、认为非角点的点都是平面点，加入平面点云集合，最后降采样
-            extractFeatures(startRingIndex, endRingIndex, pointColInd, cornerCloud, surfaceCloud);
+            extractFeatures(cornerCloud, surfaceCloud);
         }
 
-        void calculateSmoothness(const std::vector<float> &pointRange)
+        void cloudInfoExtraction(cv::Mat rangeMat)
+        {
+            // 有效激光点数量
+            int count = 0;
+            // extract segmented cloud for lidar odometry
+            for (int i = 0; i < N_SCAN; ++i)
+            {
+                //提取特征的时候，每一行的前5个和最后5个不考虑
+                //记录每根扫描线起始第5个激光点在一维数组中的索引
+                // cloudInfo为自定义的msg
+                // 记录每根扫描线起始第5个激光点在一维数组中的索引
+                startRingIndex[i] = count - 1 + 5;
+                /// Horizon_SCAN=1800
+                for (int j = 0; j < Horizon_SCAN; ++j)
+                {
+                    if (rangeMat.at<float>(i, j) != FLT_MAX)
+                    {
+                        // mark the points' column index for marking occlusion later
+                        // 记录激光点对应的Horizon_SCAN方向上的索引
+                        pointColInd[count] = j;
+                        // save range info激光点距离
+                        pointRange[count] = rangeMat.at<float>(i, j);
+                        // size of extracted cloud
+                        ++count;
+                    }
+                }
+                // 记录每根扫描线倒数第5个激光点在一维数组中的索引
+                endRingIndex[i] = count - 1 - 5;
+            }
+        }
+
+        void calculateSmoothness()
         {
             // 遍历当前激光帧运动畸变校正后的有效点云
             int cloudSize = extractedCloud->points.size();
@@ -142,7 +186,7 @@ namespace lidar
             }
         }
 
-        void markOccludedPoints(const std::vector<float> &pointRange, const std::vector<int> &pointColInd)
+        void markOccludedPoints()
         {
             int cloudSize = extractedCloud->points.size();
             // mark occluded points and parallel beam points
@@ -195,8 +239,7 @@ namespace lidar
             }
         }
 
-        void extractFeatures(const std::vector<int> &startRingIndex, const std::vector<int> &endRingIndex, const std::vector<int> &pointColInd,
-                             pcl::PointCloud<PointType>::Ptr cornerCloud, pcl::PointCloud<PointType>::Ptr surfaceCloud)
+        void extractFeatures(pcl::PointCloud<PointType>::Ptr cornerCloud, pcl::PointCloud<PointType>::Ptr surfaceCloud)
         {
             cornerCloud->clear();
             surfaceCloud->clear();
