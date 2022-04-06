@@ -21,7 +21,7 @@ namespace lidar
     };
 
     // 用来提取角点、平面点
-    class FeatureExtraction
+    class CornerSurfExtraction
     {
     public:
         int N_SCAN;
@@ -47,7 +47,7 @@ namespace lidar
         // 1表示角点，-1表示平面点
         int *cloudLabel = nullptr;
 
-        FeatureExtraction(int n_scan, int horizon_scan, float edgeThreshold_, float surfThreshold_, float odometry_surfLeafSize)
+        CornerSurfExtraction(int n_scan, int horizon_scan, float edgeThreshold_, float surfThreshold_, float odometry_surfLeafSize)
             : N_SCAN(n_scan), Horizon_SCAN(horizon_scan),
               edgeThreshold(edgeThreshold_), surfThreshold(surfThreshold_),
               odometrySurfLeafSize(odometry_surfLeafSize)
@@ -55,7 +55,7 @@ namespace lidar
             initializationValue();
         }
 
-        ~FeatureExtraction()
+        ~CornerSurfExtraction()
         {
             if (cloudCurvature)
             {
