@@ -61,6 +61,9 @@ git reset HEAD filename  从暂存区中移除文件
 git reset --hard HEAD~3  会将最新的3次提交全部重置，就像没有提交过一样。
 git reset --hard commit 38679ed709fd0a3767b79b93d0fba5bb8dd235f8
 
+https://blog.csdn.net/stone_yw/article/details/80795669
+git stash
+git stash pop
 ----------------------------------
 1.Empty reply from server
 git config --unset http.proxy

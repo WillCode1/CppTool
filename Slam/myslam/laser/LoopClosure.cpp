@@ -1,3 +1,4 @@
+#include "utility.h"
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <pcl/kdtree/kdtree_flann.h>
@@ -5,32 +6,21 @@
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/registration/icp.h>
 
-using PointType = pcl::PointXYZI;
-struct PointXYZIRPYT
-{
-    PCL_ADD_POINT4D
-    PCL_ADD_INTENSITY;
-    float roll;
-    float pitch;
-    float yaw;
-    double time;
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW 
-} EIGEN_ALIGN16;
-typedef PointXYZIRPYT  PointTypePose;
-
 
 namespace lidar
 {
-    class LoopClosure{
-        bool LoopClosureByOdom(pcl::PointCloud<PointType>::Ptr cloudKeyPoses3D,
-                               pcl::PointCloud<PointTypePose>::Ptr cloudKeyPoses6D,
+    class LoopClosure
+    {
+        // for lio-sam
+        bool LoopClosureByOdom(pcl::PointCloud<PointType>::Ptr keyFramePoses3D,
+                               pcl::PointCloud<PointTypePose>::Ptr keyFramePoses6D,
                                const std::vector<pcl::PointCloud<PointType>::Ptr> &cloudKeyFrames,
-                               Eigen::Affine3f& correctionLidarFrame)
+                               Eigen::Affine3f &correctionTrans)
         {
             double historyKeyframeSearchRadius = 15;     // m
             double historyKeyframeSearchFrameDiff = 300; // keyframe
 
-            int loopKeyCur = cloudKeyPoses3D->size() - 1;
+            int loopKeyCur = keyFramePoses3D->size() - 1;
             int loopKeyPre = -1;
             {
                 std::vector<int> pointSearchIndLoop;
@@ -38,9 +28,8 @@ namespace lidar
                 pcl::KdTreeFLANN<PointType>::Ptr kdtreeHistoryKeyPoses;
                 kdtreeHistoryKeyPoses.reset(new pcl::KdTreeFLANN<PointType>());
 
-                kdtreeHistoryKeyPoses->setInputCloud(cloudKeyPoses3D);
-                kdtreeHistoryKeyPoses->radiusSearch(cloudKeyPoses3D->back(), historyKeyframeSearchRadius,
-                                                    pointSearchIndLoop, pointSearchSqDisLoop, 0);
+                kdtreeHistoryKeyPoses->setInputCloud(keyFramePoses3D);
+                kdtreeHistoryKeyPoses->radiusSearch(keyFramePoses3D->back(), historyKeyframeSearchRadius, pointSearchIndLoop, pointSearchSqDisLoop, 0);
 
                 for (int i = 0; i < (int)pointSearchIndLoop.size(); ++i)
                 {
@@ -72,7 +61,7 @@ namespace lidar
                     cloudOut->resize(cloudSize);
                     Eigen::Affine3f transCur = pcl::getTransformation(transformIn->x, transformIn->y, transformIn->z, transformIn->roll, transformIn->pitch, transformIn->yaw);
 
-    #pragma omp parallel for num_threads(8)
+#pragma omp parallel for num_threads(8)
                     for (int i = 0; i < cloudSize; ++i)
                     {
                         const auto &pointFrom = cloudIn->points[i];
@@ -90,10 +79,10 @@ namespace lidar
                     for (int i = -searchNum; i <= searchNum; ++i)
                     {
                         int keyNear = key + i;
-                        if (keyNear < 0 || keyNear >= cloudKeyPoses6D->size())
+                        if (keyNear < 0 || keyNear >= keyFramePoses6D->size())
                             continue;
 
-                        *nearKeyframes += *transformPointCloud(cloudKeyFrames[keyNear], &cloudKeyPoses6D->points[keyNear]);
+                        *nearKeyframes += *transformPointCloud(cloudKeyFrames[keyNear], &keyFramePoses6D->points[keyNear]);
                     }
 
                     if (nearKeyframes->empty())
@@ -134,7 +123,7 @@ namespace lidar
                 if (!icpCorrect(cureKeyframeCloud, prevKeyframeCloud))
                     return false;
 
-                correctionLidarFrame = icp.getFinalTransformation();
+                correctionTrans = icp.getFinalTransformation();
                 // Eigen::Affine3f tCorrect = correctionLidarFrame * tWrong;
             }
             return true;

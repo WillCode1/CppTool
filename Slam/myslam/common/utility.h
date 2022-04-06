@@ -5,6 +5,9 @@
 #include <pcl/point_types.h>
 using namespace std;
 
+/*************************************************************
+ * The custom struct
+*************************************************************/
 struct Pose
 {
     Eigen::Vector3d position;
@@ -38,6 +41,26 @@ struct PointCloudData
     pcl::PointCloud<pcl::PointXYZI>::Ptr sweepCloudPtr;
 };
 
+/*************************************************************
+ * pcl struct
+*************************************************************/
+struct PointXYZIRPYT
+{
+    PCL_ADD_POINT4D
+    PCL_ADD_INTENSITY;
+    float roll;
+    float pitch;
+    float yaw;
+    double time;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+} EIGEN_ALIGN16;
+
+using PointType = pcl::PointXYZI;
+using PointTypePose = PointXYZIRPYT;
+
+/*************************************************************
+ * Tool
+*************************************************************/
 class Tool{
 public:
     /*
