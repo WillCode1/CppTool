@@ -79,31 +79,15 @@ namespace imu
         Eigen::Matrix3d extrinsicRot;     // extrinsicRot
         Eigen::Quaterniond extrinsicQRPY; // extrinsicRPY
 
-        ImuPreintegration(float imuAccNoise, float imuGyrNoise, float imuAccBiasN, float imuGyrBiasN, float imuGravity,
-                          const Eigen::Matrix3d &extRot, const Eigen::Matrix3d &extRPY, const Eigen::Vector3d &extrinsicTrans)
+        ImuPreintegration(float imuAccNoise, float imuGyrNoise, float imuAccBiasN, float imuGyrBiasN, float imuGravity)
         {
-            extrinsicRot = extRot;
-#if 1
-            extrinsicRot << -1, 0, 0,
-                0, 1, 0,
-                0, 0, -1;
-
-            // extRPY << 0, 1, 0,
-            //     -1, 0, 0,
-            //     0, 0, 1;
-
-            // extrinsicTrans = Eigen::Vector3d(0, 0, 0);
-
             imuAccNoise = 0.01;
             imuGyrNoise = 0.001;
             imuAccBiasN = 0.0002;
             imuGyrBiasN = 0.00003;
             imuGravity = 9.80511;
-#endif
-            extrinsicQRPY = Eigen::Quaterniond(extRPY);
 
-            imu2Lidar = gtsam::Pose3(gtsam::Rot3(1, 0, 0, 0), gtsam::Point3(-extrinsicTrans.x(), -extrinsicTrans.y(), -extrinsicTrans.z()));
-            lidar2Imu = gtsam::Pose3(gtsam::Rot3(1, 0, 0, 0), gtsam::Point3(extrinsicTrans.x(), extrinsicTrans.y(), extrinsicTrans.z()));
+            InitLaserImuExtrinsicParam();
 
             // imu预积分的噪声协方差
             boost::shared_ptr<gtsam::PreintegrationParams> p = gtsam::PreintegrationParams::MakeSharedU(imuGravity);
@@ -131,6 +115,24 @@ namespace imu
             imuIntegratorImu_ = new gtsam::PreintegratedImuMeasurements(p, prior_imu_bias); // setting up the IMU integration for IMU message thread
             // imu预积分器，用于因子图优化
             imuIntegratorOpt_ = new gtsam::PreintegratedImuMeasurements(p, prior_imu_bias); // setting up the IMU integration for optimization
+        }
+
+        void InitLaserImuExtrinsicParam()
+        {
+            extrinsicRot << -1, 0, 0,
+                0, 1, 0,
+                0, 0, -1;
+
+            Eigen::Matrix3d extRPY;
+            extRPY << 0, 1, 0,
+                -1, 0, 0,
+                0, 0, 1;
+
+            Eigen::Vector3d extrinsicTrans = Eigen::Vector3d(0, 0, 0);
+            extrinsicQRPY = Eigen::Quaterniond(extRPY);
+
+            imu2Lidar = gtsam::Pose3(gtsam::Rot3(1, 0, 0, 0), gtsam::Point3(-extrinsicTrans.x(), -extrinsicTrans.y(), -extrinsicTrans.z()));
+            lidar2Imu = gtsam::Pose3(gtsam::Rot3(1, 0, 0, 0), gtsam::Point3(extrinsicTrans.x(), extrinsicTrans.y(), extrinsicTrans.z()));
         }
 
         void resetOptimization()

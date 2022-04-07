@@ -65,6 +65,8 @@ orb-slam2：https://www.cnblogs.com/yepeichu/p/11602502.html
 rf2o：前提静态场景 https://zhuanlan.zhihu.com/p/51010526
 LIO-SAM：
 laser畸变校正：一帧激光中，首尾点云位姿差值，通过角度比例插值修正
+--->畸变过程: 点云做了(想对于当前帧起始时刻的)反向运动，去畸变点云增加正向运动
+--->deskewPoint = transStartInverse * transCur * skewPoint
 
 非线性优化方法：https://zhuanlan.zhihu.com/p/101292765?utm_source=wechat_session
 --->一阶
@@ -98,7 +100,7 @@ VIO相对于VO的好处：
 =========================================
 1.高斯牛顿、LM 手写实现
 2.g2o、ceres、gtsam使用
-5.LMOptimization：https://blog.csdn.net/weixin_37835423/article/details/111587379
+5.LMOptimization: https://blog.csdn.net/weixin_37835423/article/details/111587379
 6.branch and bound: fast_correlative_scan_matcher_2d.cc
 7.LEGO-LOAM、FAST-LIO
 8.my localization

@@ -34,6 +34,13 @@ using PointXYZIRT = VelodynePointXYZIRT;
 
 const int queueLength = 2000;
 
+/*
+    laser畸变校正
+    (1)畸变过程: 点云做了(想对于当前帧起始时刻的)反向运动
+    (2)去畸变过程: 向点云增加正向运动
+    (3)deskewPoint = transStartInverse * transCur * skewPoint
+ */
+
 class CloudDeskewByImuPreintegration
 {
 private:
