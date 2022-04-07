@@ -3,6 +3,7 @@
 #include <deque>
 #include <float.h>
 #include "types.h"
+#include "utils.h"
 
 namespace aw
 {
