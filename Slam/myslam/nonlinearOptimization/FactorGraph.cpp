@@ -46,50 +46,10 @@ void init()
     isam = new ISAM2(parameters);
 }
 
-void saveKeyFramesAndFactor()
+gtsam::Pose3 pclPointTogtsamPose3(const PointTypePose& thisPoint)
 {
-    // odom factor
-    addOdomFactor();
-
-    // gps factor
-    addGPSFactor();
-
-    // loop factor
-    addLoopFactor();
-
-    // update iSAM
-    isam->update(gtSAMgraph, initialEstimate);
-    isam->update();
-
-    if (aLoopIsClosed)
-    {
-        isam->update();
-        isam->update();
-        isam->update();
-        isam->update();
-        isam->update();
-    }
-    // update之后要清空一下保存的因子图，注：历史数据不会清掉，ISAM保存起来了
-    gtSAMgraph.resize(0);
-    initialEstimate.clear();
-
-    // save key poses
-    Pose3 latestEstimate;
-
-    // 优化结果
-    optimizedEstimate = isam->calculateEstimate();
-    // 当前帧位姿结果
-    latestEstimate = optimizedEstimate.at<Pose3>(optimizedEstimate.size() - 1);
-    // 位姿协方差
-    poseCovariance = isam->marginalCovariance(optimizedEstimate.size() - 1);
-
-    // transformTobeMapped更新当前帧位姿
-    transformTobeMapped[0] = latestEstimate.rotation().roll();
-    transformTobeMapped[1] = latestEstimate.rotation().pitch();
-    transformTobeMapped[2] = latestEstimate.rotation().yaw();
-    transformTobeMapped[3] = latestEstimate.translation().x();
-    transformTobeMapped[4] = latestEstimate.translation().y();
-    transformTobeMapped[5] = latestEstimate.translation().z();
+    return gtsam::Pose3(gtsam::Rot3::RzRyRx(double(thisPoint.roll), double(thisPoint.pitch), double(thisPoint.yaw)),
+                        gtsam::Point3(double(thisPoint.x), double(thisPoint.y), double(thisPoint.z)));
 }
 
 /**
@@ -232,12 +192,51 @@ void correctPoses()
     }
 }
 
-gtsam::Pose3 pclPointTogtsamPose3(const PointTypePose& thisPoint)
+void saveKeyFramesAndFactor()
 {
-    return gtsam::Pose3(gtsam::Rot3::RzRyRx(double(thisPoint.roll), double(thisPoint.pitch), double(thisPoint.yaw)),
-                        gtsam::Point3(double(thisPoint.x), double(thisPoint.y), double(thisPoint.z)));
-}
+    // odom factor
+    addOdomFactor();
 
+    // gps factor
+    addGPSFactor();
+
+    // loop factor
+    addLoopFactor();
+
+    // update iSAM
+    isam->update(gtSAMgraph, initialEstimate);
+    isam->update();
+
+    if (aLoopIsClosed)
+    {
+        isam->update();
+        isam->update();
+        isam->update();
+        isam->update();
+        isam->update();
+    }
+    // update之后要清空一下保存的因子图，注：历史数据不会清掉，ISAM保存起来了
+    gtSAMgraph.resize(0);
+    initialEstimate.clear();
+
+    // save key poses
+    Pose3 latestEstimate;
+
+    // 优化结果
+    optimizedEstimate = isam->calculateEstimate();
+    // 当前帧位姿结果
+    latestEstimate = optimizedEstimate.at<Pose3>(optimizedEstimate.size() - 1);
+    // 位姿协方差
+    poseCovariance = isam->marginalCovariance(optimizedEstimate.size() - 1);
+
+    // transformTobeMapped更新当前帧位姿
+    transformTobeMapped[0] = latestEstimate.rotation().roll();
+    transformTobeMapped[1] = latestEstimate.rotation().pitch();
+    transformTobeMapped[2] = latestEstimate.rotation().yaw();
+    transformTobeMapped[3] = latestEstimate.translation().x();
+    transformTobeMapped[4] = latestEstimate.translation().y();
+    transformTobeMapped[5] = latestEstimate.translation().z();
+}
 
 int main()
 {
