@@ -89,7 +89,9 @@ laser畸变校正：一帧激光中，首尾点云位姿差值，通过角度比
 --->kdtree.radiusSearch();
 
 =========================================
-lio-sam: imu预积分值: 1.用来预测laser的初始估计initialGuess 2.点云去畸变时用来估计位移增量odomIncre
+lio-sam: imu预积分值:
+1.用来预测laser的初始估计initialGuess
+2.点云去畸变时用来估计位移增量odomIncre
 
 VIO相对于VO的好处：
 1.恢复尺度：IMU能够提供尺度信息(加速度计)，解决单目VO的无法恢复尺度的问题。

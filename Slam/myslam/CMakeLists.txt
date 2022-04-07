@@ -20,5 +20,6 @@ include_directories(
 add_executable(myslam main.cpp
         laser/LoopClosure.cpp
         laser/CloudDeskew.cpp
-        imu/ImuPreintegration.cpp)
+        imu/ImuPreintegration.cpp
+        nonlinearOptimization/FactorGraph.cpp)
 target_link_libraries(myslam ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} gtsam)
