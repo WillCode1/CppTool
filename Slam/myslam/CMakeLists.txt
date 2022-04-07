@@ -18,8 +18,7 @@ include_directories(
 )
 
 add_executable(myslam main.cpp
-        laser/CornerSurfExtraction.cpp
-        laser/CornerSurfIcp.cpp
         laser/LoopClosure.cpp
+        laser/CloudDeskew.cpp
         imu/ImuPreintegration.cpp)
 target_link_libraries(myslam ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} gtsam)

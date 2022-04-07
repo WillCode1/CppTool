@@ -86,7 +86,7 @@ namespace laser
         int surfFeatureMinValidNum = 100;
 
         double surroundingKeyframeSearchRadius = 10.0;
-        int frame_buff_size = 100;
+        int frame_buff_size = 100;  // 1
 
         CornerSurfIcp()
         {
@@ -197,6 +197,7 @@ namespace laser
          */
         void updateInitialGuess()
         {
+            // 匀速假设，高速且非匀速时，可能会出错
             Eigen::Affine3f transLast = pcl::getTransformation(cloudKeyPoses6D.back().x, cloudKeyPoses6D.back().y, cloudKeyPoses6D.back().z,
                                                                cloudKeyPoses6D.back().roll, cloudKeyPoses6D.back().pitch, cloudKeyPoses6D.back().yaw);
             auto transGuess = transLast * transBetween;

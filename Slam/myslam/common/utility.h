@@ -64,10 +64,11 @@ struct ImuData
     Eigen::Quaterniond orientation;
 };
 
+template<typename T = pcl::PointXYZI>
 struct PointCloudData
 {
     double stamp;
-    pcl::PointCloud<pcl::PointXYZI>::Ptr sweepCloudPtr;
+    typename pcl::PointCloud<T>::Ptr sweepCloudPtr;
 };
 
 /*************************************************************
