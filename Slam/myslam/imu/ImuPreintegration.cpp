@@ -89,15 +89,12 @@ namespace imu
 
             InitLaserImuExtrinsicParam();
 
-            // imu预积分的噪声协方差
             boost::shared_ptr<gtsam::PreintegrationParams> p = gtsam::PreintegrationParams::MakeSharedU(imuGravity);
 
-            // imuAccNoise和imuGyrNoise都是定义在头文件中的高斯白噪声，由配置文件中写入
             p->accelerometerCovariance = gtsam::Matrix33::Identity(3, 3) * pow(imuAccNoise, 2); // acc white noise in continuous
             p->gyroscopeCovariance = gtsam::Matrix33::Identity(3, 3) * pow(imuGyrNoise, 2);     // gyro white noise in continuous
             //对于速度的积分误差？这块暂时不太理解
             p->integrationCovariance = gtsam::Matrix33::Identity(3, 3) * pow(1e-4, 2); // error committed in integrating position from velocities
-            //假设没有初始的bias
             gtsam::imuBias::ConstantBias prior_imu_bias((gtsam::Vector(6) << 0, 0, 0, 0, 0, 0).finished()); // assume zero initial bias
 
             // 噪声先验
@@ -445,7 +442,7 @@ namespace imu
             imuQueOpt.push_back(thisImu);
             imuQueImu.push_back(thisImu);
 
-            // 要求上一次imu因子图优化执行成功，确保更新了上一帧（激光里程计帧）的状态、偏置，预积分已经被重新计算
+            // 确保更新过了一帧（激光里程计帧）的状态、偏置，预积分已经被重新计算
             // 这里需要先在odomhandler中优化一次后再进行该函数后续的工作
             if (!doneFirstOpt)
                 return;

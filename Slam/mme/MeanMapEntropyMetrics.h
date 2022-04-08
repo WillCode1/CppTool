@@ -98,9 +98,9 @@ public:
 
             for (int j : pointSearchInd)
             {
-                double x = mean_x - check_map->points[j].x;
-                double y = mean_y - check_map->points[j].y;
-                double z = mean_z - check_map->points[j].z;
+                double x = check_map->points[j].x - mean_x;
+                double y = check_map->points[j].y - mean_y;
+                double z = check_map->points[j].z - mean_z;
 
                 xx += x * x;
                 xy += x * y;
