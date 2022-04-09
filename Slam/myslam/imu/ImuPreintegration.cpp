@@ -283,20 +283,15 @@ namespace imu
                 // 提取前一帧与当前帧之间的imu数据，计算预积分
                 ImuData *thisImu = &imuQueOpt.front();
                 double imuTime = thisImu->stamp;
-                // currentCorrectionTime是当前回调函数收到的激光里程计数据的时间
                 if (imuTime < currentCorrectionTime - delta_t)
                 {
                     double dt = (lastImuT_opt < 0) ? (1.0 / 500.0) : (imuTime - lastImuT_opt);
-                    // imu预积分数据输入：加速度、角速度、dt
                     // 加入的是这个用来因子图优化的预积分器imuIntegratorOpt_,注意加入了上一步算出的dt
-                    //作者要求的9轴imu数据中欧拉角在本程序文件中没有任何用到,全在地图优化里用到的
                     imuIntegratorOpt_->integrateMeasurement(
                         gtsam::Vector3(thisImu->linear_acceleration.x(), thisImu->linear_acceleration.y(), thisImu->linear_acceleration.z()),
                         gtsam::Vector3(thisImu->angular_velocity.x(), thisImu->angular_velocity.y(), thisImu->angular_velocity.z()), dt);
-                    //在推出一次数据前保存上一个数据的时间戳
 
                     lastImuT_opt = imuTime;
-                    // 从队列中删除已经处理的imu数据
                     imuQueOpt.pop_front();
                 }
                 else
