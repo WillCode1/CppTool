@@ -44,22 +44,25 @@ int main(int argc, char **argv)
 ///高斯牛顿法
 void GN(double *x, double *y, double *est0)
 {
-    int iterations = 50;                                     // 迭代次数
-    double cost = 0, lastCost = 0;                           // 本次迭代的cost和上一次迭代的cost
-    Mat_<double> xM(N, 1, x), yM(N, 1, y), estM(3, 1, est0); // x矩阵，y矩阵，参数矩阵，
-    Mat_<double> jacobiM, estYM, errorM, bM, dxM;            //雅可比矩阵，评估值Y，误差矩阵，b值矩阵，deltaX矩阵
+    int iterations = 50;                                              // 迭代次数
+    double cost = 0, lastCost = 0;                                    // 本次迭代的cost和上一次迭代的cost
+    // 3 gai 6
+    Mat_<double> mat_X(N, 1, x), mat_Y(N, 1, y), mat_est(3, 1, est0); // x矩阵，y矩阵，参数矩阵，
+    Mat_<double> J, error, mat_b, mat_dx;                             // 雅可比矩阵，误差矩阵，b值矩阵，deltaX矩阵
+    // cv::Mat matA(laserCloudSelNum, 6, CV_32F, cv::Scalar::all(0));
 
     for (int iter = 0; iter < iterations; iter++)
     {
-        jacobiM = jacobi(estM, xM);
-        estYM = yEstimate(estM, xM);
-        errorM = yM - estYM;                     // e
-        cost = errorM.dot(errorM);               // e^2
-        bM = jacobiM.t() * errorM;               // b
-        Mat_<double> HM = jacobiM.t() * jacobiM; // H
-        if (solve(HM, bM, dxM))                  // 求解Hx = b
+        error = mat_Y - yEstimate(mat_est, mat_X);
+        cost = error.dot(error);
+        J = jacobi(mat_est, mat_X);
+        mat_b = J.t() * error;
+        Mat_<double> mat_H = J.t() * J;
+        // J(x)J^T(x)△x = -J(x)f(x)
+        // H△x = g
+        if (solve(mat_H, mat_b, mat_dx))
         {
-            if (isnan(dxM.at<double>(0)))
+            if (isnan(mat_dx.at<double>(0)))
             {
                 cout << "result is nan!" << endl;
                 break;
@@ -67,10 +70,10 @@ void GN(double *x, double *y, double *est0)
             if (iter > 0 && cost >= lastCost)
             {
                 cout << "iteration: " << iter + 1 << ",cost: " << cost << ">= last cost: " << lastCost << ", break." << endl;
-                cout << "THe Value, x: " << estM.at<double>(0) << ",y:" << estM.at<double>(1) << ",c:" << estM.at<double>(2) << endl;
+                cout << "THe Value, x: " << mat_est.at<double>(0) << ",y:" << mat_est.at<double>(1) << ",c:" << mat_est.at<double>(2) << endl;
                 break;
             }
-            estM += dxM;
+            mat_est += mat_dx;
             lastCost = cost;
         }
         else
@@ -83,8 +86,9 @@ void GN(double *x, double *y, double *est0)
 /// est：估计值，X：X值
 Mat jacobi(const Mat &est, const Mat &x)
 {
+    // J (N, 3)
     Mat_<double> J(x.rows, est.rows), da, db, dc; // a,b,c的导数
-    da = x;
+    da = x; // N, 1
     exp(est.at<double>(1) * x + est.at<double>(2), dc);
     db = x.mul(dc);
 
