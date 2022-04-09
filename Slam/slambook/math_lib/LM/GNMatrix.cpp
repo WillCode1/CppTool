@@ -1,8 +1,8 @@
 /*
-* Gauss-Newton iteration method
-* author:Davidwang
-* date  :2020.08.24
-*/
+ * Gauss-Newton iteration method
+ * author:Davidwang
+ * date  :2020.08.24
+ */
 
 #include <iostream>
 #include <chrono>
@@ -46,7 +46,7 @@ void GN(double *x, double *y, double *est0)
 {
     int iterations = 50;                                     // 迭代次数
     double cost = 0, lastCost = 0;                           // 本次迭代的cost和上一次迭代的cost
-    Mat_<double> xM(N, 1, x), yM(N, 1, y), estM(3, 1, est0); //x矩阵，y矩阵，参数矩阵，
+    Mat_<double> xM(N, 1, x), yM(N, 1, y), estM(3, 1, est0); // x矩阵，y矩阵，参数矩阵，
     Mat_<double> jacobiM, estYM, errorM, bM, dxM;            //雅可比矩阵，评估值Y，误差矩阵，b值矩阵，deltaX矩阵
 
     for (int iter = 0; iter < iterations; iter++)
@@ -54,7 +54,7 @@ void GN(double *x, double *y, double *est0)
         jacobiM = jacobi(estM, xM);
         estYM = yEstimate(estM, xM);
         errorM = yM - estYM;                     // e
-        cost = errorM.dot(errorM);            // e^2
+        cost = errorM.dot(errorM);               // e^2
         bM = jacobiM.t() * errorM;               // b
         Mat_<double> HM = jacobiM.t() * jacobiM; // H
         if (solve(HM, bM, dxM))                  // 求解Hx = b
@@ -70,7 +70,7 @@ void GN(double *x, double *y, double *est0)
                 cout << "THe Value, x: " << estM.at<double>(0) << ",y:" << estM.at<double>(1) << ",c:" << estM.at<double>(2) << endl;
                 break;
             }
-            estM = estM + dxM;
+            estM += dxM;
             lastCost = cost;
         }
         else
@@ -83,7 +83,7 @@ void GN(double *x, double *y, double *est0)
 /// est：估计值，X：X值
 Mat jacobi(const Mat &est, const Mat &x)
 {
-    Mat_<double> J(x.rows, est.rows), da, db, dc; //a,b,c的导数
+    Mat_<double> J(x.rows, est.rows), da, db, dc; // a,b,c的导数
     da = x;
     exp(est.at<double>(1) * x + est.at<double>(2), dc);
     db = x.mul(dc);
@@ -102,4 +102,3 @@ Mat yEstimate(const Mat &est, const Mat &x)
     Y = est.at<double>(0) * x + Y;
     return Y;
 }
-

@@ -1,8 +1,8 @@
 /*
-* Levenberg-Marquardt iteration method
-* author:Davidwang
-* date  :2020.08.24
-*/
+ * Levenberg-Marquardt iteration method
+ * author:Davidwang
+ * date  :2020.08.24
+ */
 
 #include <iostream>
 #include <chrono>
@@ -101,7 +101,7 @@ void LM(double *x, double *y, double *est0)
 /// est：估计值，X：X值
 Mat jacobi(const Mat &est, const Mat &x)
 {
-    Mat_<double> J(x.rows, est.rows), da, db, dc; //a,b,c的导数
+    Mat_<double> J(x.rows, est.rows), da, db, dc; // a,b,c的导数
     da = x;
     exp(est.at<double>(1) * x + est.at<double>(2), dc);
     db = x.mul(dc);
@@ -119,4 +119,3 @@ Mat yEstimate(const Mat &est, const Mat &x)
     Y = est.at<double>(0) * x + Y;
     return Y;
 }
-
