@@ -7,38 +7,44 @@
 using namespace std;
 using namespace Eigen;
 
-int main(int argc, char **argv) {
-  double ar = 1.0, br = 2.0, cr = 1.0;         // 真实参数值
-  double ae = 3.0, be = -5.0, ce = 5.0;        // 估计参数值
-  int N = 100;                                 // 数据点
-  double w_sigma = 1.0;                        // 噪声Sigma值
+// y = exp(x^2 + 2*x + 1)
+// J(x)J^T(x)△x = -J(x)f(x)
+int main(int argc, char **argv)
+{
+  double ar = 1.0, br = 2.0, cr = 1.0;  // 真实参数值
+  double ae = 3.0, be = -5.0, ce = 5.0; // 估计参数值
+  int N = 100;                          // 数据点
+  double w_sigma = 1.0;                 // 噪声Sigma值
   double inv_sigma = 1.0 / w_sigma;
-  cv::RNG rng;                                 // OpenCV随机数产生器
+  cv::RNG rng; // OpenCV随机数产生器
 
-  vector<double> x_data, y_data;      // 数据
-  for (int i = 0; i < N; i++) {
+  vector<double> x_data, y_data; // 数据
+  for (int i = 0; i < N; i++)
+  {
     double x = i / 100.0;
     x_data.push_back(x);
     y_data.push_back(exp(ar * x * x + br * x + cr) + rng.gaussian(w_sigma * w_sigma));
   }
 
   // 开始Gauss-Newton迭代
-  int iterations = 100;    // 迭代次数
-  double cost = 0, lastCost = 0;  // 本次迭代的cost和上一次迭代的cost
+  int iterations = 100;          // 迭代次数
+  double cost = 0, lastCost = 0; // 本次迭代的cost和上一次迭代的cost
 
   chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
-  for (int iter = 0; iter < iterations; iter++) {
-    Matrix3d H = Matrix3d::Zero();             // Hessian = J^T W^{-1} J in Gauss-Newton
-    Vector3d b = Vector3d::Zero();             // bias
+  for (int iter = 0; iter < iterations; iter++)
+  {
+    Matrix3d H = Matrix3d::Zero(); // Hessian = J^T W^{-1} J in Gauss-Newton
+    Vector3d b = Vector3d::Zero(); // bias
     cost = 0;
 
-    for (int i = 0; i < N; i++) {
-      double xi = x_data[i], yi = y_data[i];  // 第i个数据点
+    for (int i = 0; i < N; i++)
+    {
+      double xi = x_data[i], yi = y_data[i]; // 第i个数据点
       double error = yi - exp(ae * xi * xi + be * xi + ce);
-      Vector3d J; // 雅可比矩阵
-      J[0] = -xi * xi * exp(ae * xi * xi + be * xi + ce);  // de/da
-      J[1] = -xi * exp(ae * xi * xi + be * xi + ce);  // de/db
-      J[2] = -exp(ae * xi * xi + be * xi + ce);  // de/dc
+      Vector3d J;                                         // 雅可比矩阵
+      J[0] = -xi * xi * exp(ae * xi * xi + be * xi + ce); // de/da
+      J[1] = -xi * exp(ae * xi * xi + be * xi + ce);      // de/db
+      J[2] = -exp(ae * xi * xi + be * xi + ce);           // de/dc
 
       // J(x)J^T(x)△x = -J(x)f(x)
       // H△x = g
@@ -50,12 +56,14 @@ int main(int argc, char **argv) {
 
     // 求解线性方程 Hx=b
     Vector3d dx = H.ldlt().solve(b);
-    if (isnan(dx[0])) {
+    if (isnan(dx[0]))
+    {
       cout << "result is nan!" << endl;
       break;
     }
 
-    if (iter > 10 && cost >= lastCost) {
+    if (iter > 10 && cost >= lastCost)
+    {
       cout << "times: " << iter << " cost: " << cost << ">= last cost: " << lastCost << ", break." << endl;
       break;
     }
@@ -66,8 +74,7 @@ int main(int argc, char **argv) {
 
     lastCost = cost;
 
-    cout << "total cost: " << cost << ", \t\tupdate: " << dx.transpose() <<
-         "\t\testimated params: " << ae << "," << be << "," << ce << endl;
+    cout << "total cost: " << cost << ", \t\tupdate: " << dx.transpose() << "\t\testimated params: " << ae << "," << be << "," << ce << endl;
   }
 
   chrono::steady_clock::time_point t2 = chrono::steady_clock::now();

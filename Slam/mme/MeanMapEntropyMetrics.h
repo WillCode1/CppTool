@@ -54,9 +54,8 @@ public:
         pcl::io::loadPCDFile(cloud_file_name, *update_map_cloud_);
     }
 
-    double Calculate(pcl::PointCloud<pointXYZ>::Ptr check_map)
+    double Calculate(pcl::PointCloud<pointXYZ>::Ptr check_map, const double& searchRadius)
     {
-        double searchRadius = 0.4;
         kdtree->setInputCloud(check_map);
 
         int m = check_map->size();
@@ -124,7 +123,7 @@ public:
             if (!isfinite(tmp))
                 continue;
 
-            std::cout << covariance.determinant() << std::endl;
+//            std::cout << covariance.determinant() << std::endl;
 //            std::cout << tmp << std::endl;
 
             cnt++;
@@ -140,7 +139,7 @@ public:
 
     pcl::PointCloud<pointXYZ>::Ptr CalculateOverlap2(pcl::PointCloud<pointXYZ>::Ptr tag,
                                                      pcl::PointCloud<pointXYZ>::Ptr cur,
-                                                     bool add_noise = false)
+                                                     const double &sigma = 0.0)
     {
         pcl::PointCloud<pointXYZ>::Ptr res;
         res.reset(new pcl::PointCloud<pointXYZ>());
@@ -159,8 +158,8 @@ public:
                 continue;
             }
 
-            if (add_noise)
-                res->emplace_back(addNoise(cur->points[i], 5));
+            if (sigma != 0)
+                res->emplace_back(addNoise(cur->points[i], sigma));
             else
                 res->emplace_back(cur->points[i]);
         }
@@ -235,16 +234,16 @@ public:
         }
     }
 
-    void Metrics()
+    void Metrics(const double& searchRadius, const double &sigma)
     {
 //        CalculateOverlap(update_map_cloud_, gt_map_cloud_);
 //        cloudAddNoise(update_map_cloud_, 0.1);
         gt_map_cloud_ = CalculateOverlap2(update_map_cloud_, gt_map_cloud_);
-        update_map_cloud_ = CalculateOverlap2(gt_map_cloud_, update_map_cloud_, true);
-        draw(gt_map_cloud_);
-        draw(update_map_cloud_);
-        std::cout << "gt = " << Calculate(gt_map_cloud_) << std::endl;
-        std::cout << "new = " << Calculate(update_map_cloud_) << std::endl;
+        update_map_cloud_ = CalculateOverlap2(gt_map_cloud_, update_map_cloud_, sigma);
+//        draw(gt_map_cloud_);
+//        draw(update_map_cloud_);
+        std::cout << "gt = " << Calculate(gt_map_cloud_, searchRadius) << std::endl;
+        std::cout << "new = " << Calculate(update_map_cloud_, searchRadius) << std::endl;
     }
 
 private:
@@ -268,3 +267,13 @@ private:
 // 0.70, new = -3.9725
 // 0.80, new = -4.2561
 // 1.00, new = -4.85561
+
+// 0., new = 0.613592
+// 1.0, new = 3.35743
+// 0.8, new = 3.3204
+// 0.5, new = 3.13729
+// 0.2, new = 2.4161
+// 0.1, new = 1.78008
+// 0.05, new = 1.30424
+// 0.02, new = 0.921232
+

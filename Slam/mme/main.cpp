@@ -9,7 +9,7 @@ int main()
     mme.LoadCurMap("/home/will/data/test/filtered_pointcloud_map/pcd/filtered_map.pcd");
     Timer timer;
     timer.start();
-    mme.Metrics();
+    mme.Metrics(0.4, 0.2);
     timer.elapsedByLast();
     return 0;
 }
