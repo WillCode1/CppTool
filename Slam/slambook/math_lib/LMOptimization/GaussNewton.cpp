@@ -36,7 +36,7 @@ Mat reprojection(const Mat &est, const Mat &x)
 }
 
 ///高斯牛顿法
-void GN(float *x, float *y, float *est0, int iterations)
+void GNOptimization(float *x, float *y, float *est0, int iterations)
 {
     float cost = 0, lastCost = 0; // 本次迭代的cost和上一次迭代的cost
     // x矩阵，y矩阵，参数矩阵
@@ -53,9 +53,9 @@ void GN(float *x, float *y, float *est0, int iterations)
         jacobi(mat_est, mat_X, J);
         mat_H = J.t() * J;
         mat_b = J.t() * error;
-        // J(x)J^T(x)△x = -J(x)f(x)
-        // H△x = g
-        if (solve(mat_H, mat_b, mat_dx))
+        // J * J^T * △x = -J(x) * error
+        // H * △x = g
+        if (solve(mat_H, mat_b, mat_dx, cv::DECOMP_QR))
         {
             if (isnan(mat_dx.at<float>(0)))
             {
@@ -95,7 +95,7 @@ int main(int argc, char **argv)
     }
 
     chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
-    GN(x_data, y_data, est, 50);
+    GNOptimization(x_data, y_data, est, 50);
     chrono::steady_clock::time_point t2 = chrono::steady_clock::now();
     chrono::duration<double> time_used = chrono::duration_cast<chrono::duration<double>>(t2 - t1);
 

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(LevenbergMarquardt)
+project(LMOptimization)
 
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_FLAGS "-std=c++14 -O3")
@@ -13,8 +13,8 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 # Eigen
 include_directories("/usr/include/eigen3")
 
-add_executable(LMMx LMMatrix.cpp)
-target_link_libraries(LMMx ${OpenCV_LIBS})
+add_executable(LM LevenbergMarquardt.cpp)
+target_link_libraries(LM ${OpenCV_LIBS})
 
-add_executable(GN GNMatrix.cpp)
+add_executable(GN GaussNewton.cpp)
 target_link_libraries(GN ${OpenCV_LIBS})

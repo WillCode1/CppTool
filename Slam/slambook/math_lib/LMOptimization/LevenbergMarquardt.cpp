@@ -37,7 +37,7 @@ Mat yEstimate(const Mat &est, const Mat &x)
 }
 
 ///列文伯格－马夸尔特法
-void LM(float *x, float *y, float *est0, int iterations)
+void LMOptimization(float *x, float *y, float *est0, int iterations)
 {
     float epsilon = 0.00001;     // ε ,足够小的数
     float cost = 0, estCost = 0; // 本次迭代的cost和评估的cost
@@ -51,12 +51,12 @@ void LM(float *x, float *y, float *est0, int iterations)
 
     for (int iter = 0; iter < iterations; iter++)
     {
-        jacobi(mat_est, mat_X, J);
         error = mat_Y - yEstimate(mat_est, mat_X);
         cost = error.dot(error);
-        mat_H = J.t() * J + lambd * (Mat::eye(3, 3, CV_32F)); // （H＋λI）,结果是3X3矩阵
+        jacobi(mat_est, mat_X, J);
+        mat_H = J.t() * J + lambd * Mat::eye(3, 3, CV_32F); // （H＋λI）,结果是3X3矩阵
         mat_b = J.t() * error;
-        if (solve(mat_H, mat_b, mat_dx)) // 求解（H＋λI）Δx = b
+        if (solve(mat_H, mat_b, mat_dx, cv::DECOMP_QR)) // 求解（H＋λI）Δx = b
         {
             if (isnan(mat_dx.at<float>(0)))
             {
@@ -111,7 +111,7 @@ int main(int argc, char **argv)
     }
 
     chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
-    LM(x_data, y_data, est, 50);
+    LMOptimization(x_data, y_data, est, 50);
     chrono::steady_clock::time_point t2 = chrono::steady_clock::now();
     chrono::duration<float> time_used = chrono::duration_cast<chrono::duration<float>>(t2 - t1);
 

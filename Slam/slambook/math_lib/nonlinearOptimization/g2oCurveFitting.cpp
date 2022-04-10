@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
   typedef g2o::BlockSolver<g2o::BlockSolverTraits<3, 1>> BlockSolverType;  // 每个误差项优化变量维度为3，误差值维度为1
   typedef g2o::LinearSolverDense<BlockSolverType::PoseMatrixType> LinearSolverType; // 线性求解器类型
 
-  // 梯度下降方法，可以从GN, LM, DogLeg 中选
+  // 梯度下降方法，可以从GN, LMOptimization, DogLeg 中选
   auto solver = new g2o::OptimizationAlgorithmGaussNewton(
     g2o::make_unique<BlockSolverType>(g2o::make_unique<LinearSolverType>()));
   g2o::SparseOptimizer optimizer;     // 图模型

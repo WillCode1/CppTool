@@ -24,7 +24,7 @@ include_directories("/usr/include/eigen3")
 add_executable(gaussNewton gaussNewton.cpp)
 target_link_libraries(gaussNewton ${OpenCV_LIBS})
 
-add_executable(ceresCurveFitting ceresCurveFitting.cpp ../LM/LMMatrix.cpp ../LM/GNMatrix.cpp)
+add_executable(ceresCurveFitting ceresCurveFitting.cpp ../LMOptimization/LevenbergMarquardt.cpp ../LMOptimization/GaussNewton.cpp)
 target_link_libraries(ceresCurveFitting ${OpenCV_LIBS} ${CERES_LIBRARIES})
 
 add_executable(g2oCurveFitting g2oCurveFitting.cpp)

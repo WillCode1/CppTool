@@ -100,7 +100,6 @@ VIO相对于VO的好处：
 4.精度更高：VIO融合了两种传感器的信息，位姿估计的精度要更高。
 
 =========================================
-1.高斯牛顿、LM 手写实现
 2.g2o、ceres、gtsam使用
 5.LMOptimization: https://blog.csdn.net/weixin_37835423/article/details/111587379
 6.branch and bound: fast_correlative_scan_matcher_2d.cc
