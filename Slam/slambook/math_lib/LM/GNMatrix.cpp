@@ -36,9 +36,8 @@ Mat reprojection(const Mat &est, const Mat &x)
 }
 
 ///高斯牛顿法
-void GN(float *x, float *y, float *est0)
+void GN(float *x, float *y, float *est0, int iterations)
 {
-    int iterations = 50;          // 迭代次数
     float cost = 0, lastCost = 0; // 本次迭代的cost和上一次迭代的cost
     // x矩阵，y矩阵，参数矩阵
     cv::Mat_<float> mat_X(N, 1, x);
@@ -96,7 +95,7 @@ int main(int argc, char **argv)
     }
 
     chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
-    GN(x_data, y_data, est);
+    GN(x_data, y_data, est, 50);
     chrono::steady_clock::time_point t2 = chrono::steady_clock::now();
     chrono::duration<double> time_used = chrono::duration_cast<chrono::duration<double>>(t2 - t1);
 
