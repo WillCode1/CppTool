@@ -44,15 +44,15 @@ void GN(float *x, float *y, float *est0, int iterations)
     cv::Mat_<float> mat_Y(N, 1, y);
     cv::Mat_<float> mat_est(3, 1, est0);
     cv::Mat J(N, 3, CV_32F, cv::Scalar::all(0)); // 雅可比矩阵
-    cv::Mat error, mat_b, mat_dx;                // 误差矩阵，b值矩阵，deltaX矩阵
+    cv::Mat error, mat_H, mat_b, mat_dx;         // 误差矩阵，b值矩阵，deltaX矩阵
 
     for (int iter = 0; iter < iterations; iter++)
     {
         error = mat_Y - reprojection(mat_est, mat_X);
         cost = error.dot(error);
         jacobi(mat_est, mat_X, J);
+        mat_H = J.t() * J;
         mat_b = J.t() * error;
-        Mat_<float> mat_H = J.t() * J;
         // J(x)J^T(x)△x = -J(x)f(x)
         // H△x = g
         if (solve(mat_H, mat_b, mat_dx))

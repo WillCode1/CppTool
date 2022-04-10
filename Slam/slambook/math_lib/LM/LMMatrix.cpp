@@ -46,17 +46,17 @@ void LM(float *x, float *y, float *est0, int iterations)
     Mat_<float> mat_X(N, 1, x);
     Mat_<float> mat_Y(N, 1, y);
     Mat_<float> mat_est(3, 1, est0);
-    cv::Mat J(N, 3, CV_32F, cv::Scalar::all(0));          // 雅可比矩阵
-    cv::Mat error, mat_b, mat_dx, estxM, estY2M, error2M; // 误差矩阵，b值矩阵，ΔX矩阵,评估的X矩阵,使用评估X矩阵得到的Y矩阵,评估X矩阵得到的误差矩阵
+    cv::Mat J(N, 3, CV_32F, cv::Scalar::all(0));                // 雅可比矩阵
+    cv::Mat error, mat_H, mat_b, mat_dx, estxM, estY2M, error2; // 误差矩阵，b值矩阵，ΔX矩阵,评估的X矩阵,使用评估X矩阵得到的Y矩阵,评估X矩阵得到的误差矩阵
 
     for (int iter = 0; iter < iterations; iter++)
     {
         jacobi(mat_est, mat_X, J);
         error = mat_Y - yEstimate(mat_est, mat_X);
         cost = error.dot(error);
+        mat_H = J.t() * J + lambd * (Mat::eye(3, 3, CV_32F)); // （H＋λI）,结果是3X3矩阵
         mat_b = J.t() * error;
-        Mat_<float> HM = J.t() * J + lambd * (Mat::eye(3, 3, CV_32F)); // （H＋λI）,结果是3X3矩阵
-        if (solve(HM, mat_b, mat_dx))                                  // 求解（H＋λI）Δx = b
+        if (solve(mat_H, mat_b, mat_dx)) // 求解（H＋λI）Δx = b
         {
             if (isnan(mat_dx.at<float>(0)))
             {
@@ -65,8 +65,8 @@ void LM(float *x, float *y, float *est0, int iterations)
             }
             estxM = mat_est + mat_dx;         // x + Δx
             estY2M = yEstimate(estxM, mat_X); // 得到新X值对应的Y值
-            error2M = mat_Y - estY2M;         // y - y`
-            estCost = error2M.dot(error2M);   // 再评估误差
+            error2 = mat_Y - estY2M;          // y - y`
+            estCost = error2.dot(error2);     // 再评估误差
             if (estCost < cost)               // 成功则更新向量与估计误差
             {
                 if (mat_dx.dot(mat_dx) < epsilon) // Δx * Δx < ε
