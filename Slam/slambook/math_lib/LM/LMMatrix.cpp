@@ -13,33 +13,26 @@ using namespace cv;
 const int N = 50;     // 数据点数量
 const int Scale = 10; // lambd 缩放因子
 
-/*  函数声明  */
-void LM(double *, double *, double *);
-Mat jacobi(const Mat &, const Mat &);
-Mat yEstimate(const Mat &, const Mat &);
-
-int main(int argc, char **argv)
+/// est：估计值，X：X值
+Mat jacobi(const Mat &est, const Mat &x)
 {
-    double ar = 18.0, br = 2.0, cr = 1.0; // 真实参数值
-    double est[] = {2.0, 4.0, 3.0};       // 估计参数值
-    double w_sigma = 1.0;                 // 噪声Sigma值
-    cv::RNG rng;                          // OpenCV随机数产生器
+    Mat_<double> J(x.rows, est.rows), da, db, dc; // a,b,c的导数
+    da = x;
+    exp(est.at<double>(1) * x + est.at<double>(2), dc);
+    db = x.mul(dc);
 
-    double x_data[N], y_data[N]; // 生成真值数据
-    for (int i = 0; i < N; i++)
-    {
-        double x = i / 100.0;
-        x_data[i] = x;
-        y_data[i] = ar * x + exp(br * x + cr) + rng.gaussian(w_sigma * w_sigma);
-    }
-
-    chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
-    LM(x_data, y_data, est);
-    chrono::steady_clock::time_point t2 = chrono::steady_clock::now();
-    chrono::duration<double> time_used = chrono::duration_cast<chrono::duration<double>>(t2 - t1);
-
-    cout << "solve time cost = " << time_used.count() << " seconds. " << endl;
-    return 0;
+    da.copyTo(J(Rect(0, 0, 1, J.rows)));
+    db.copyTo(J(Rect(1, 0, 1, J.rows)));
+    dc.copyTo(J(Rect(2, 0, 1, J.rows)));
+    return J;
+}
+///计算 y = ax + exp(bx + c)
+Mat yEstimate(const Mat &est, const Mat &x)
+{
+    Mat_<double> Y(x.rows, x.cols);
+    exp(est.at<double>(1) * x + est.at<double>(2), Y);
+    Y = est.at<double>(0) * x + Y;
+    return Y;
 }
 
 ///列文伯格－马夸尔特法
@@ -98,24 +91,27 @@ void LM(double *x, double *y, double *est0)
     }
 }
 
-/// est：估计值，X：X值
-Mat jacobi(const Mat &est, const Mat &x)
+// https://blog.csdn.net/yolon3000/article/details/109043895
+int main(int argc, char **argv)
 {
-    Mat_<double> J(x.rows, est.rows), da, db, dc; // a,b,c的导数
-    da = x;
-    exp(est.at<double>(1) * x + est.at<double>(2), dc);
-    db = x.mul(dc);
+    double ar = 18.0, br = 2.0, cr = 1.0; // 真实参数值
+    double est[] = {2.0, 4.0, 3.0};       // 估计参数值
+    double w_sigma = 1.0;                 // 噪声Sigma值
+    cv::RNG rng;                          // OpenCV随机数产生器
 
-    da.copyTo(J(Rect(0, 0, 1, J.rows)));
-    db.copyTo(J(Rect(1, 0, 1, J.rows)));
-    dc.copyTo(J(Rect(2, 0, 1, J.rows)));
-    return J;
-}
-///计算 y = ax + exp(bx + c)
-Mat yEstimate(const Mat &est, const Mat &x)
-{
-    Mat_<double> Y(x.rows, x.cols);
-    exp(est.at<double>(1) * x + est.at<double>(2), Y);
-    Y = est.at<double>(0) * x + Y;
-    return Y;
+    double x_data[N], y_data[N]; // 生成真值数据
+    for (int i = 0; i < N; i++)
+    {
+        double x = i / 100.0;
+        x_data[i] = x;
+        y_data[i] = ar * x + exp(br * x + cr) + rng.gaussian(w_sigma * w_sigma);
+    }
+
+    chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
+    LM(x_data, y_data, est);
+    chrono::steady_clock::time_point t2 = chrono::steady_clock::now();
+    chrono::duration<double> time_used = chrono::duration_cast<chrono::duration<double>>(t2 - t1);
+
+    cout << "solve time cost = " << time_used.count() << " seconds. " << endl;
+    return 0;
 }
