@@ -13,21 +13,22 @@ using namespace cv;
 const int N = 50; // 数据点数量
 
 /*  函数声明  */
-void GN(double *, double *, double *);
-Mat jacobi(const Mat &, const Mat &);
+void GN(float *, float *, float *);
+void jacobi(const Mat &est, const Mat &x, cv::Mat &jacobi);
 Mat yEstimate(const Mat &, const Mat &);
 
+// https://blog.csdn.net/yolon3000/article/details/109043895
 int main(int argc, char **argv)
 {
-    double ar = 18.0, br = 2.0, cr = 1.0; // 真实参数值
-    double est[] = {2.0, 4.0, 3.0};       // 估计参数值
-    double w_sigma = 1.0;                 // 噪声Sigma值
-    cv::RNG rng;                          // OpenCV随机数产生器
+    float ar = 18.0, br = 2.0, cr = 1.0; // 真实参数值
+    float est[] = {2.0, 4.0, 3.0};       // 估计参数值
+    float w_sigma = 1.0;                 // 噪声Sigma值
+    cv::RNG rng;                         // OpenCV随机数产生器
 
-    double x_data[N], y_data[N]; // 生成真值数据
+    float x_data[N], y_data[N]; // 生成真值数据
     for (int i = 0; i < N; i++)
     {
-        double x = i / 100.0;
+        float x = i / 100.0;
         x_data[i] = x;
         y_data[i] = ar * x + exp(br * x + cr) + rng.gaussian(w_sigma * w_sigma);
     }
@@ -42,27 +43,29 @@ int main(int argc, char **argv)
 }
 
 ///高斯牛顿法
-void GN(double *x, double *y, double *est0)
+void GN(float *x, float *y, float *est0)
 {
-    int iterations = 50;                                              // 迭代次数
-    double cost = 0, lastCost = 0;                                    // 本次迭代的cost和上一次迭代的cost
-    // 3 gai 6
-    Mat_<double> mat_X(N, 1, x), mat_Y(N, 1, y), mat_est(3, 1, est0); // x矩阵，y矩阵，参数矩阵，
-    Mat_<double> J, error, mat_b, mat_dx;                             // 雅可比矩阵，误差矩阵，b值矩阵，deltaX矩阵
-    // cv::Mat matA(laserCloudSelNum, 6, CV_32F, cv::Scalar::all(0));
+    int iterations = 50;          // 迭代次数
+    float cost = 0, lastCost = 0; // 本次迭代的cost和上一次迭代的cost
+    // x矩阵，y矩阵，参数矩阵
+    cv::Mat_<float> mat_X(N, 1, x);
+    cv::Mat_<float> mat_Y(N, 1, y);
+    cv::Mat_<float> mat_est(3, 1, est0);
+    cv::Mat J(N, 3, CV_32F, cv::Scalar::all(0)); // 雅可比矩阵
+    cv::Mat error, mat_b, mat_dx;                // 误差矩阵，b值矩阵，deltaX矩阵
 
     for (int iter = 0; iter < iterations; iter++)
     {
         error = mat_Y - yEstimate(mat_est, mat_X);
         cost = error.dot(error);
-        J = jacobi(mat_est, mat_X);
+        jacobi(mat_est, mat_X, J);
         mat_b = J.t() * error;
-        Mat_<double> mat_H = J.t() * J;
+        Mat_<float> mat_H = J.t() * J;
         // J(x)J^T(x)△x = -J(x)f(x)
         // H△x = g
         if (solve(mat_H, mat_b, mat_dx))
         {
-            if (isnan(mat_dx.at<double>(0)))
+            if (isnan(mat_dx.at<float>(0)))
             {
                 cout << "result is nan!" << endl;
                 break;
@@ -70,7 +73,7 @@ void GN(double *x, double *y, double *est0)
             if (iter > 0 && cost >= lastCost)
             {
                 cout << "iteration: " << iter + 1 << ",cost: " << cost << ">= last cost: " << lastCost << ", break." << endl;
-                cout << "THe Value, x: " << mat_est.at<double>(0) << ",y:" << mat_est.at<double>(1) << ",c:" << mat_est.at<double>(2) << endl;
+                cout << "THe Value, x: " << mat_est.at<float>(0) << ",y:" << mat_est.at<float>(1) << ",c:" << mat_est.at<float>(2) << endl;
                 break;
             }
             mat_est += mat_dx;
@@ -84,25 +87,24 @@ void GN(double *x, double *y, double *est0)
 }
 
 /// est：估计值，X：X值
-Mat jacobi(const Mat &est, const Mat &x)
+void jacobi(const Mat &est, const Mat &x, cv::Mat &jacobi)
 {
-    // J (N, 3)
-    Mat_<double> J(x.rows, est.rows), da, db, dc; // a,b,c的导数
-    da = x; // N, 1
-    exp(est.at<double>(1) * x + est.at<double>(2), dc);
-    db = x.mul(dc);
-
-    da.copyTo(J(Rect(0, 0, 1, J.rows)));
-    db.copyTo(J(Rect(1, 0, 1, J.rows)));
-    dc.copyTo(J(Rect(2, 0, 1, J.rows)));
-    return J;
+    for (int i = 0; i < N; i++)
+    {
+        // de/da = a
+        jacobi.at<float>(i, 0) = x.at<float>(i, 0);
+        // de/dc = exp(bx + c)
+        jacobi.at<float>(i, 2) = exp(est.at<float>(1, 0) * x.at<float>(i, 0) + est.at<float>(2, 0));
+        // de/db = x * exp(bx + c)
+        jacobi.at<float>(i, 1) = x.at<float>(i, 0) * jacobi.at<float>(i, 2);
+    }
 }
 
 /// 计算 y = ax + exp(bx + c)
 Mat yEstimate(const Mat &est, const Mat &x)
 {
-    Mat_<double> Y(x.rows, x.cols);
-    exp(est.at<double>(1) * x + est.at<double>(2), Y);
-    Y = est.at<double>(0) * x + Y;
+    Mat_<float> Y(x.rows, x.cols);
+    exp(est.at<float>(1) * x + est.at<float>(2), Y);
+    Y = est.at<float>(0) * x + Y;
     return Y;
 }
