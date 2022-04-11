@@ -70,7 +70,7 @@ public:
             std::vector<float> pointSearchSqDis;
             kdtree->radiusSearch(check_map->points[i], searchRadius, pointSearchInd, pointSearchSqDis, 0);
 
-            if (pointSearchInd.empty())
+            if (pointSearchInd.size() < 2)
                 continue;
 
             double mean_x = 0;
