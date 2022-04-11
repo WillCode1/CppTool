@@ -54,11 +54,10 @@ public:
         pcl::io::loadPCDFile(cloud_file_name, *update_map_cloud_);
     }
 
-    double Calculate(pcl::PointCloud<pointXYZ>::Ptr check_map, const double& searchRadius)
+    double Calculate(pcl::PointCloud<pointXYZ>::Ptr check_map, const double& searchRadius, const std::vector<int>& index)
     {
         kdtree->setInputCloud(check_map);
-
-        int m = check_map->size();
+        int m = index.size();
         int cnt = 0;
         double mme = 0;
         Eigen::Matrix3d covariance;
@@ -68,7 +67,7 @@ public:
         {
             std::vector<int> pointSearchInd;
             std::vector<float> pointSearchSqDis;
-            kdtree->radiusSearch(check_map->points[i], searchRadius, pointSearchInd, pointSearchSqDis, 0);
+            kdtree->radiusSearch(check_map->points[index[i]], searchRadius, pointSearchInd, pointSearchSqDis, 0);
 
             if (pointSearchInd.size() < 2)
                 continue;
@@ -137,14 +136,9 @@ public:
         return mme;
     }
 
-    pcl::PointCloud<pointXYZ>::Ptr CalculateOverlap2(pcl::PointCloud<pointXYZ>::Ptr tag,
-                                                     pcl::PointCloud<pointXYZ>::Ptr cur,
-                                                     const double &sigma = 0.0)
+    std::vector<int> CalculateOverlap(const double& searchRadius, pcl::PointCloud<pointXYZ>::Ptr tag, pcl::PointCloud<pointXYZ>::Ptr cur)
     {
-        pcl::PointCloud<pointXYZ>::Ptr res;
-        res.reset(new pcl::PointCloud<pointXYZ>());
-
-        double searchRadius = 0.3;
+        std::vector<int> res;
         kdtree->setInputCloud(tag);
         int m = cur->size();
         for (auto i = 0; i < m; ++i)
@@ -158,49 +152,10 @@ public:
                 continue;
             }
 
-            if (sigma != 0)
-                res->emplace_back(addNoise(cur->points[i], sigma));
-            else
-                res->emplace_back(cur->points[i]);
+            res.emplace_back(i);
         }
 
         return res;
-    }
-
-    void boxFilter(pcl::PointCloud<pointXYZ>::Ptr input_cloud, const pcl::PointXYZ& min, const pcl::PointXYZ& max)
-    {
-        pcl::CropBox<pointXYZ> cropBoxFilter;
-        cropBoxFilter.setMin(Eigen::Vector4f(min.x, min.y, min.z, 1.));
-        cropBoxFilter.setMax(Eigen::Vector4f(max.x, max.y, max.z, 1.));
-        cropBoxFilter.setInputCloud(input_cloud);
-        cropBoxFilter.filter(*input_cloud);
-    }
-
-    bool CalculateOverlap(pcl::PointCloud<pointXYZ>::Ptr cur1, pcl::PointCloud<pointXYZ>::Ptr cur2)
-    {
-        pcl::PointXYZ minpt, maxpt;
-        pcl::getMinMax3D(*cur1, minpt, maxpt);
-        pcl::PointXYZ minpt2, maxpt2;
-        pcl::getMinMax3D(*cur2, minpt2, maxpt2);
-
-        if (!(maxpt.x >= minpt2.x && maxpt.y >= maxpt2.y && maxpt.z >= maxpt2.z &&
-              maxpt2.x >= minpt.x && maxpt2.y >= minpt.y && maxpt2.z >= minpt.z))
-        {
-            return false;
-        }
-
-        pcl::PointXYZ minpt3, maxpt3;
-        minpt3.x = minpt.x > minpt2.x ? minpt.x : minpt2.x;
-        minpt3.y = minpt.y > minpt2.y ? minpt.y : minpt2.y;
-        minpt3.z = minpt.z > minpt2.z ? minpt.z : minpt2.z;
-
-        maxpt3.x = maxpt.x < maxpt2.x ? maxpt.x : maxpt2.x;
-        maxpt3.y = maxpt.y < maxpt2.y ? maxpt.y : maxpt2.y;
-        maxpt3.z = maxpt.z < maxpt2.z ? maxpt.z : maxpt2.z;
-
-        boxFilter(cur1, minpt3, maxpt3);
-        boxFilter(cur2, minpt3, maxpt3);
-        return true;
     }
 
     void cloudAddNoise(pcl::PointCloud<pointXYZ>::Ptr cur, const double &sigma)
@@ -236,14 +191,12 @@ public:
 
     void Metrics(const double& searchRadius, const double &sigma)
     {
-//        CalculateOverlap(update_map_cloud_, gt_map_cloud_);
+        std::vector<int> gt_index, update_index;
+        gt_index = CalculateOverlap(searchRadius, update_map_cloud_, gt_map_cloud_);
+        update_index = CalculateOverlap(searchRadius, gt_map_cloud_, update_map_cloud_);
 //        cloudAddNoise(update_map_cloud_, 0.1);
-        gt_map_cloud_ = CalculateOverlap2(update_map_cloud_, gt_map_cloud_);
-        update_map_cloud_ = CalculateOverlap2(gt_map_cloud_, update_map_cloud_, sigma);
-//        draw(gt_map_cloud_);
-//        draw(update_map_cloud_);
-        std::cout << "gt = " << Calculate(gt_map_cloud_, searchRadius) << std::endl;
-        std::cout << "new = " << Calculate(update_map_cloud_, searchRadius) << std::endl;
+        std::cout << "gt = " << Calculate(gt_map_cloud_, searchRadius, gt_index) << std::endl;
+        std::cout << "new = " << Calculate(update_map_cloud_, searchRadius, update_index) << std::endl;
     }
 
 private:
@@ -255,25 +208,3 @@ private:
 
     pcl::KdTreeFLANN<pointXYZ>::Ptr kdtree;
 };
-
-// 0, new = -4.35793
-// 0.05, new = -3.39328
-// 0.10, new = -2.96566
-// 0.20, new = -2.76492
-// 0.30, new = -2.90125
-// 0.40, new = -3.14307
-// 0.50, new = -3.41055
-// 0.60, new = -3.67453
-// 0.70, new = -3.9725
-// 0.80, new = -4.2561
-// 1.00, new = -4.85561
-
-// 0., new = 0.613592
-// 1.0, new = 3.35743
-// 0.8, new = 3.3204
-// 0.5, new = 3.13729
-// 0.2, new = 2.4161
-// 0.1, new = 1.78008
-// 0.05, new = 1.30424
-// 0.02, new = 0.921232
-
