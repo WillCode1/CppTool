@@ -108,12 +108,13 @@ public:
                 zz += z * z;
             }
 
-            xx /= pointSearchInd.size() - 1;
-            xy /= pointSearchInd.size() - 1;
-            xz /= pointSearchInd.size() - 1;
-            yy /= pointSearchInd.size() - 1;
-            yz /= pointSearchInd.size() - 1;
-            zz /= pointSearchInd.size() - 1;
+            // sample covariance
+            xx /= pointSearchInd.size();
+            xy /= pointSearchInd.size();
+            xz /= pointSearchInd.size();
+            yy /= pointSearchInd.size();
+            yz /= pointSearchInd.size();
+            zz /= pointSearchInd.size();
 
             covariance << xx, xy, xz, xy, yy, yz, xz, yz, zz;
             covariance *= 2 * M_PI * e;
