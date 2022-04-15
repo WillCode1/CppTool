@@ -61,8 +61,10 @@ public:
         int cnt = 0;
         double mme = 0;
         Eigen::Matrix3d covariance;
+        Eigen::Vector4d centroid;
         double e = 2.718281828459045;
 
+//#pragma omp parallel for num_threads(8)
         for (auto i = 0; i < m; ++i)
         {
             std::vector<int> pointSearchInd;
@@ -72,51 +74,7 @@ public:
             if (pointSearchInd.size() < 2)
                 continue;
 
-            double mean_x = 0;
-            double mean_y = 0;
-            double mean_z = 0;
-
-            for (int j : pointSearchInd)
-            {
-                mean_x += check_map->points[j].x;
-                mean_y += check_map->points[j].y;
-                mean_z += check_map->points[j].z;
-            }
-
-            mean_x /= pointSearchInd.size();
-            mean_y /= pointSearchInd.size();
-            mean_z /= pointSearchInd.size();
-
-            double xx = 0;
-            double xy = 0;
-            double xz = 0;
-            double yy = 0;
-            double yz = 0;
-            double zz = 0;
-
-            for (int j : pointSearchInd)
-            {
-                double x = check_map->points[j].x - mean_x;
-                double y = check_map->points[j].y - mean_y;
-                double z = check_map->points[j].z - mean_z;
-
-                xx += x * x;
-                xy += x * y;
-                xz += x * z;
-                yy += y * y;
-                yz += y * z;
-                zz += z * z;
-            }
-
-            // sample covariance
-            xx /= pointSearchInd.size();
-            xy /= pointSearchInd.size();
-            xz /= pointSearchInd.size();
-            yy /= pointSearchInd.size();
-            yz /= pointSearchInd.size();
-            zz /= pointSearchInd.size();
-
-            covariance << xx, xy, xz, xy, yy, yz, xz, yz, zz;
+            pcl::computeMeanAndCovarianceMatrix(*check_map, pointSearchInd,covariance, centroid);
             covariance *= 2 * M_PI * e;
             auto tmp = std::log(covariance.determinant()) / std::log(e);
 
@@ -142,6 +100,8 @@ public:
         std::vector<int> res;
         kdtree->setInputCloud(tag);
         int m = cur->size();
+
+//#pragma omp parallel for num_threads(8)
         for (auto i = 0; i < m; ++i)
         {
             std::vector<int> pointSearchInd;
