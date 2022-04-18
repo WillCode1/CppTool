@@ -107,4 +107,7 @@ rosrun rqt_bag rqt_bag 8445_2022-01-23-09-59-42.bag
 =====================================
 git push https://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@github.com/WillCode1/CppTool.git
 
+ssh autowise@172.21.2.14
+password: autowise
+scp -r zhengzhou_jingkai_hdmap/ will@172.22.4.32:/home/will/autowise/
 
