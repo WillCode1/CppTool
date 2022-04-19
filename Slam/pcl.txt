@@ -1,0 +1,14 @@
+点云处理：
+(1)点云滤波，去除NaN值得无效点云
+--->pcl::removeNaNFromPointCloud
+
+(2)点云下采样: pcl::VoxelGrid<PointType> downSizeFilter;
+--->downSizeFilter.setInputCloud(surfPointsLessFlatScan);
+--->downSizeFilter.setLeafSize(0.2, 0.2, 0.2);
+--->downSizeFilter.filter(surfPointsLessFlatScanDS);
+
+(3)kd-tree：表示k维空间中点集合
+--->pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
+--->kdtree.nearestKSearch();
+--->kdtree.radiusSearch();
+
