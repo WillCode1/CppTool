@@ -54,7 +54,8 @@ bool CCalibration::readPatternImg()
 
     return true;
 }
-//通过计算三个相邻角点构成的两个向量之间的夹角判断角点连接性
+
+//通过计算三个相邻角点构成的两个向量之间的夹角判断角点连接性(判断同行、同列是否平行)
 bool CCalibration::testCorners(vector<cv::Point2f> &corners, int patternWidth, int patternHeight)
 {
     if (corners.size() != patternWidth * patternHeight)
@@ -134,8 +135,7 @@ void CCalibration::calibProcess()
                                                   corners, CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK);
         if (!patternfound)
         {
-            cout << "Can not find chess board corners!\n"
-                 << endl;
+            cout << "Can not find chess board corners!\n" << endl;
             continue;
         }
         else
@@ -148,6 +148,7 @@ void CCalibration::calibProcess()
             }
 
             /************************亚像素精确化******************************/
+            // https://blog.csdn.net/qq_28584889/article/details/103356855
             cornerSubPix(image, corners, Size(11, 11), Size(-1, -1), TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT, 30, 0.1));
             bool good = testCorners(corners, boardSize.width, boardSize.height);
             if (false == good)
@@ -176,7 +177,8 @@ void CCalibration::calibProcess()
     Size squre_size = Size(20, 20);        //棋盘格尺寸
     vector<vector<Point3f>> object_points; //所有棋盘图像的角点三维坐标
     vector<int> pointCounts;
-    //初始化单幅靶标图片的三维点
+	vector<cv::Point3f> singlePatternPoints;
+    //初始化单幅靶标图片的三维点，前两个参数是：棋盘格子数、格子大小
     init3DPoints(boardSize, squre_size, singlePatternPoints);
     //初始化标定板上的三维坐标
     for (int n = 0; n < successImgNum; n++)
