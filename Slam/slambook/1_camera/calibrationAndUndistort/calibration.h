@@ -23,7 +23,7 @@ public:
 
 private:
 	vector<cv::Point3f> singlePatternPoints;
-    vector<Mat> patternImgList; 
+    vector<Mat> patternImgList;     // 存放所有用于标定的图片
     int imgHeight;
     int imgWidth;
     int imgNum;
