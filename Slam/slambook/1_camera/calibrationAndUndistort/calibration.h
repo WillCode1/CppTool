@@ -31,8 +31,8 @@ private:
     string patternImgPath;
     string calibResultPath;
     Size boardSize;
-    Mat camK;
-    Mat camDiscoeff;
+    Mat camK;           // 相机内参
+    Mat camDiscoeff;    // 畸变参数
 
 private:
 	int evaluateCalibrationResult(vector<vector<cv::Point3f>> objectPoints, vector<vector<cv::Point2f>> cornerSquare, vector<int> pointCnts, vector<cv::Vec3d> _rvec,
