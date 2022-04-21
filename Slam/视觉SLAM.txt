@@ -2,6 +2,26 @@
 放大图像：上采样（upsampling）或图像插值（interpolating）
 
 cornerSubPix：size是不是要大于格子大小
+readme中，是因为鱼眼相机才会有那么多参数吗?
+
+硬件上鱼眼相机都是一样的，ocam模型和openCV只是多项式不同，ocam模型的话，多项式位数会更高，对畸变的拟合更好，但相应的也会存在过拟合的风险
+
+// Manually point out corners
+void ManuallySetPoint(const cv::Mat &img_bk, cv::Mat &img_click, cv::Mat &img);
+
+// Manually adjust corners
+void ManuallyAdjustCorner(const cv::Mat &img_bk, cv::Mat &img);
+
+// Calc point from cam to world
+cv::Point3f PinholeParam::Camera2World(cv::Point2f pt);
+cv::Point3f FisheyeParam::Camera2World(cv::Point2f pt);
+
+// Calc extrinsic
+void Optimizer::CalculateTwc(cv::Mat &Twc, cv::Mat &Twc_nonlinear,opengv::bearingVectors_t bearings,opengv::points_t points3D);
+
+left/calib_results.txt
+2021-12-08-16:47:38_left.ssv
+
 ======================================
 cv::cvtColor：图像通道转换，可试验效果???
 
@@ -17,6 +37,8 @@ cv::projectPoints(objectPoints, rvec, tvec, cameraMatrix, distCoeffs, imagePoint
 --->投影三维点到一个图像平面。
 --->参数：世界坐标系中的三维点，相机外参，相机内参，畸变参数，图像坐标系中的二维点
 
+cv::initUndistortRectifyMap
+
 ===================================
 焦距f：光心到成像平面的距离
 相机内参(intrinsic)：f_x、f_y、c_x、c_y
@@ -26,7 +48,6 @@ cv::projectPoints(objectPoints, rvec, tvec, cameraMatrix, distCoeffs, imagePoint
 畸变参数
 
 ===================================
-列出目标：
 1.相机外参标定流水线
 就是要把一辆车，前后左右的摄像头外参都算出来，然后拼成一幅图
 这个过程目前是要提前采集图像，然后手动标定完外参后，再拼接。
