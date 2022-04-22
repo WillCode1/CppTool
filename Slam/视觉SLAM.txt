@@ -23,6 +23,10 @@ void Optimizer::CalculateTwc(cv::Mat &Twc, cv::Mat &Twc_nonlinear,opengv::bearin
 ======================================
 cv::cvtColor：图像通道转换，可试验效果???
 
+cv::Mat Mat::rowRange(int startrow, int endrow) const;
+cv::Mat Mat::colRange(int startrow, int endrow) const;
+--->获取某些范围内行或列的指针
+
 cv::findChessboardCorners
 cv::cornerSubPix：角点亚像素精确化
 
