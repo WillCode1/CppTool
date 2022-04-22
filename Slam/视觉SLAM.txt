@@ -4,6 +4,8 @@
 cornerSubPix：size是不是要大于格子大小
 readme中，是因为鱼眼相机才会有那么多参数吗?
 
+预期的去畸变过程?畸变参数在哪?
+
 硬件上鱼眼相机都是一样的，ocam模型和openCV只是多项式不同，ocam模型的话，多项式位数会更高，对畸变的拟合更好，但相应的也会存在过拟合的风险
 
 // Manually point out corners
@@ -18,9 +20,6 @@ cv::Point3f FisheyeParam::Camera2World(cv::Point2f pt);
 
 // Calc extrinsic
 void Optimizer::CalculateTwc(cv::Mat &Twc, cv::Mat &Twc_nonlinear,opengv::bearingVectors_t bearings,opengv::points_t points3D);
-
-left/calib_results.txt
-2021-12-08-16:47:38_left.ssv
 
 ======================================
 cv::cvtColor：图像通道转换，可试验效果???
@@ -48,7 +47,7 @@ cv::initUndistortRectifyMap
 畸变参数
 
 ===================================
-1.相机外参标定流水线
+1.相机外参标定流水线(camera_system_extrinsic_calibration)
 就是要把一辆车，前后左右的摄像头外参都算出来，然后拼成一幅图
 这个过程目前是要提前采集图像，然后手动标定完外参后，再拼接。
 现在有需求，要把这个过程做成流水线形式的，车开上去，按个按钮，就标定好了
@@ -56,8 +55,6 @@ cv::initUndistortRectifyMap
 2.鱼眼相机自动检测角点
 目前鱼眼摄像头没有自动检测角点的功能
 现在还是人用鼠标在图像上去点角点，很费时
-
-我之前和你说的，手动外参标定的是 camera_system_extrinsic_calibration
 
 3.相机外参在线标定
 还有就是可以同时去调研一下，一些在线标定的方案，就是不依赖棋盘格等特殊环境的标定方案。
