@@ -45,6 +45,7 @@ rar x etc.rar
 dot文件：
 dot -T pdf gtsam_opt.dot -o graph.pdf
 
+定位文件：locate "keyword"
 ln -s /opt/app/app ~/desktop
 =============常用Git命令==============
 git status
