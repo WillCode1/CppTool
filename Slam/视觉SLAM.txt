@@ -1,27 +1,11 @@
 缩小图像：下采样（subsampled）或降采样（downsampled）
 放大图像：上采样（upsampling）或图像插值（interpolating）
 
-cornerSubPix：size是不是要大于格子大小
-
-CalculateTwc
-
 硬件上鱼眼相机都是一样的，ocam模型和openCV只是多项式不同，ocam模型的话，多项式位数会更高，对畸变的拟合更好，但相应的也会存在过拟合的风险
 
-// Manually point out corners
-void ManuallySetPoint(const cv::Mat &img_bk, cv::Mat &img_click, cv::Mat &img);
-
-// Manually adjust corners
-void ManuallyAdjustCorner(const cv::Mat &img_bk, cv::Mat &img);
-
-// Calc point from cam to world
-cv::Point3f PinholeParam::Camera2World(cv::Point2f pt);
-cv::Point3f FisheyeParam::Camera2World(cv::Point2f pt);
-
-// Calc extrinsic
-void Optimizer::CalculateTwc(cv::Mat &Twc, cv::Mat &Twc_nonlinear,opengv::bearingVectors_t bearings,opengv::points_t points3D);
-
 ======================================
-cv::cvtColor：图像通道转换，可试验效果???
+cv::cvtColor
+--->灰度图无法恢复到RGB，因为丢失信息
 
 cv::Mat Mat::rowRange(int startrow, int endrow) const;
 cv::Mat Mat::colRange(int startrow, int endrow) const;
@@ -62,9 +46,11 @@ cv::initUndistortRectifyMap
 --->亚像素调整:
 (1)可以从大到小，来几次亚像素调整
 (2)可以从world坐标系投射一些角点周围点到图像提取像素，计算周围像素梯度，过滤异常值
---->g2o，惩罚项可以改成到图像底部中间的距离
-
-车身不对齐世界坐标系情况
+--->g2o，惩罚项可以改成到图像底部中间的距离(离图片中间点，越远，畸变越大。)
+--->是否可以先去畸变，再计算重投影误差
+--->cornerSubPix
+--->stitch中车身坐标系的计算
+--->adjustCorner
 
 3.相机外参在线标定
 还有就是可以同时去调研一下，一些在线标定的方案，就是不依赖棋盘格等特殊环境的标定方案。
@@ -82,4 +68,8 @@ cv::initUndistortRectifyMap
 7.双目内参+外参库标定整理
 
 熟悉一下SLAM前后端的项目
+
+1.auto_gt
+2.行车过程在线标定(需要四个相机单独建图)
+
 
