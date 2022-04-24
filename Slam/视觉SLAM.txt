@@ -12,6 +12,7 @@ cv::Mat Mat::colRange(int startrow, int endrow) const;
 --->获取某些范围内行或列的指针
 
 cv::findChessboardCorners
+cv::goodFeaturesToTrack: https://blog.csdn.net/guduruyu/article/details/69537083
 cv::cornerSubPix：角点亚像素精确化
 
 cv::calibrateCamera(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs, flags)
@@ -30,7 +31,6 @@ cv::initUndistortRectifyMap
 相机内参(intrinsic)：f_x、f_y、c_x、c_y
 --->f_x, f_y表示像素坐标在u,v轴上缩放了多少倍 * 焦距f
 --->c_x，c_y表示像素坐标平移了多少
-相机外参(extrinsic)：R、t，摄像头相对车身坐标系的位姿，摄像头的外参是会变的，随着车辆的使用，相机的位置和角度会发生一定的偏移。有点像手眼标定
 畸变参数
 
 ===================================
@@ -46,9 +46,8 @@ cv::initUndistortRectifyMap
 --->亚像素调整:
 (1)可以从大到小，来几次亚像素调整
 (2)可以从world坐标系投射一些角点周围点到图像提取像素，计算周围像素梯度，过滤异常值
---->g2o，惩罚项可以改成到图像底部中间的距离(离图片中间点，越远，畸变越大。)
+--->g2o，惩罚项可以改成到图像底部中间的距离(离图片中间点，距离越远，畸变越大。)
 --->是否可以先去畸变，再计算重投影误差
---->cornerSubPix
 --->stitch中车身坐标系的计算
 --->adjustCorner
 
@@ -71,5 +70,5 @@ cv::initUndistortRectifyMap
 
 1.auto_gt
 2.行车过程在线标定(需要四个相机单独建图)
-
-
+--->不如把其中一个课题改成预积分的尝试
+3.标定做好总可以做其他的吧
