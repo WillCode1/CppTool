@@ -23,7 +23,8 @@ const int kKeyCodeEsc = 0x1B;
 
 using namespace SemanticSLAM;
 
-struct DemoOption {
+struct DemoOption
+{
   int start_index;
   int image_width;
   int image_height;
@@ -41,7 +42,8 @@ struct DemoOption {
   std::string str_bmp_folder;
 };
 
-int kbhit(void) {
+int kbhit(void)
+{
   struct termios oldt, newt;
   int ch;
   int oldf;
@@ -54,7 +56,8 @@ int kbhit(void) {
   ch = getchar();
   tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
   fcntl(STDIN_FILENO, F_SETFL, oldf);
-  if (ch != EOF) {
+  if (ch != EOF)
+  {
     ungetc(ch, stdin);
     return 1;
   }
@@ -62,41 +65,43 @@ int kbhit(void) {
 }
 
 DemoOption LoadInitOption(const std::string &filename);
-void LoadOdometry(const std::string &filename,
-                  std::queue<std::pair<uint64_t, WheelOdometry>> &odometry);
-void LoadImageLists(const std::string &filenanme,
-                    std::queue<std::pair<uint64_t, int>> &image_id);
+void LoadOdometry(const std::string &filename, std::queue<std::pair<uint64_t, WheelOdometry>> &odometry);
+void LoadImageLists(const std::string &filenanme, std::queue<std::pair<uint64_t, int>> &image_id);
 
 bool LoadImageFromFolder(cv::Mat &image_slot, cv::Mat &image_dash,
                          cv::Mat &image_arrow, cv::Mat &image_lane,
                          cv::Mat &image_raw, int image_id,
                          const DemoOption &demo_option);
 
-void SkipImage(int start_index,
-               std::queue<std::pair<uint64_t, int>> &image_id) {
-  for (int i = 0; i < start_index; i++) {
+void SkipImage(int start_index, std::queue<std::pair<uint64_t, int>> &image_id)
+{
+  for (int i = 0; i < start_index; i++)
+  {
     if (image_id.empty())
       break;
     image_id.pop();
   }
 }
 
-void ShowDemoInfo() {
-
+void ShowDemoInfo()
+{
   std::cout << kColorYellow << "keyboard control:  " << std::endl;
   std::cout << "   press 'r'  to reset system " << std::endl;
   std::cout << "   press 'space' to pause/resume system " << std::endl;
   std::cout << "   press 's'  to save map " << kColorReset << std::endl;
 }
 
-const std::string GetCarModelPath(const std::string &exe_path) {
+const std::string GetCarModelPath(const std::string &exe_path)
+{
   const size_t bar_index = exe_path.find_last_of('/');
-  std::string model_path =
-      exe_path.substr(0, bar_index + 1) + "../../model/car.obj";
+  std::string model_path = exe_path.substr(0, bar_index + 1) + "../../model/car.obj";
   return model_path;
 }
-int main(int argc, char **argv) {
-  if (argc != 2) {
+
+int main(int argc, char **argv)
+{
+  if (argc != 2)
+  {
     std::cout << " usage : ./test_hpa_mapping  config_file  " << std::endl;
     return 1;
   }
@@ -115,7 +120,8 @@ int main(int argc, char **argv) {
 
   std::ofstream fout;
   fout.open("test_hpa_mapping_result.txt");
-  if (!fout.is_open()) {
+  if (!fout.is_open())
+  {
     std::cout << " Create result.txt failed " << std::endl;
     return -1;
   }
@@ -130,23 +136,31 @@ int main(int argc, char **argv) {
 
   bool stop = false;
 
-  while (true) {
+  while (true)
+  {
 
     // Key control
-    if (kbhit()) {
+    if (kbhit())
+    {
       uchar key_code = getchar();
-      if (key_code == kKeyCodeS) {
+      if (key_code == kKeyCodeS)
+      {
         std::cout << kColorGreen;
         avp_mapper_ptr->SaveMap("map.bin");
         std::cout << kColorReset;
-      } else if (key_code == kKeyCodeSpace) {
+      }
+      else if (key_code == kKeyCodeSpace)
+      {
         std::cout << kColorRed << " Stop" << kColorReset << std::endl;
         stop = !stop;
-      } else if (key_code == kKeyCodeR) {
-        std::cout << kColorYellow << " Rest System " << kColorReset
-                  << std::endl;
+      }
+      else if (key_code == kKeyCodeR)
+      {
+        std::cout << kColorYellow << " Rest System " << kColorReset << std::endl;
         avp_mapper_ptr->Reset();
-      } else if (key_code == kKeyCodeEsc) {
+      }
+      else if (key_code == kKeyCodeEsc)
+      {
         std::cout << kColorGreen << " Esc" << kColorReset << std::endl;
         avp_mapper_ptr->SaveMap("map.bin");
         avp_mapper_ptr->SaveTrajectory("trajectory.txt");
@@ -155,7 +169,8 @@ int main(int argc, char **argv) {
         break;
       }
     }
-    if (stop) {
+    if (stop)
+    {
       std::this_thread::sleep_for(std::chrono::milliseconds(kTimeInterval));
       continue;
     }
@@ -164,7 +179,8 @@ int main(int argc, char **argv) {
     OdometryData odom_data;
     DataLoader::DataType data_type = dataloader.NextData(frame_data, odom_data);
 
-    if (data_type == DataLoader::DataType::DATA_IMAGE) {
+    if (data_type == DataLoader::DataType::DATA_IMAGE)
+    {
 
       if (frame_data.id < demo_option.start_index)
         continue;
@@ -172,12 +188,10 @@ int main(int argc, char **argv) {
       std::cout << " ======================================== " << std::endl;
       std::cout << " current image id  " << frame_data.id << std::endl;
 
-      if (!LoadImageFromFolder(image_slot, image_dash, image_arrow, image_lane,
-                               image_raw, frame_data.id, demo_option))
+      if (!LoadImageFromFolder(image_slot, image_dash, image_arrow, image_lane, image_raw, frame_data.id, demo_option))
         continue;
 
-      std::vector<unsigned char *> segmentation_imgs{
-          image_slot.data, image_dash.data, image_arrow.data, image_lane.data};
+      std::vector<unsigned char *> segmentation_imgs{image_slot.data, image_dash.data, image_arrow.data, image_lane.data};
 
 #ifdef ENABLE_VIEWER
       avp_mapper_ptr->SetRawImage(image_raw);
@@ -186,43 +200,40 @@ int main(int argc, char **argv) {
       Timer timer_mapping_duration("mapping time cost per frame ");
 
       // Main functions
-      AVPPose current_pose = avp_mapper_ptr->GrabSegImages(frame_data.timestamp,
-                                                           segmentation_imgs);
+      AVPPose current_pose = avp_mapper_ptr->GrabSegImages(frame_data.timestamp, segmentation_imgs);
 
       timer_mapping_duration.Print();
       double mapping_duration = timer_mapping_duration.GetTimeConsuming();
 
 #ifdef ENABLE_VIEWER
 
-      PlotViewer::GetInstance().UpdateData(
-          "total", timer_mapping_duration.GetTimeConsuming());
+      PlotViewer::GetInstance().UpdateData("total", timer_mapping_duration.GetTimeConsuming());
 
-      if (avp_mapper_ptr->RemapImageRequired()) {
+      if (avp_mapper_ptr->RemapImageRequired())
+      {
         HpaViewer::GetInstance().AddMarker();
       }
 
       // Draw  Semantic Map
 
-      if (frame_data.id == demo_option.start_index || frame_data.id % 10 == 0) {
+      if (frame_data.id == demo_option.start_index || frame_data.id % 10 == 0)
+      {
         std::cout << " frame id " << frame_data.id << std::endl;
         Timer timer_update("update map ");
-        HpaViewer::GetInstance().UpdateSemanticMap(
-            avp_mapper_ptr->GetSemanticPoints());
+        HpaViewer::GetInstance().UpdateSemanticMap(avp_mapper_ptr->GetSemanticPoints());
         timer_update.Print();
-        PlotViewer::GetInstance().UpdateData("update semantic points",
-                                             timer_update.GetTimeConsuming());
+        PlotViewer::GetInstance().UpdateData("update semantic points", timer_update.GetTimeConsuming());
       }
 #endif
-      fout << current_pose.x << " " << current_pose.y << " " << mapping_duration
-           << std::endl;
+      fout << current_pose.x << " " << current_pose.y << " " << mapping_duration << std::endl;
 
       if (mapping_duration < kTimeInterval) // ms
       {
-        std::this_thread::sleep_for(
-            std::chrono::milliseconds(kTimeInterval - (int)mapping_duration));
+        std::this_thread::sleep_for(std::chrono::milliseconds(kTimeInterval - (int)mapping_duration));
       }
-
-    } else if (data_type == DataLoader::DataType::DATA_ODOM) {
+    }
+    else if (data_type == DataLoader::DataType::DATA_ODOM)
+    {
       avp_mapper_ptr->SetOdometry(odom_data.timestamp, odom_data.odometry);
     }
   }
@@ -232,7 +243,8 @@ int main(int argc, char **argv) {
   return 1;
 }
 
-DemoOption LoadInitOption(const std::string &filename) {
+DemoOption LoadInitOption(const std::string &filename)
+{
 
   DemoOption option;
 
@@ -265,9 +277,12 @@ DemoOption LoadInitOption(const std::string &filename) {
   option.str_bmp_folder = bmp_folder;
 
   std::cout << " use compressed data : ";
-  if (option.use_compress) {
+  if (option.use_compress)
+  {
     std::cout << " yes " << std::endl;
-  } else {
+  }
+  else
+  {
     std::cout << " no " << std::endl;
   }
   std::cout << " image width " << option.image_width << std::endl;
@@ -276,11 +291,12 @@ DemoOption LoadInitOption(const std::string &filename) {
   return option;
 }
 
-void LoadOdometry(const std::string &filename,
-                  std::queue<std::pair<uint64_t, WheelOdometry>> &odometry) {
+void LoadOdometry(const std::string &filename, std::queue<std::pair<uint64_t, WheelOdometry>> &odometry)
+{
   std::ifstream fin;
   fin.open(filename.c_str());
-  if (!fin.is_open()) {
+  if (!fin.is_open())
+  {
     std::cout << " open " << filename << " failed " << std::endl;
     return;
   }
@@ -288,7 +304,8 @@ void LoadOdometry(const std::string &filename,
   std::getline(fin, data);
   std::getline(fin, data);
 
-  while (!fin.eof()) {
+  while (!fin.eof())
+  {
     uint64_t microsecond;
     int seq;
     uint64_t msg_time;
@@ -296,25 +313,25 @@ void LoadOdometry(const std::string &filename,
     double qx, qy, qz, qw;
 
     std::getline(fin, data);
-    sscanf(data.c_str(), "%ld,%d,%ld,map,%lf,%lf,%lf,%lf,%lf,%lf,%lf",
-           &msg_time, &seq, &microsecond, &x, &y, &z, &qx, &qy, &qz, &qw);
-    odometry.push(std::make_pair(microsecond / 1000,
-                                 WheelOdometry(x, y, z, qw, qx, qy, qz)));
+    sscanf(data.c_str(), "%ld,%d,%ld,map,%lf,%lf,%lf,%lf,%lf,%lf,%lf", &msg_time, &seq, &microsecond, &x, &y, &z, &qx, &qy, &qz, &qw);
+    odometry.push(std::make_pair(microsecond / 1000, WheelOdometry(x, y, z, qw, qx, qy, qz)));
   }
   fin.close();
 }
-void LoadImageLists(const std::string &filenanme,
-                    std::queue<std::pair<uint64_t, int>> &image_id) {
+void LoadImageLists(const std::string &filenanme, std::queue<std::pair<uint64_t, int>> &image_id)
+{
   std::ifstream fin;
   fin.open(filenanme.c_str());
-  if (!fin.is_open()) {
+  if (!fin.is_open())
+  {
     std::cout << " open  " << filenanme << " failed " << std::endl;
     return;
   }
 
   std::string data;
   std::getline(fin, data); // skip first line
-  while (!fin.eof()) {
+  while (!fin.eof())
+  {
     int id;
     uint64_t microsecond;
     std::getline(fin, data);
@@ -327,47 +344,39 @@ void LoadImageLists(const std::string &filenanme,
 bool LoadImageFromFolder(cv::Mat &image_slot, cv::Mat &image_dash,
                          cv::Mat &image_arrow, cv::Mat &image_lane,
                          cv::Mat &image_raw, int image_id,
-                         const DemoOption &demo_option) {
+                         const DemoOption &demo_option)
+{
 
   std::string data_path = demo_option.str_image_folder;
 
-  if (!demo_option.use_compress) {
+  if (!demo_option.use_compress)
+  {
+    image_slot = cv::imread(data_path + "/slot/" + std::to_string(image_id) + "_slot.bmp", cv::IMREAD_GRAYSCALE);
+    image_dash = cv::imread(data_path + "/dash/" + std::to_string(image_id) + "_dash.bmp", cv::IMREAD_GRAYSCALE);
+    image_arrow = cv::imread(data_path + "/arrow/" + std::to_string(image_id) + "_arrow.bmp", cv::IMREAD_GRAYSCALE);
 
-    image_slot = cv::imread(data_path + "/slot/" + std::to_string(image_id) +
-                                "_slot.bmp",
-                            cv::IMREAD_GRAYSCALE);
-    image_dash = cv::imread(data_path + "/dash/" + std::to_string(image_id) +
-                                "_dash.bmp",
-                            cv::IMREAD_GRAYSCALE);
-    image_arrow = cv::imread(data_path + "/arrow/" + std::to_string(image_id) +
-                                 "_arrow.bmp",
-                             cv::IMREAD_GRAYSCALE);
+    image_raw = cv::imread(data_path + "/result/" + std::to_string(image_id) + ".bmp");
 
-    image_raw =
-        cv::imread(data_path + "/result/" + std::to_string(image_id) + ".bmp");
+    image_lane = cv::imread(data_path + "/lane/" + std::to_string(image_id) + "_lane.bmp", cv::IMREAD_GRAYSCALE);
 
-    image_lane = cv::imread(data_path + "/lane/" + std::to_string(image_id) +
-                                "_lane.bmp",
-                            cv::IMREAD_GRAYSCALE);
-
-    if (image_lane.empty()) {
-      image_lane = cv::Mat::zeros(demo_option.image_height,
-                                  demo_option.image_width, CV_8UC1);
+    if (image_lane.empty())
+    {
+      image_lane = cv::Mat::zeros(demo_option.image_height, demo_option.image_width, CV_8UC1);
     }
-  } else {
-    cv::Mat image = cv::imread(data_path + "/compress/seg_" +
-                                   std::to_string(image_id) + ".png",
-                               cv::IMREAD_GRAYSCALE);
+  }
+  else
+  {
+    cv::Mat image = cv::imread(data_path + "/compress/seg_" + std::to_string(image_id) + ".png", cv::IMREAD_GRAYSCALE);
 
-    if (image.empty()) {
+    if (image.empty())
+    {
       std::cout << " open compressed seg image failed " << std::endl;
       return false;
     }
 
-    if (image.rows != demo_option.image_height ||
-        image.cols != demo_option.image_width) {
-      cv::resize(image, image,
-                 cv::Size(demo_option.image_width, demo_option.image_height));
+    if (image.rows != demo_option.image_height || image.cols != demo_option.image_width)
+    {
+      cv::resize(image, image, cv::Size(demo_option.image_width, demo_option.image_height));
     }
 
     cv::inRange(image, 1, 1, image_slot);
@@ -385,24 +394,19 @@ bool LoadImageFromFolder(cv::Mat &image_slot, cv::Mat &image_dash,
     cv::merge(mbgr, image_raw);
   }
 
-  if (image_slot.empty() || image_dash.empty() || image_arrow.empty() ||
-      image_raw.empty() || image_lane.empty()) {
-    std::cout << data_path + "/result/" + std::to_string(image_id) + ".bmp"
-              << std::endl;
+  if (image_slot.empty() || image_dash.empty() || image_arrow.empty() || image_raw.empty() || image_lane.empty())
+  {
+    std::cout << data_path + "/result/" + std::to_string(image_id) + ".bmp" << std::endl;
     std::cout << " image empty " << std::endl;
     return false;
   }
 
-  if (image_slot.rows != demo_option.image_height ||
-      image_slot.cols != demo_option.image_width) {
-    cv::resize(image_slot, image_slot,
-               cv::Size(demo_option.image_width, demo_option.image_height));
-    cv::resize(image_dash, image_dash,
-               cv::Size(demo_option.image_width, demo_option.image_height));
-    cv::resize(image_arrow, image_arrow,
-               cv::Size(demo_option.image_width, demo_option.image_height));
-    cv::resize(image_raw, image_raw,
-               cv::Size(demo_option.image_width, demo_option.image_height));
+  if (image_slot.rows != demo_option.image_height || image_slot.cols != demo_option.image_width)
+  {
+    cv::resize(image_slot, image_slot, cv::Size(demo_option.image_width, demo_option.image_height));
+    cv::resize(image_dash, image_dash, cv::Size(demo_option.image_width, demo_option.image_height));
+    cv::resize(image_arrow, image_arrow, cv::Size(demo_option.image_width, demo_option.image_height));
+    cv::resize(image_raw, image_raw, cv::Size(demo_option.image_width, demo_option.image_height));
   }
   return true;
 }
