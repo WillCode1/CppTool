@@ -21,7 +21,8 @@ using namespace FeatureSLAM;
 using namespace SemanticSLAM;
 using namespace std;
 
-int kbhit(void) {
+int kbhit(void)
+{
   struct termios oldt, newt;
   int ch;
   int oldf;
@@ -34,7 +35,8 @@ int kbhit(void) {
   ch = getchar();
   tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
   fcntl(STDIN_FILENO, F_SETFL, oldf);
-  if (ch != EOF) {
+  if (ch != EOF)
+  {
     ungetc(ch, stdin);
     return 1;
   }
@@ -44,9 +46,11 @@ int kbhit(void) {
 const int kImageRow0 = 200;
 const int kImageRow1 = 570;
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
 
-  if (argc != 2 && argc != 3) {
+  if (argc != 2 && argc != 3)
+  {
     std::cerr << " args error " << std::endl;
     std::cout << " usage  ./mc_slam config_file  [aligned_odom ] " << std::endl;
     return 1;
@@ -67,7 +71,8 @@ int main(int argc, char **argv) {
 
   DataLoader::Mode mode(DataLoader::NOT_ALIGNED);
 
-  if (argc == 3) {
+  if (argc == 3)
+  {
     odometry_file = std::string(argv[2]);
     mode = DataLoader::ALIGNED;
   }
@@ -87,83 +92,82 @@ int main(int argc, char **argv) {
   auto feature_mapper = CreateFeatureMapper(str_config);
   Timer timer("Total Mapping");
 
-  while (true) {
+  while (true)
+  {
     DataFrame frame_data;
     OdometryData odom_data;
 
-    if (mode == DataLoader::ALIGNED) {
+    if (mode == DataLoader::ALIGNED)
+    {
 
       bool ret = dataloader.NextFrame(frame_data, odom_data);
 
       if (!ret)
         break;
 
-      cv::Mat imgleft = cv::imread(data_path + frame_data.str_image_left,
-                                   cv::IMREAD_GRAYSCALE);
-      cv::Mat imgfront = cv::imread(data_path + frame_data.str_image_front,
-                                    cv::IMREAD_GRAYSCALE);
-      cv::Mat imgright = cv::imread(data_path + frame_data.str_image_right,
-                                    cv::IMREAD_GRAYSCALE);
-      cv::Mat imgback = cv::imread(data_path + frame_data.str_image_back,
-                                   cv::IMREAD_GRAYSCALE);
+      cv::Mat imgleft = cv::imread(data_path + frame_data.str_image_left, cv::IMREAD_GRAYSCALE);
+      cv::Mat imgfront = cv::imread(data_path + frame_data.str_image_front, cv::IMREAD_GRAYSCALE);
+      cv::Mat imgright = cv::imread(data_path + frame_data.str_image_right, cv::IMREAD_GRAYSCALE);
+      cv::Mat imgback = cv::imread(data_path + frame_data.str_image_back, cv::IMREAD_GRAYSCALE);
 
-      if (imgleft.empty() || imgfront.empty() || imgright.empty() ||
-          imgback.empty())
+      if (imgleft.empty() || imgfront.empty() || imgright.empty() || imgback.empty())
         continue;
 
-      if (!use_crop_image) {
+      if (!use_crop_image)
+      {
         imgleft = imgleft.rowRange(kImageRow0, kImageRow1);
         imgfront = imgfront.rowRange(kImageRow0, kImageRow1);
         imgright = imgright.rowRange(kImageRow0, kImageRow1);
         imgback = imgback.rowRange(kImageRow0, kImageRow1);
       }
       Timer timer(" total cost ");
-      feature_mapper->TrackMultiCam(imgleft, imgfront, imgright, imgback,
-                                    odom_data.odometry);
+      feature_mapper->TrackMultiCam(imgleft, imgfront, imgright, imgback, odom_data.odometry);
       timer.Print();
-
-    } else {
+    }
+    else
+    {
       DataLoader::DataType dt = dataloader.NextData(frame_data, odom_data);
 
-      if (dt == DataLoader::DATA_IMAGE) {
+      if (dt == DataLoader::DATA_IMAGE)
+      {
 
         if (frame_data.id < start_index)
           continue;
 
-        cv::Mat imgleft = cv::imread(data_path + frame_data.str_image_left,
-                                     cv::IMREAD_GRAYSCALE);
-        cv::Mat imgfront = cv::imread(data_path + frame_data.str_image_front,
-                                      cv::IMREAD_GRAYSCALE);
-        cv::Mat imgright = cv::imread(data_path + frame_data.str_image_right,
-                                      cv::IMREAD_GRAYSCALE);
-        cv::Mat imgback = cv::imread(data_path + frame_data.str_image_back,
-                                     cv::IMREAD_GRAYSCALE);
+        cv::Mat imgleft = cv::imread(data_path + frame_data.str_image_left, cv::IMREAD_GRAYSCALE);
+        cv::Mat imgfront = cv::imread(data_path + frame_data.str_image_front, cv::IMREAD_GRAYSCALE);
+        cv::Mat imgright = cv::imread(data_path + frame_data.str_image_right, cv::IMREAD_GRAYSCALE);
+        cv::Mat imgback = cv::imread(data_path + frame_data.str_image_back, cv::IMREAD_GRAYSCALE);
 
-        if (imgleft.empty() || imgfront.empty() || imgright.empty() ||
-            imgback.empty())
+        if (imgleft.empty() || imgfront.empty() || imgright.empty() || imgback.empty())
           continue;
 
-        if (!use_crop_image) {
+        if (!use_crop_image)
+        {
           imgleft = imgleft.rowRange(kImageRow0, kImageRow1);
           imgfront = imgfront.rowRange(kImageRow0, kImageRow1);
           imgright = imgright.rowRange(kImageRow0, kImageRow1);
           imgback = imgback.rowRange(kImageRow0, kImageRow1);
         }
         Timer timer(" total cost ");
-        feature_mapper->TrackMultiCam(imgleft, imgfront, imgright, imgback,
-                                      frame_data.timestamp);
+        feature_mapper->TrackMultiCam(imgleft, imgfront, imgright, imgback, frame_data.timestamp);
         timer.Print();
-
-      } else if (dt == DataLoader::DATA_ODOM) {
+      }
+      else if (dt == DataLoader::DATA_ODOM)
+      {
         feature_mapper->InsertOdometry(odom_data.timestamp, odom_data.odometry);
-      } else {
+      }
+      else
+      {
         break;
       }
     }
 
-    if (kbhit()) {
+    if (kbhit())
+    {
       uchar ch = getchar();
-      if (ch == KEYCODE_ESC) {
+      if (ch == KEYCODE_ESC)
+      {
 
         break;
       }
@@ -176,11 +180,13 @@ int main(int argc, char **argv) {
   std::cout << kColorYellow << "Saving Maps " << kColorReset << std::endl;
 
   const std::string traj_file = "trajectory.txt";
-  if ((access("trajectory.txt", F_OK)) != -1) {
+  if ((access("trajectory.txt", F_OK)) != -1)
+  {
     feature_mapper->AlignMaptoTrajectory("trajectory.txt");
-  } else {
-    std::cout << kColorRed << " Can not find " << traj_file << kColorReset
-              << std::endl;
+  }
+  else
+  {
+    std::cout << kColorRed << " Can not find " << traj_file << kColorReset << std::endl;
   }
 
   feature_mapper->SaveMap("map_multicam.bin");
@@ -188,5 +194,5 @@ int main(int argc, char **argv) {
   std::this_thread::sleep_for(std::chrono::seconds(5));
   feature_mapper->Shutdown();
 
-  return 1;
+  return 0;
 }
