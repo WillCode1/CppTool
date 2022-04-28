@@ -1,3 +1,4 @@
+// Have read
 #include "avp_mapping_interface.h"
 #include "colordef.h"
 #include "dataloader.h"
@@ -21,6 +22,8 @@ const int kKeyCodeS = 115;
 const int kKeyCodeSpace = 32;
 const int kKeyCodeEsc = 0x1B;
 
+// AVP : Automated Valet Parking // 自动代客泊车
+// HPA : Home zone Parking Assistant // 家庭区域停车助理
 using namespace SemanticSLAM;
 
 struct DemoOption
