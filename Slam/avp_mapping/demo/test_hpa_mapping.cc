@@ -68,13 +68,9 @@ int kbhit(void)
 }
 
 DemoOption LoadInitOption(const std::string &filename);
-void LoadOdometry(const std::string &filename, std::queue<std::pair<uint64_t, WheelOdometry>> &odometry);
-void LoadImageLists(const std::string &filenanme, std::queue<std::pair<uint64_t, int>> &image_id);
 
-bool LoadImageFromFolder(cv::Mat &image_slot, cv::Mat &image_dash,
-                         cv::Mat &image_arrow, cv::Mat &image_lane,
-                         cv::Mat &image_raw, int image_id,
-                         const DemoOption &demo_option);
+bool LoadImageFromFolder(cv::Mat &image_slot, cv::Mat &image_dash, cv::Mat &image_arrow, cv::Mat &image_lane,
+                         cv::Mat &image_raw, int image_id, const DemoOption &demo_option);
 
 void SkipImage(int start_index, std::queue<std::pair<uint64_t, int>> &image_id)
 {
@@ -243,7 +239,7 @@ int main(int argc, char **argv)
   fout.close();
   std::cout << " Done " << std::endl;
 
-  return 1;
+  return 0;
 }
 
 DemoOption LoadInitOption(const std::string &filename)
@@ -292,56 +288,6 @@ DemoOption LoadInitOption(const std::string &filename)
   std::cout << " image height " << option.image_height << std::endl;
   settings.release();
   return option;
-}
-
-void LoadOdometry(const std::string &filename, std::queue<std::pair<uint64_t, WheelOdometry>> &odometry)
-{
-  std::ifstream fin;
-  fin.open(filename.c_str());
-  if (!fin.is_open())
-  {
-    std::cout << " open " << filename << " failed " << std::endl;
-    return;
-  }
-  std::string data;
-  std::getline(fin, data);
-  std::getline(fin, data);
-
-  while (!fin.eof())
-  {
-    uint64_t microsecond;
-    int seq;
-    uint64_t msg_time;
-    double x, y, z;
-    double qx, qy, qz, qw;
-
-    std::getline(fin, data);
-    sscanf(data.c_str(), "%ld,%d,%ld,map,%lf,%lf,%lf,%lf,%lf,%lf,%lf", &msg_time, &seq, &microsecond, &x, &y, &z, &qx, &qy, &qz, &qw);
-    odometry.push(std::make_pair(microsecond / 1000, WheelOdometry(x, y, z, qw, qx, qy, qz)));
-  }
-  fin.close();
-}
-void LoadImageLists(const std::string &filenanme, std::queue<std::pair<uint64_t, int>> &image_id)
-{
-  std::ifstream fin;
-  fin.open(filenanme.c_str());
-  if (!fin.is_open())
-  {
-    std::cout << " open  " << filenanme << " failed " << std::endl;
-    return;
-  }
-
-  std::string data;
-  std::getline(fin, data); // skip first line
-  while (!fin.eof())
-  {
-    int id;
-    uint64_t microsecond;
-    std::getline(fin, data);
-    sscanf(data.c_str(), "%d %ld", &id, &microsecond);
-    image_id.push(std::make_pair(microsecond, id));
-  }
-  fin.close();
 }
 
 bool LoadImageFromFolder(cv::Mat &image_slot, cv::Mat &image_dash,
