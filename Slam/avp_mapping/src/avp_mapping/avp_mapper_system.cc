@@ -67,7 +67,7 @@ namespace SemanticSLAM
   {
     if (remaps_.size() != 4)
     {
-      NM_ERROR("REMAP SIZE IF WRONG")
+      NM_ERROR("REMAP SIZE IS WRONG")
       std::cout << kColorRed << " REMAP SIZE IS WRONG " << kColorReset << std::endl;
     }
     return remaps_;
@@ -97,9 +97,9 @@ namespace SemanticSLAM
     const size_t bar_index = config.find_last_of('/');
     std::string str_data_path = config.substr(0, bar_index + 1);
 
+    // skill: c++11读取配置文件技巧
     cv::FileStorage fs(config, cv::FileStorage::READ);
-
-    cv::FileNode node_remap = fs["remap"];
+    cv::FileNode node_remap = fs["remap"];  // remap.yaml
 
     if (node_remap.empty())
     {
@@ -117,6 +117,8 @@ namespace SemanticSLAM
       std::cout << kColorRed << "REMAP FILE DOES NOT EXIST" << kColorReset << std::endl;
       return;
     }
+
+    // question: 这些都是什么矩阵，remap.yaml都是怎么生成的
     remaps_.push_back(std::make_pair(fs_remap["mapx_left"].mat(), fs_remap["mapy_left"].mat()));
     remaps_.push_back(std::make_pair(fs_remap["mapx_front"].mat(), fs_remap["mapy_front"].mat()));
     remaps_.push_back(std::make_pair(fs_remap["mapx_right"].mat(), fs_remap["mapy_right"].mat()));

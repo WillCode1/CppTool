@@ -43,7 +43,7 @@ namespace SemanticSLAM
 
   private:
     std::shared_ptr<HpaMap> hpa_map_;
-    std::vector<std::pair<cv::Mat, cv::Mat>> remaps_;
+    std::vector<std::pair<cv::Mat, cv::Mat>> remaps_;   // 全景重映射PanoramicRemap
     std::shared_ptr<BevTracker> tracker_;
     std::shared_ptr<MessageFilter> message_filter_;
   };

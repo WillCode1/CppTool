@@ -109,7 +109,6 @@ int main(int argc, char **argv)
   const int kTimeInterval = 1000 / kFps;
 
   DemoOption demo_option = LoadInitOption(argv[1]);
-
   DataLoader dataloader(DataLoader::NOT_ALIGNED);
 
   dataloader.SetOdometryFile(demo_option.str_odom);
@@ -137,7 +136,6 @@ int main(int argc, char **argv)
 
   while (true)
   {
-
     // Key control
     if (kbhit())
     {
@@ -180,7 +178,6 @@ int main(int argc, char **argv)
 
     if (data_type == DataLoader::DataType::DATA_IMAGE)
     {
-
       if (frame_data.id < demo_option.start_index)
         continue;
 
@@ -205,7 +202,6 @@ int main(int argc, char **argv)
       double mapping_duration = timer_mapping_duration.GetTimeConsuming();
 
 #ifdef ENABLE_VIEWER
-
       PlotViewer::GetInstance().UpdateData("total", timer_mapping_duration.GetTimeConsuming());
 
       if (avp_mapper_ptr->RemapImageRequired())
@@ -244,7 +240,6 @@ int main(int argc, char **argv)
 
 DemoOption LoadInitOption(const std::string &filename)
 {
-
   DemoOption option;
 
   cv::FileStorage settings(filename, cv::FileStorage::READ);
@@ -295,7 +290,6 @@ bool LoadImageFromFolder(cv::Mat &image_slot, cv::Mat &image_dash,
                          cv::Mat &image_raw, int image_id,
                          const DemoOption &demo_option)
 {
-
   std::string data_path = demo_option.str_image_folder;
 
   if (!demo_option.use_compress)

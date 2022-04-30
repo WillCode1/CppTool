@@ -97,15 +97,14 @@ DataLoader::DataType DataLoader::NextData(DataFrame &frame, OdometryData &odomet
   DataType dt(DATA_NONE);
   if (!image_list_.empty() && !odom_list_.empty())
   {
-    auto image_slice = image_list_.front();
-    auto odom_slice = odom_list_.front();
+    const auto& image_slice = image_list_.front();
+    const auto& odom_slice = odom_list_.front();
     auto odom_timestamp = odom_slice.first;
     auto image_timestamp = image_slice.first;
     if (image_timestamp < odom_timestamp)
     {
       frame = image_slice.second;
       image_list_.pop();
-
       dt = DATA_IMAGE;
     }
     else
@@ -138,7 +137,6 @@ void DataLoader::SkipImageData(int start_index)
 
 bool DataLoader::NextFrame(DataFrame &dataframe, OdometryData &odometry_data)
 {
-
   if (!image_list_.empty() && !odom_list_.empty())
   {
     auto image_slice = image_list_.front();

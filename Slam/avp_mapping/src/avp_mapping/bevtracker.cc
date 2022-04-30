@@ -59,10 +59,8 @@ namespace SemanticSLAM
 
   BevTracker::~BevTracker()
   {
-
 #ifdef ENABLE_VIEWER
     //  Shutdown viewer
-
     PlotViewer::GetInstance().RequestFinish();
     while (!PlotViewer::GetInstance().IsFinish())
     {
@@ -74,13 +72,11 @@ namespace SemanticSLAM
     {
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
-
 #endif
   }
 
   void BevTracker::Track()
   {
-
     if (state_ == TrackingState::NOT_INITIALIZED)
     {
       Initialize();
@@ -191,11 +187,8 @@ namespace SemanticSLAM
     return false;
   }
 
-  std::vector<Vec3_t> GetSemanticPoints(const CameraConfig &camera_config,
-                                        cv::InputArray image,
-                                        cv::InputArray mapping_mask,
-                                        const Mat33_t &trans_world2base,
-                                        unsigned int measurement_threshold)
+  std::vector<Vec3_t> GetSemanticPoints(const CameraConfig &camera_config, cv::InputArray image, cv::InputArray mapping_mask,
+                                        const Mat33_t &trans_world2base, unsigned int measurement_threshold)
   {
     cv::Mat mask = mapping_mask.getMat();
 
@@ -293,7 +286,6 @@ namespace SemanticSLAM
 
   void BevTracker::CreateMapMappoints()
   {
-
     Timer timer("create-map-points");
 
     auto camera_config = SystemConfig::GetSystemConfig()->GetCameraConfig();
@@ -339,7 +331,6 @@ namespace SemanticSLAM
 
   void BevTracker::LoadConfiguration(const std::string &config)
   {
-
     cv::FileStorage fsettings(config, cv::FileStorage::READ);
     if (!fsettings.isOpened())
     {
