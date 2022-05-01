@@ -15,7 +15,7 @@ namespace SemanticSLAM
     //  quadtree::Box<float> box;
     Eigen::Vector2f centroid;
     std::size_t id;
-    int measurement;
+    int measurement;  // question
   };
 
   class HpaMap

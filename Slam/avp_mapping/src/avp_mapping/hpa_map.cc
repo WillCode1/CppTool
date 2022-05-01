@@ -4,7 +4,6 @@
 
 namespace SemanticSLAM
 {
-
   HpaMap::HpaMap() : map_changed_(false)
   {
     quadtree::Box map_region = quadtree::Box(-100.0f, -100.0f, 300.0f, 300.0f);
@@ -259,7 +258,6 @@ namespace SemanticSLAM
     std::vector<PointTyped> semantic_points;
     for (auto &box : boxes)
     {
-
       if (box.prob_ < 0)
         continue;
       PointTyped p;
