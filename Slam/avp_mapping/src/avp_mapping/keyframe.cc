@@ -23,8 +23,7 @@ namespace SemanticSLAM
   std::vector<KeyFrame *> KeyFrame::GetConnectedKeyframes()
   {
     std::lock_guard<std::mutex> lock(mutex_connected_keyframe_);
-    std::vector<KeyFrame *> connected_keyframes(connected_keyframes_.begin(),
-                                                connected_keyframes_.end());
+    std::vector<KeyFrame *> connected_keyframes(connected_keyframes_.begin(), connected_keyframes_.end());
     return connected_keyframes;
   }
 
@@ -38,8 +37,7 @@ namespace SemanticSLAM
       connected_keyframes_.insert(keyframe);
   }
 
-  void KeyFrame::GenerateSemanticPoints(cv::InputArray image,
-                                        SemanticFeature type)
+  void KeyFrame::GenerateSemanticPoints(cv::InputArray image, SemanticFeature type)
   {
     const auto camera_config = SystemConfig::GetSystemConfig()->GetCameraConfig();
 

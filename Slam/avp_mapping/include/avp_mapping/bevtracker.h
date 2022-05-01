@@ -21,65 +21,68 @@
 #include "hpa_viewer.h"
 #include "plot_viewer.h"
 #endif
-namespace SemanticSLAM {
-class BevTracker {
-public:
-  BevTracker() = delete;
-  BevTracker(const std::string &config, const std::shared_ptr<HpaMap> &hpa_map);
+namespace SemanticSLAM
+{
+  class BevTracker
+  {
+  public:
+    BevTracker() = delete;
+    BevTracker(const std::string &config, const std::shared_ptr<HpaMap> &hpa_map);
 
-  bool GrabSegImages(uint64_t microsecond,
-                     std::vector<unsigned char *> seg_imgs, WheelOdometry odom,
-                     AVPPose &vehicle_pose);
-  void GenerateEnergyMat(std::vector<unsigned char *> imgs);
+    bool GrabSegImages(uint64_t microsecond,
+                       std::vector<unsigned char *> seg_imgs, WheelOdometry odom,
+                       AVPPose &vehicle_pose);
+    void GenerateEnergyMat(std::vector<unsigned char *> imgs);
 
-  ~BevTracker();
+    ~BevTracker();
 
-  void Track();
+    void Track();
 
-  void SetRawImage(cv::InputArray image);
+    void SetRawImage(cv::InputArray image);
 
-  void PredictPoseByOdom();
+    void PredictPoseByOdom();
 
-  bool NeedKeyFrame();
+    bool NeedKeyFrame();
 
-  void CreateNewKeyFrame();
+    void CreateNewKeyFrame();
 
-  void SaveTrajectory(const std::string &filename);
+    void SaveTrajectory(const std::string &filename);
 
-  void SaveOdometry(const std::string &filename);
+    void SaveOdometry(const std::string &filename);
 
-  void Reset();
+    void Reset();
 
-  void CreateMapMappoints();
+    void CreateMapMappoints();
 
-  bool RemapImageRequired();
+    bool RemapImageRequired();
 
-public:
-  enum class TrackingState {
-    NOT_INITIALIZED = -1,
-    OK = 0,
-    LOST = 1,
+  public:
+    enum class TrackingState
+    {
+      NOT_INITIALIZED = -1,
+      OK = 0,
+      LOST = 1,
+    };
+
+  private:
+    void LoadConfiguration(const std::string &config);
+    void Initialize();
+
+  private:
+    TrackingState state_;
+    std::shared_ptr<TrajectorySmoother> trajectory_smoother_;
+    std::shared_ptr<HpaMap> map_;
+    double trajectory_length_;
+    Frame current_frame_;
+    KeyFrame *ref_keyfm_;
+    Frame last_frame_;
+
+    // for demo visualization
+    cv::Mat image_raw_;
+    std::shared_ptr<AvpDistanceTransformer> avp_distance_transformer_;
+
+    std::shared_ptr<TrajectoryLog> odometry_log_;
+    std::shared_ptr<TrajectoryLog> trajectory_log_;
+    cv::Mat mapping_mask_;
   };
-
-private:
-  void LoadConfiguration(const std::string &config);
-  void Initialize();
-
-private:
-  TrackingState state_;
-  std::shared_ptr<TrajectorySmoother> trajectory_smoother_;
-  std::shared_ptr<HpaMap> map_;
-  double trajectory_length_;
-  Frame current_frame_;
-  KeyFrame *ref_keyfm_;
-  Frame last_frame_;
-
-  // for demo visualization
-  cv::Mat image_raw_;
-  std::shared_ptr<AvpDistanceTransformer> avp_distance_transformer_;
-
-  std::shared_ptr<TrajectoryLog> odometry_log_;
-  std::shared_ptr<TrajectoryLog> trajectory_log_;
-  cv::Mat mapping_mask_;
-};
 }
