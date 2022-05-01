@@ -8,11 +8,11 @@ namespace SemanticSLAM
     LoadConfiguration(config);
 
     // image_resolution   width x height
-
     auto image_resolution = SystemConfig::GetSystemConfig()->GetImageSize();
     auto image_width = image_resolution.first;
     auto image_height = image_resolution.second;
     avp_distance_transformer_ = std::make_shared<AvpDistanceTransformer>(image_height, image_width);
+
 #ifdef ENABLE_VIEWER
     std::shared_ptr<std::thread> viewer_thread = std::make_shared<std::thread>(&HpaViewer::Run, &HpaViewer::GetInstance(image_resolution.first, image_resolution.second));
     viewer_thread->detach();
@@ -25,7 +25,6 @@ namespace SemanticSLAM
 
     std::shared_ptr<std::thread> plot_viewer_thread = std::make_shared<std::thread>(&PlotViewer::Run, &PlotViewer::GetInstance());
     plot_viewer_thread->detach();
-
 #endif
 
     trajectory_smoother_ = std::make_shared<TrajectorySmoother>(1, 1, 0.1);
@@ -145,7 +144,6 @@ namespace SemanticSLAM
     std::vector<KeyFrame *> connected_keyframes = ref_keyfm_->GetConnectedKeyframes();
 
     // find closest keyframe
-
     KeyFrame *closest_keyframe = nullptr;
     double min_distance = 1e10;
     for (auto kf : connected_keyframes)

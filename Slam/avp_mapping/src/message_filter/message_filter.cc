@@ -3,9 +3,8 @@
 #include <iostream>
 
 MessageFilter::MessageFilter(const float gps_frequency, const float odom_frequency)
-    : max_message_count_(100)
+    : max_message_count_(100), interval_time_(40000)
 {
-  interval_time_ = 40000;
 }
 
 MessageFilter::~MessageFilter() {}
