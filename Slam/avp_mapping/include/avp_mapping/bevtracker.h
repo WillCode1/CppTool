@@ -83,6 +83,6 @@ namespace SemanticSLAM
 
     std::shared_ptr<TrajectoryLog> odometry_log_;
     std::shared_ptr<TrajectoryLog> trajectory_log_;
-    cv::Mat mapping_mask_;  // ./mask/mask.bmp
+    cv::Mat mapping_mask_;  // ./mask/mask.bmp, 车身mask
   };
 }
