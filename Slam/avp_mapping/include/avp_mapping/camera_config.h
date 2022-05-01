@@ -11,6 +11,7 @@ struct CameraIntrinsic {
 };
 
 struct CameraExtrinsic {
+  // question
   double scale;
   double baselink2cam;
   double camera_height;

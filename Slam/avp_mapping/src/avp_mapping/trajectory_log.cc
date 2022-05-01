@@ -2,7 +2,6 @@
 #include "colordef.h"
 
 namespace SemanticSLAM {
-
 /**
  * Export TUM or Kitti Format Trajectory
  *

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "box.h"
 #include "keyframe.h"
 #include "quadtree.h"
@@ -9,6 +8,7 @@
 
 namespace SemanticSLAM
 {
+  // map point
   struct Node
   {
     int label;
@@ -37,8 +37,7 @@ namespace SemanticSLAM
     std::vector<PointTyped> GetSemanticPoints();
 
   private:
-    void SaveBox(std::ofstream &fout, const quadtree::Box &box, const int prob,
-                 const int label);
+    void SaveBox(std::ofstream &fout, const quadtree::Box &box, const int prob, const int label);
     void WriteKeyframe(std::ofstream &fout, KeyFrame *kf);
     void SaveQuadtreeMap(std::ofstream &fout);
     void SaveKeyframeMap(std::ofstream &fout);

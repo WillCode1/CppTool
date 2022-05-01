@@ -236,10 +236,8 @@ unsigned int Initializer::CheckPose(const Mat44_t &ref_pose,
 }
 
 bool Initializer::IsVehicleMoved(const Mat44_t cur_odom) {
-
   // check the vehicle is moving or not
-  double odom_distance =
-      hypot(ref_odom_(0, 3) - cur_odom(0, 3), ref_odom_(1, 3) - cur_odom(1, 3));
+  double odom_distance = hypot(ref_odom_(0, 3) - cur_odom(0, 3), ref_odom_(1, 3) - cur_odom(1, 3));
 
   if (odom_distance < 0.3) {
     return false;

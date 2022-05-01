@@ -39,6 +39,6 @@ public:
   std::mutex mutex_connected_keyframe_;
   std::set<KeyFrame *> connected_keyframes_;
   int id_;
-  Mat33_t trans_world2base_;
+  Mat33_t trans_world2base_;  // current keyframe pose
 };
 }

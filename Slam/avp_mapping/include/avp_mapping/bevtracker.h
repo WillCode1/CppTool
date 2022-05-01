@@ -1,5 +1,4 @@
 #pragma once
-
 #include "camera_config.h"
 #include "colordef.h"
 #include "feature/avp_distance_transform.h"
@@ -21,6 +20,7 @@
 #include "hpa_viewer.h"
 #include "plot_viewer.h"
 #endif
+
 namespace SemanticSLAM
 {
   class BevTracker
@@ -29,9 +29,9 @@ namespace SemanticSLAM
     BevTracker() = delete;
     BevTracker(const std::string &config, const std::shared_ptr<HpaMap> &hpa_map);
 
-    bool GrabSegImages(uint64_t microsecond,
-                       std::vector<unsigned char *> seg_imgs, WheelOdometry odom,
-                       AVPPose &vehicle_pose);
+    bool GrabSegImages(uint64_t microsecond, std::vector<unsigned char *> seg_imgs,
+                       const WheelOdometry& odom, AVPPose &vehicle_pose);
+
     void GenerateEnergyMat(std::vector<unsigned char *> imgs);
 
     ~BevTracker();
@@ -52,7 +52,7 @@ namespace SemanticSLAM
 
     void Reset();
 
-    void CreateMapMappoints();
+    void CreateNewMappoints();
 
     bool RemapImageRequired();
 
@@ -74,8 +74,8 @@ namespace SemanticSLAM
     std::shared_ptr<HpaMap> map_;
     double trajectory_length_;
     Frame current_frame_;
-    KeyFrame *ref_keyfm_;
     Frame last_frame_;
+    KeyFrame *ref_keyfm_;
 
     // for demo visualization
     cv::Mat image_raw_;
@@ -83,6 +83,6 @@ namespace SemanticSLAM
 
     std::shared_ptr<TrajectoryLog> odometry_log_;
     std::shared_ptr<TrajectoryLog> trajectory_log_;
-    cv::Mat mapping_mask_;
+    cv::Mat mapping_mask_;  // ./mask/mask.bmp
   };
 }

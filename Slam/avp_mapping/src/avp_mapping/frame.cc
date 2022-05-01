@@ -2,6 +2,7 @@
 namespace SemanticSLAM
 {
   int Frame::next_id_ = 0;
+
   Frame::Frame() : visual_loc_confidence_(100)
   {
     trans_world2base_ = Mat33_t::Identity();

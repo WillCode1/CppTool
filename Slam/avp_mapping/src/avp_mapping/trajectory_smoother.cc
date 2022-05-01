@@ -71,12 +71,10 @@ namespace SemanticSLAM
 
     //  optimizer.setVerbose(true);
 
-    g2o::VertexSE2 *v =
-        static_cast<g2o::VertexSE2 *>(optimizer_->vertex(current_id_));
+    g2o::VertexSE2 *v = static_cast<g2o::VertexSE2 *>(optimizer_->vertex(current_id_));
     Vec3_t pose = v->estimate().toVector();
 
-    NM_DEBUG(" trajectory smooth  x : {} {}\n", frame->trans_world2base_(0, 2),
-             frame->trans_world2base_(1, 2));
+    NM_DEBUG(" trajectory smooth  x : {} {}\n", frame->trans_world2base_(0, 2), frame->trans_world2base_(1, 2));
     NM_DEBUG(" after  : {} {}\n ", pose.x(), pose.y());
 
     frame->trans_world2base_ = Utils::Se2Vector2Matrix(pose);
@@ -124,7 +122,6 @@ namespace SemanticSLAM
 
   void TrajectorySmoother::InsertVisualLocPriorEdge(Frame *frame)
   {
-
     //  Mat33_t prior_information;
     //  prior_information << 1, 0, 0, 0, 1, 0, 0, 0, 20;
 

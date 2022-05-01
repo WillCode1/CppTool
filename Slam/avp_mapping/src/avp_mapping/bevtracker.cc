@@ -1,5 +1,6 @@
 #include "bevtracker.h"
 #include "timer.h"
+
 namespace SemanticSLAM
 {
   BevTracker::BevTracker(const std::string &config, const std::shared_ptr<HpaMap> &hpa_map)
@@ -34,7 +35,7 @@ namespace SemanticSLAM
     trajectory_log_ = std::make_shared<TrajectoryLog>("", TrajectoryLog::Format::NULLMAX);
   }
 
-  bool BevTracker::GrabSegImages(uint64_t microsecond, std::vector<unsigned char *> seg_imgs, WheelOdometry odom, AVPPose &vehicle_pose)
+  bool BevTracker::GrabSegImages(uint64_t microsecond, std::vector<unsigned char *> seg_imgs, const WheelOdometry& odom, AVPPose &vehicle_pose)
   {
     // generate energy mat
     current_frame_ = Frame(odom, current_frame_);
@@ -82,7 +83,7 @@ namespace SemanticSLAM
     }
     else
     {
-      // predict current  pose by odometry ;
+      // predict current  pose by odometry
       auto camera_config = SystemConfig::GetSystemConfig()->GetCameraConfig();
       PredictPoseByOdom();
 
@@ -92,11 +93,13 @@ namespace SemanticSLAM
         Optimizer::GetInstance().OptimizeFramePose(ref_keyfm_, current_frame_, camera_config);
       }
     }
+
     trajectory_smoother_->Smoother(&current_frame_);
+
     if (NeedKeyFrame())
     {
       CreateNewKeyFrame();
-      CreateMapMappoints();
+      CreateNewMappoints();
     }
 
 #ifdef ENABLE_VIEWER
@@ -136,7 +139,7 @@ namespace SemanticSLAM
     }
 
     // condition 1
-    // if there is no  reference keyframe
+    // if there is no reference keyframe
     if (ref_keyfm_ == nullptr)
       return true;
 
@@ -160,7 +163,6 @@ namespace SemanticSLAM
 
     // condition 2
     // the the distance of closet keyframe is larger than the threshold
-
     if (min_distance < 3.5 && ref_keyfm_ != closest_keyframe)
     {
       ref_keyfm_ = closest_keyframe;
@@ -169,7 +171,6 @@ namespace SemanticSLAM
 
     // condition 3
     // the output of perception is not enough
-
     if (current_frame_.edge_size_ < 100)
       return true;
 
@@ -201,7 +202,6 @@ namespace SemanticSLAM
 
     for (int i = 0; i < img.rows; i++)
     {
-
       const unsigned char *pt = img.ptr<uchar>(i);
 
       for (int j = 0; j < img.cols; j++)
@@ -282,33 +282,21 @@ namespace SemanticSLAM
     trajectory_smoother_->Reset();
   }
 
-  void BevTracker::CreateMapMappoints()
+  void BevTracker::CreateNewMappoints()
   {
     Timer timer("create-map-points");
-
     auto camera_config = SystemConfig::GetSystemConfig()->GetCameraConfig();
-
     auto trans_world2base = current_frame_.trans_world2base_;
 
     const unsigned int map_prob_min_slot = SystemConfig::GetSystemConfig()->map_prob_min_slot_;
-    const unsigned int map_prob_min_dash_ = SystemConfig::GetSystemConfig()->map_prob_min_dash_;
+    const unsigned int map_prob_min_dash = SystemConfig::GetSystemConfig()->map_prob_min_dash_;
     const unsigned int map_prob_min_arrow = SystemConfig::GetSystemConfig()->map_prob_min_arrow_;
-    const unsigned int map_prob_min_lane = SystemConfig::GetSystemConfig()->map_prob_min_dash_;
+    const unsigned int map_prob_min_lane = SystemConfig::GetSystemConfig()->map_prob_min_lane_;
 
-    std::vector<Vec3_t> slot_points =
-        GetSemanticPoints(camera_config, current_frame_.image_slot_,
-                          mapping_mask_, trans_world2base, map_prob_min_slot);
-    std::vector<Vec3_t> dash_points =
-        GetSemanticPoints(camera_config, current_frame_.image_dash_,
-                          mapping_mask_, trans_world2base, map_prob_min_dash_);
-
-    std::vector<Vec3_t> lane_points =
-        GetSemanticPoints(camera_config, current_frame_.image_lane_,
-                          mapping_mask_, trans_world2base, map_prob_min_lane);
-
-    std::vector<Vec3_t> arrow_points =
-        GetSemanticPoints(camera_config, current_frame_.image_arrow_,
-                          mapping_mask_, trans_world2base, map_prob_min_arrow);
+    std::vector<Vec3_t> slot_points = GetSemanticPoints(camera_config, current_frame_.image_slot_, mapping_mask_, trans_world2base, map_prob_min_slot);
+    std::vector<Vec3_t> dash_points = GetSemanticPoints(camera_config, current_frame_.image_dash_, mapping_mask_, trans_world2base, map_prob_min_dash);
+    std::vector<Vec3_t> arrow_points = GetSemanticPoints(camera_config, current_frame_.image_arrow_, mapping_mask_, trans_world2base, map_prob_min_arrow);
+    std::vector<Vec3_t> lane_points = GetSemanticPoints(camera_config, current_frame_.image_lane_, mapping_mask_, trans_world2base, map_prob_min_lane);
 
     map_->AddSlotPoints(slot_points);
     map_->AddDashPoints(dash_points);
@@ -342,9 +330,10 @@ namespace SemanticSLAM
     const std::string str_mask = fsettings["mask"];
     mapping_mask_ = cv::imread(str_data_path + str_mask, cv::IMREAD_GRAYSCALE);
 
+    // question: 为什么是这个形状
     if (mapping_mask_.empty())
     {
-      std::cout << " fatal error  mask is empty " << std::endl;
+      std::cout << " fatal error mask is empty " << std::endl;
       exit(0);
     }
     // load sysytem config
@@ -357,7 +346,7 @@ namespace SemanticSLAM
     // Fix the first frame to the origin;
     current_frame_.trans_world2base_ = Mat33_t::Identity();
     CreateNewKeyFrame();
-    CreateMapMappoints();
+    CreateNewMappoints();
     state_ = TrackingState::OK;
   }
 
@@ -366,12 +355,12 @@ namespace SemanticSLAM
     // segmentation images : parking slot, dash, arrow, lane.
     if (imgs.size() != 4)
     {
-      std::cout << kColorRed << " Input Segementation Image Size != 4"
-                << kColorReset << std::endl;
-      NM_ERROR(" Input Segementation Image Size !=  4 ");
+      std::cout << kColorRed << " Input Segementation Image Size != 4" << kColorReset << std::endl;
+      NM_ERROR(" Input Segementation Image Size != 4 ");
       return;
     }
 
+    // question: what's EnergyMat?
     Timer timer("distance_tranform");
     avp_distance_transformer_->DistranceTransform(imgs[0], current_frame_.image_slot_.data);
     avp_distance_transformer_->DistranceTransform(imgs[1], current_frame_.image_dash_.data);

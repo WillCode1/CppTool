@@ -82,11 +82,8 @@ namespace SemanticSLAM
   /***
    *  optimize current frame pose relative to ref keyframe
    */
-  bool Optimizer::OptimizeFramePose(KeyFrame *last_keyframe, Frame &current_frame,
-
-                                    const CameraConfig &camera_config)
+  bool Optimizer::OptimizeFramePose(KeyFrame *last_keyframe, Frame &current_frame, const CameraConfig &camera_config)
   {
-
     ResetResource();
 
     Mat33_t current_pose = current_frame.trans_world2base_;
@@ -95,8 +92,7 @@ namespace SemanticSLAM
     Mat33_t trans_lc = last_pose.inverse() * current_pose;
     Vec3_t trans_lc_vector = Utils::Se2Matrix2Vector(trans_lc);
     vse2_->setId(0);
-    vse2_->setEstimate(
-        g2o::SE2(trans_lc_vector.x(), trans_lc_vector.y(), trans_lc_vector.z()));
+    vse2_->setEstimate(g2o::SE2(trans_lc_vector.x(), trans_lc_vector.y(), trans_lc_vector.z()));
     optimizer_->addVertex(vse2_);
 
     const double baselink2cam = camera_config.cam_extrinsic.baselink2cam;
@@ -107,8 +103,7 @@ namespace SemanticSLAM
     const double cx = camera_config.cam_intrinsic.cx;
     const double cy = camera_config.cam_intrinsic.cy;
 
-    g2o::CameraParameters *cam_param =
-        new g2o::CameraParameters(fx, fy, Eigen::Vector2d(cx, cy));
+    g2o::CameraParameters *cam_param = new g2o::CameraParameters(fx, fy, Eigen::Vector2d(cx, cy));
 
     Timer timer("optimization");
 
@@ -167,24 +162,19 @@ namespace SemanticSLAM
 
     Vec3_t optimized_tlc = vse2_->estimate().toVector();
     // update pose
-    current_frame.trans_world2base_ =
-        last_pose * Utils::Se2Vector2Matrix(optimized_tlc);
+    current_frame.trans_world2base_ = last_pose * Utils::Se2Vector2Matrix(optimized_tlc);
 
 #ifdef ENABLE_VIEWER
-
-    PlotViewer::GetInstance().UpdateData("optimization",
-                                         timer.GetTimeConsuming());
+    PlotViewer::GetInstance().UpdateData("optimization", timer.GetTimeConsuming());
     cv::Mat image_current_frame = current_frame.image_slot_.clone();
     cv::cvtColor(image_current_frame, image_current_frame, cv::COLOR_GRAY2BGR);
 
     cv::Scalar color1(255, 156, 0);
     cv::Scalar color2(0, 255, 112);
     // Draw projection before optimization
-    DrawProjection(image_current_frame, trans_lc_vector, keyframe_points,
-                   camera_config, color1);
+    DrawProjection(image_current_frame, trans_lc_vector, keyframe_points, camera_config, color1);
     // Draw projection after optimization
-    DrawProjection(image_current_frame, optimized_tlc, keyframe_points,
-                   camera_config, color2);
+    DrawProjection(image_current_frame, optimized_tlc, keyframe_points, camera_config, color2);
 
     cv::putText(image_current_frame, "before optimization ",
                 cv::Point(10, image_current_frame.rows - 50),

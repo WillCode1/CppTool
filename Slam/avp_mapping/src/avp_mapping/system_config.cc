@@ -8,9 +8,9 @@ namespace SemanticSLAM
   SystemConfig::SystemConfig()
       : map_max_length_(0), use_vision_opt_(true), feature_map_length_(30) {}
   SystemConfig::~SystemConfig() {}
+
   bool SystemConfig::Initialization(cv::FileStorage &fsettings)
   {
-
     map_prob_min_slot_ = fsettings["map_prob_min_slot"].real();
     map_prob_min_dash_ = fsettings["map_prob_min_dash"].real();
     map_prob_min_lane_ = fsettings["map_prob_min_lane"].real();
@@ -18,8 +18,7 @@ namespace SemanticSLAM
 
     map_max_length_ = fsettings["map_max_length"].real();
 
-    // if there is no map_max_length is set or map_max_length is invalid ,  use
-    // default setting
+    // if there is no map_max_length is set or map_max_length is invalid, use default setting
     if (map_max_length_ < 1e-10)
     {
       map_max_length_ = 100;
@@ -38,28 +37,20 @@ namespace SemanticSLAM
       feature_map_length_ = fsettings["feature_map_length"];
       if (feature_map_length_ < 1e-10)
       {
-        std::cout << kColorRed << " Feature map lenght invalid" << kColorReset
-                  << std::endl;
+        std::cout << kColorRed << " Feature map lenght invalid" << kColorReset << std::endl;
         feature_map_length_ = 30.0;
       }
     }
 
-    std::cout << " use vision optimization " << kColorGreen << use_vision_opt_
-              << kColorReset << std::endl;
+    std::cout << " use vision optimization " << kColorGreen << use_vision_opt_ << kColorReset << std::endl;
 
-    std::cout << " map_prob_min_slot " << kColorGreen << map_prob_min_slot_
-              << kColorReset << std::endl;
-    std::cout << " map_prob_min_dash " << kColorGreen << map_prob_min_dash_
-              << kColorReset << std::endl;
-    std::cout << " map_prob_min_arrow " << kColorGreen << map_prob_min_arrow_
-              << kColorReset << std::endl;
-    std::cout << " map_prob_min_lane " << kColorGreen << map_prob_min_lane_
-              << kColorReset << std::endl;
-    std::cout << " map_max_length : " << kColorGreen << map_max_length_
-              << kColorReset << std::endl;
+    std::cout << " map_prob_min_slot " << kColorGreen << map_prob_min_slot_ << kColorReset << std::endl;
+    std::cout << " map_prob_min_dash " << kColorGreen << map_prob_min_dash_ << kColorReset << std::endl;
+    std::cout << " map_prob_min_arrow " << kColorGreen << map_prob_min_arrow_ << kColorReset << std::endl;
+    std::cout << " map_prob_min_lane " << kColorGreen << map_prob_min_lane_ << kColorReset << std::endl;
+    std::cout << " map_max_length : " << kColorGreen << map_max_length_ << kColorReset << std::endl;
 
-    std::cout << " feature_map_length : " << kColorGreen << feature_map_length_
-              << kColorReset << std::endl;
+    std::cout << " feature_map_length : " << kColorGreen << feature_map_length_ << kColorReset << std::endl;
 
     // intialize camera config ;
     auto &cam_intrinsic = camera_config_.cam_intrinsic;
@@ -78,7 +69,6 @@ namespace SemanticSLAM
     cam_extrinsic.camera_height = 4.0;
 
     // intialize vehicle body mask
-
     vehiclebodymask_.top = 125;
     vehiclebodymask_.left = 176;
     vehiclebodymask_.width = (243 - 176);

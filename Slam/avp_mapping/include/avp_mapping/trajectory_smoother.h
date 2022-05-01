@@ -21,43 +21,44 @@
 #include "log.h"
 #include "utils.h"
 
-namespace SemanticSLAM {
+namespace SemanticSLAM
+{
+  // question: 什么功能
+  class TrajectorySmoother
+  {
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  public:
+    TrajectorySmoother() = delete;
+    TrajectorySmoother(double odom_x_sigma, double odom_y_sigma, double odom_theta_sigma);
+    ~TrajectorySmoother();
+    bool Smoother(Frame *frame);
+    void Reset();
+    bool ScaleOdometrySigma(double scale);
 
-class TrajectorySmoother {
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-public:
-  TrajectorySmoother() = delete;
-  TrajectorySmoother(double odom_x_sigma, double odom_y_sigma,
-                     double odom_theta_sigma);
-  ~TrajectorySmoother();
-  bool Smoother(Frame *frame);
-  void Reset();
-  bool ScaleOdometrySigma(double scale);
+  private:
+    void InsertNewVertex(Frame *frame);
+    void InsertVisualLocPriorEdge(Frame *frame);
+    void InsertOdometryEdge(Frame *frame);
+    void RemoveFrontestData();
+    bool NeedFuse(Frame *frame);
+    void OptimizeNormalFrame(Frame *frame);
 
-private:
-  void InsertNewVertex(Frame *frame);
-  void InsertVisualLocPriorEdge(Frame *frame);
-  void InsertOdometryEdge(Frame *frame);
-  void RemoveFrontestData();
-  bool NeedFuse(Frame *frame);
-  void OptimizeNormalFrame(Frame *frame);
+  private:
+    int current_id_;
 
-private:
-  int current_id_;
+    double odom_x_sigma_;
+    double odom_y_sigma_;
+    double odom_theta_sigma_;
 
-  double odom_x_sigma_;
-  double odom_y_sigma_;
-  double odom_theta_sigma_;
+    std::shared_ptr<g2o::SparseOptimizer> optimizer_;
+    g2o::BlockSolverX::LinearSolverType *linearsolver_;
+    g2o::BlockSolverX *solverptr_;
+    g2o::OptimizationAlgorithmLevenberg *solver_;
 
-  std::shared_ptr<g2o::SparseOptimizer> optimizer_;
-  g2o::BlockSolverX::LinearSolverType *linearsolver_;
-  g2o::BlockSolverX *solverptr_;
-  g2o::OptimizationAlgorithmLevenberg *solver_;
-
-  Eigen::Vector3d last_odometry_;
-  std::queue<g2o::VertexSE2 *> vertex_queue_;
-  std::queue<g2o::EdgeSE2 *> edge_se2_queue_;
-  std::queue<g2o::EdgeSE2PosePrior *> edge_se2_prior_queue_;
-  size_t max_vertex_;
-};
+    Eigen::Vector3d last_odometry_;
+    std::queue<g2o::VertexSE2 *> vertex_queue_;
+    std::queue<g2o::EdgeSE2 *> edge_se2_queue_;
+    std::queue<g2o::EdgeSE2PosePrior *> edge_se2_prior_queue_;
+    size_t max_vertex_;
+  };
 }

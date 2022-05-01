@@ -2,9 +2,9 @@
 #include "interface/avp_mapping_interface.h"
 #include <memory>
 #include <string>
-
 #include "bevtracker.h"
 #include "message_filter/message_filter.h"
+
 namespace SemanticSLAM
 {
   class AvpMapperSystem : public AvpMapper
