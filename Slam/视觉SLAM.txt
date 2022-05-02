@@ -1,4 +1,6 @@
 岗位职责主要是：框架搭建、算法优化、场景优化。
+环境重建、定位融合、自动标定系统。
+lidar：点云滤波、聚类、3d目标检测、分割、跟踪
 
 缩小图像：下采样（subsampled）或降采样（downsampled）
 放大图像：上采样（upsampling）或图像插值（interpolating）
@@ -19,7 +21,8 @@ cv::Mat Mat::colRange(int startrow, int endrow) const;
 
 cv::findChessboardCorners
 cv::goodFeaturesToTrack: https://blog.csdn.net/guduruyu/article/details/69537083
-cv::cornerSubPix：角点亚像素精确化
+cv::cornerSubPix
+--->角点亚像素精确化，精确到小数
 
 cv::calibrateCamera(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs, flags)
 --->从一个校准模式的几个视图中找到相机的内参和外参。

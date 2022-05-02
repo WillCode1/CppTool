@@ -1,7 +1,9 @@
+// Have read
 #include "hpa_map.h"
 #include "colordef.h"
 #include "log.h"
 
+// question: load map 在哪?
 namespace SemanticSLAM
 {
   HpaMap::HpaMap() : map_changed_(false)
@@ -131,8 +133,7 @@ namespace SemanticSLAM
     }
   }
 
-  void HpaMap::SaveBox(std::ofstream &fout, const quadtree::Box &box,
-                       const int prob, const int label)
+  void HpaMap::SaveBox(std::ofstream &fout, const quadtree::Box &box, const int prob, const int label)
   {
     auto tl = box.GetTopLeft();
     auto size = box.getSize();
@@ -195,7 +196,6 @@ namespace SemanticSLAM
     const int id = kf->id_;
     fout.write((char *)&id, sizeof(int));
     // write pose
-
     Mat33_t trans_world2base = kf->trans_world2base_;
     double tx = trans_world2base(0, 2);
     double ty = trans_world2base(1, 2);
@@ -205,10 +205,11 @@ namespace SemanticSLAM
     fout.write((char *)&ty, sizeof(double));
     fout.write((char *)&theta, sizeof(double));
 
+    // question: arrow_points_这个不用保存?
+
     // save slot point
     int slot_point_num = kf->slot_point_num_;
     fout.write((char *)&slot_point_num, sizeof(int));
-
     for (auto &p : kf->slot_points_)
     {
       fout.write((char *)&p.u, sizeof(p.u));
@@ -219,10 +220,8 @@ namespace SemanticSLAM
     }
 
     // save dash point
-
     int dash_point_num = kf->dash_point_num_;
     fout.write((char *)&dash_point_num, sizeof(int));
-
     for (auto &p : kf->dash_points_)
     {
       fout.write((char *)&p.u, sizeof(p.u));

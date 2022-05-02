@@ -67,8 +67,8 @@ namespace quadtree
   {
   public:
     SemanticBox(const Box &box, int label, int prob)
-        : box_(box), label_(label), prob_(prob){};
-    ~SemanticBox(){};
+        : box_(box), label_(label), prob_(prob){}
+    ~SemanticBox(){}
     Box box_;
     int label_;
     int prob_;

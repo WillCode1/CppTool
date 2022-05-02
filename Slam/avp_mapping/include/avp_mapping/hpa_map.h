@@ -45,8 +45,8 @@ namespace SemanticSLAM
   private:
     bool map_changed_;
     std::mutex mutex_map_;
-    std::unique_ptr<quadtree::Quadtree<SemanticSLAM::Node *>> quadtree_;
     std::mutex mutex_keyframe_;
     std::vector<KeyFrame *> keyframes_;
+    std::unique_ptr<quadtree::Quadtree<SemanticSLAM::Node *>> quadtree_;
   };
 }

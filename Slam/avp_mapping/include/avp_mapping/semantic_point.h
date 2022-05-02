@@ -1,7 +1,7 @@
 #pragma once
 namespace SemanticSLAM {
 struct SemanticPoint {
-  int u;
+  int u;    // question: 4个参数含义
   int v;
   float x;
   float y;

@@ -11,11 +11,9 @@
 
 namespace quadtree
 {
-
   template <typename T>
   class Quadtree
   {
-
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     Quadtree(const Box &box) : box_(box), root_(std::unique_ptr<Node>(new Node))
@@ -45,7 +43,7 @@ namespace quadtree
       Box box;
       int prob;
       int label;
-      bool sent;
+      bool sent; // 用于标记是否已经发送，并用于显示
       Node() : prob(-1), label(-1), sent(false) {}
     };
 
@@ -102,12 +100,10 @@ namespace quadtree
         return Box(origin, child_size);
       // Norst East
       case 1:
-        return Box(Eigen::Vector2f(origin.x() + child_size.x(), origin.y()),
-                   child_size);
+        return Box(Eigen::Vector2f(origin.x() + child_size.x(), origin.y()), child_size);
       // South West
       case 2:
-        return Box(Eigen::Vector2f(origin.x(), origin.y() + child_size.y()),
-                   child_size);
+        return Box(Eigen::Vector2f(origin.x(), origin.y() + child_size.y()), child_size);
       // South East
       case 3:
         return Box(origin + child_size, child_size);
@@ -155,20 +151,15 @@ namespace quadtree
     {
       assert(node != nullptr);
       if (!box.Contains(value->centroid))
-
         return;
 
       // assert(box.contains(value->centroid));
-
       if (IsLeaf(node))
       {
-
         // Insert the value in this node if possible
         if (depth >= MaxDepth)
         {
-
           // the final leave
-
           if (node->label == value->label)
             node->prob += value->measurement;
           else
@@ -196,7 +187,7 @@ namespace quadtree
         else
         {
           // this would not happen is this case
-          //        node->values.push_back(value);
+          // node->values.push_back(value);
         }
       }
     }
