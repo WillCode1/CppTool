@@ -12,3 +12,4 @@
 --->kdtree.nearestKSearch();
 --->kdtree.radiusSearch();
 
+lidar：点云滤波、聚类、3d目标检测、分割、跟踪
