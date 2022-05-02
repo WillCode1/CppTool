@@ -16,7 +16,7 @@ namespace SemanticSLAM
     // Generate semantic point for localization  ;
     GenerateSemanticPoints(f.image_slot_, PARKING_SLOT);
     GenerateSemanticPoints(f.image_dash_, DASH);
-    //  GenerateSemanticPoints( f.image_arrow_,ARROW );
+    // GenerateSemanticPoints(f.image_arrow_, ARROW);
     GenerateSemanticPoints(f.image_lane_, LANE);
   }
 
@@ -48,10 +48,10 @@ namespace SemanticSLAM
     double scale = camera_config_.cam_extrinsic.scale;
     double baselink2cam = camera_config_.cam_extrinsic.baselink2cam;
 
-    //  Too Sparse, need better strategy ????
-
+    // Too Sparse, need better strategy ????
     std::vector<SemanticPoint> smt_points;
 
+    // question: BevTracker::GetSemanticPoints
     for (int i = 0; i < prob_image.rows; i = i + 3)
     {
       const unsigned char *pt = prob_image.ptr<uchar>(i);

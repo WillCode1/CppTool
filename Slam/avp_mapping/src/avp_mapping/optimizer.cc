@@ -24,11 +24,9 @@ namespace SemanticSLAM
       instance = new Optimizer();
       instance->optimizer_ = new g2o::SparseOptimizer;
       g2o::BlockSolverX::LinearSolverType *linearsolver;
-      linearsolver =
-          new g2o::LinearSolverDense<g2o::BlockSolverX::PoseMatrixType>();
+      linearsolver = new g2o::LinearSolverDense<g2o::BlockSolverX::PoseMatrixType>();
       g2o::BlockSolverX *solver_ptr = new g2o::BlockSolverX(linearsolver);
-      g2o::OptimizationAlgorithmLevenberg *solver =
-          new g2o::OptimizationAlgorithmLevenberg(solver_ptr);
+      g2o::OptimizationAlgorithmLevenberg *solver = new g2o::OptimizationAlgorithmLevenberg(solver_ptr);
       instance->optimizer_->setAlgorithm(solver);
       std::unordered_map<g2o::EdgeSE2SemanticProject *, bool> empty_list;
       instance->edge_resources_ = empty_list;
@@ -39,11 +37,9 @@ namespace SemanticSLAM
   }
 
   void DrawProjection(cv::InputArray im, const Vec3_t &trans_tc_vector,
-                      const std::vector<Vec3_t> &points,
-                      const CameraConfig &camera_config,
+                      const std::vector<Vec3_t> &points, const CameraConfig &camera_config,
                       const cv::Scalar &color)
   {
-
     const double baselink2cam = camera_config.cam_extrinsic.baselink2cam;
     const double cam_height_ = camera_config.cam_extrinsic.camera_height;
     cv::Mat image = im.getMat();
@@ -55,25 +51,19 @@ namespace SemanticSLAM
 
     for (auto p : points)
     {
-
       p.z() = 1;
       double theta = trans_tc_vector.z();
-      double inv_x =
-          -cos(theta) * trans_tc_vector.x() - sin(theta) * trans_tc_vector.y();
-      double inv_y =
-          sin(theta) * trans_tc_vector.x() - cos(theta) * trans_tc_vector.y();
+      double inv_x = -cos(theta) * trans_tc_vector.x() - sin(theta) * trans_tc_vector.y();
+      double inv_y = sin(theta) * trans_tc_vector.x() - cos(theta) * trans_tc_vector.y();
       double inv_theta = -theta;
 
       Mat33_t trans_ct;
-      trans_ct << cos(inv_theta), -sin(inv_theta), inv_x, sin(inv_theta),
-          cos(inv_theta), inv_y, 0, 0, 1;
+      trans_ct << cos(inv_theta), -sin(inv_theta), inv_x, sin(inv_theta), cos(inv_theta), inv_y, 0, 0, 1;
 
       Vec3_t point_vehicle = trans_ct * p;
-      Vec3_t point_camera(-point_vehicle.y(), -point_vehicle.x() + baselink2cam,
-                          cam_height_);
+      Vec3_t point_camera(-point_vehicle.y(), -point_vehicle.x() + baselink2cam, cam_height_);
 
-      Vec2_t uv(point_camera.x() / point_camera.z() * fx + cx,
-                point_camera.y() / point_camera.z() * fy + cy);
+      Vec2_t uv(point_camera.x() / point_camera.z() * fx + cx, point_camera.y() / point_camera.z() * fy + cy);
 
       cv::circle(image, cv::Point2d(uv.x(), uv.y()), 2, color, 2, CV_AA);
     }
@@ -191,8 +181,7 @@ namespace SemanticSLAM
     return true;
   }
 
-  g2o::EdgeSE2PosePrior *
-  Optimizer::CreatePosePriorEdge(const Vec3_t &trans_lc_vector)
+  g2o::EdgeSE2PosePrior *Optimizer::CreatePosePriorEdge(const Vec3_t &trans_lc_vector)
   {
     g2o::EdgeSE2PosePrior *edge_pose_prior = new g2o::EdgeSE2PosePrior();
 

@@ -32,8 +32,7 @@ Eigen::Vector3d Utils::Se2Matrix2Vector(const Eigen::Matrix3d &m) {
   return Eigen::Vector3d(m(0, 2), m(1, 2), atan2(m(1, 0), m(0, 0)));
 }
 
-Eigen::Matrix4d
-Utils::WheelOdom2Matrix(const SemanticSLAM::WheelOdometry &odom) {
+Eigen::Matrix4d Utils::WheelOdom2Matrix(const SemanticSLAM::WheelOdometry &odom) {
   Eigen::Matrix4d m = Eigen::Matrix4d::Identity();
   m(0, 3) = odom.x;
   m(1, 3) = odom.y;
