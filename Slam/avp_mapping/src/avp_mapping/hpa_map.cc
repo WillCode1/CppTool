@@ -3,7 +3,6 @@
 #include "colordef.h"
 #include "log.h"
 
-// question: load map 在哪?
 namespace SemanticSLAM
 {
   HpaMap::HpaMap() : map_changed_(false)

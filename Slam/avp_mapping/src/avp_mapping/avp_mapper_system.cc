@@ -119,7 +119,7 @@ namespace SemanticSLAM
       return;
     }
 
-    // question: 这些都是什么矩阵，remap.yaml都是怎么生成的
+    // 来源于外参标定代码
     remaps_.push_back(std::make_pair(fs_remap["mapx_left"].mat(), fs_remap["mapy_left"].mat()));
     remaps_.push_back(std::make_pair(fs_remap["mapx_front"].mat(), fs_remap["mapy_front"].mat()));
     remaps_.push_back(std::make_pair(fs_remap["mapx_right"].mat(), fs_remap["mapy_right"].mat()));

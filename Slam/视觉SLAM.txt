@@ -14,6 +14,9 @@ goodFeaturesToTrack():cv::cornerHarris()
 cv::cvtColor
 --->灰度图无法恢复到RGB，因为丢失信息
 
+cv::inRange
+--->对图像的三个通道同时做阈值范围限制，在三个通道阈值范围内的像素值设为二值化中的高值，比如255，不在三个通道阈值范围内的像素值设为二值化中的低值，比如0，最后输出的图像是单通道图像
+
 cv::Mat Mat::rowRange(int startrow, int endrow) const;
 cv::Mat Mat::colRange(int startrow, int endrow) const;
 --->获取某些范围内行或列的指针

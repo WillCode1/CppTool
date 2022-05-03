@@ -23,7 +23,6 @@
 
 namespace SemanticSLAM
 {
-  // question: 什么功能
   class TrajectorySmoother
   {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW

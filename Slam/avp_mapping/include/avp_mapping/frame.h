@@ -29,6 +29,6 @@ namespace SemanticSLAM
     cv::Mat image_dash_;
     cv::Mat image_arrow_;
     bool got_odometry_; // no use
-    int edge_size_; // question
+    int edge_size_;
   };
 }
