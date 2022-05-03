@@ -7,9 +7,8 @@
 硬件上鱼眼相机都是一样的，ocam模型和openCV只是多项式不同，ocam模型的话，多项式位数会更高，对畸变的拟合更好，但相应的也会存在过拟合的风险
 
 鱼眼相机模型、畸变参数
-ORB算子原理
 单木相机尺度初始化ORB-SLAM2
-阅读拼接代码
+阅读环视图像拼接代码
 ======================================
 opencv接口：
 cv::cvtColor
@@ -36,6 +35,9 @@ cv::projectPoints(objectPoints, rvec, tvec, cameraMatrix, distCoeffs, imagePoint
 --->投影三维点到一个图像平面。
 --->参数：世界坐标系中的三维点，相机外参，相机内参，畸变参数，图像坐标系中的二维点
 
+cv::solvePnP
+--->可以用于外参标定、或者求解相机位姿(3D-2D)
+
 cv::undistort
 --->图像去畸变
 --->cv::initUndistortRectifyMap + cv::remap
@@ -47,11 +49,13 @@ cv::undistort
 --->f_x, f_y表示像素坐标在u,v轴上缩放了多少倍 * 焦距f
 --->c_x，c_y表示像素坐标平移了多少
 畸变参数
+--->多项式拟合
 
 相机外参标定方法：PnP方法
 (1)undistort，畸变矩阵可以填在solvePnP中
-(2)获得world坐标、uv坐标和内参K
+(2)获得world坐标、uv坐标、内参K(和畸变参数)
 (3)solvePnP或solvePnPRansac
+(4)如何不用标定板来确定相机的外参矩阵: https://www.zhihu.com/question/53498780
 
 ===================================
 1.相机外参标定流水线(camera_system_extrinsic_calibration)

@@ -211,6 +211,17 @@ namespace SemanticSLAM
         if (measurement == 0)
           continue;
         // for visualization
+        /*
+          (1)bev视角
+          (2)cx, cy模拟相机内参
+            i -> img.y -> cy
+            j -> img.x -> cx
+            cx, cy表示像素坐标平移了多少
+            cx = image_width/2
+            cy = image_height/2
+          (3)-scale: 靠上半图为前方视角，以此类推
+            车身坐标系是x向前, y向左为正
+         */
         if (measurement < measurement_threshold)
           continue;
         double x = (i - cy) * (-scale) + baselink2cam;

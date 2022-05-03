@@ -12,8 +12,8 @@ struct CameraIntrinsic {
 
 struct CameraExtrinsic {
   // for bev
-  double scale;
-  double baselink2cam;
+  double scale;         // bev根据camera_height缩放
+  double baselink2cam;  // 车身到相机的平移
   double camera_height;
 };
 

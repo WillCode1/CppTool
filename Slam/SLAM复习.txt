@@ -89,8 +89,7 @@ VIO相对于VO的好处：
 1.g2o、ceres使用
 2.LMOptimization: https://blog.csdn.net/weixin_37835423/article/details/111587379
 3.branch and bound: fast_correlative_scan_matcher_2d.cc
-4.my localization
-5.my slam
+4.imu预积分
 6.数学进阶
 7.阅读有李代数的论文
 8.PCA
