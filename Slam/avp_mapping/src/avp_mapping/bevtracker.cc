@@ -331,7 +331,6 @@ namespace SemanticSLAM
     const std::string str_mask = fsettings["mask"];
     mapping_mask_ = cv::imread(str_data_path + str_mask, cv::IMREAD_GRAYSCALE);
 
-    // question: 为什么是这个形状
     if (mapping_mask_.empty())
     {
       std::cout << " fatal error mask is empty " << std::endl;

@@ -6,11 +6,11 @@
 
 硬件上鱼眼相机都是一样的，ocam模型和openCV只是多项式不同，ocam模型的话，多项式位数会更高，对畸变的拟合更好，但相应的也会存在过拟合的风险
 
-标定的一般过程(pnp)
 ORB算子原理
-goodFeaturesToTrack():cv::cornerHarris()
 单木相机尺度初始化ORB-SLAM2
+阅读拼接代码
 ======================================
+opencv接口：
 cv::cvtColor
 --->灰度图无法恢复到RGB，因为丢失信息
 
@@ -29,20 +29,28 @@ cv::cornerSubPix
 cv::calibrateCamera(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs, flags)
 --->从一个校准模式的几个视图中找到相机的内参和外参。
 --->参数：世界坐标系中的三维点，图像坐标系中的二维点，用于计算的尺寸，相机内参，畸变参数，相机外参，模式
---->stereoCalibrate, calibrateCameraRO, undistort, solvePnP
+--->stereoCalibrate, calibrateCameraRO
 
 cv::projectPoints(objectPoints, rvec, tvec, cameraMatrix, distCoeffs, imagePoints)
 --->投影三维点到一个图像平面。
 --->参数：世界坐标系中的三维点，相机外参，相机内参，畸变参数，图像坐标系中的二维点
 
-cv::initUndistortRectifyMap
+cv::undistort
+--->图像去畸变
+--->cv::initUndistortRectifyMap + cv::remap
 
 ===================================
+相机标定：
 焦距f：光心到成像平面的距离
 相机内参(intrinsic)：f_x、f_y、c_x、c_y
 --->f_x, f_y表示像素坐标在u,v轴上缩放了多少倍 * 焦距f
 --->c_x，c_y表示像素坐标平移了多少
 畸变参数
+
+相机外参标定方法：PnP方法
+(1)undistort，畸变矩阵可以填在solvePnP中
+(2)获得world坐标、uv坐标和内参K
+(3)solvePnP或solvePnPRansac
 
 ===================================
 1.相机外参标定流水线(camera_system_extrinsic_calibration)
@@ -57,8 +65,6 @@ cv::initUndistortRectifyMap
 --->亚像素调整:
 (2)可以从world坐标系投射一些角点周围点到图像提取像素，计算周围像素梯度，过滤异常值
 --->g2o，惩罚项可以改成到图像底部中间的距离(离图片中间点，距离越远，畸变越大。)
---->stitch中车身坐标系的计算
---->adjustCorner
 --->反投回去间距不一致，表明失该点失效
 
 3.相机外参在线标定
