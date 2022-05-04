@@ -373,10 +373,10 @@ namespace SemanticSLAM
 
     // 类似梯度矩阵
     Timer timer("distance_tranform");
-    avp_distance_transformer_->DistranceTransform(imgs[0], current_frame_.image_slot_.data);
-    avp_distance_transformer_->DistranceTransform(imgs[1], current_frame_.image_dash_.data);
-    avp_distance_transformer_->DistranceTransform(imgs[2], current_frame_.image_arrow_.data);
-    avp_distance_transformer_->DistranceTransform(imgs[3], current_frame_.image_lane_.data);
+    avp_distance_transformer_->DistanceTransform(imgs[0], current_frame_.image_slot_.data);
+    avp_distance_transformer_->DistanceTransform(imgs[1], current_frame_.image_dash_.data);
+    avp_distance_transformer_->DistanceTransform(imgs[2], current_frame_.image_arrow_.data);
+    avp_distance_transformer_->DistanceTransform(imgs[3], current_frame_.image_lane_.data);
 
     timer.Print();
 

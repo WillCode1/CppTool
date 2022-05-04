@@ -6,9 +6,9 @@
 #include "plot_viewer.h"
 #endif
 #include "timer.h"
+
 namespace SemanticSLAM
 {
-
   std::mutex Optimizer::global_optimizer_mutex_;
   Optimizer::Optimizer() : optimizer_(nullptr) {}
 

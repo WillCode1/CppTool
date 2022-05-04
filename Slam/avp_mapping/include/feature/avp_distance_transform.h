@@ -21,13 +21,14 @@ namespace SemanticSLAM
       temp_inverse_ = cv::Mat::zeros(image_height_ + 2 * boarder, image_width_ + 2 * boarder, CV_32SC1);
     }
 
-    void DistranceTransform(uchar *input, unsigned char *output)
+    void DistanceTransform(uchar *input, unsigned char *output)
     {
       int boarder = 1;
+      // question: 为什么不初始化左右两边?
       initTopBottom(temp_, boarder);
       initTopBottom(temp_inverse_, boarder);
-      //    cv::Mat image(image_height_, image_width_, CV_8UC1, input);
-      //    cv::Mat dst(image_height_, image_width_, CV_8UC1, output);
+      // cv::Mat image(image_height_, image_width_, CV_8UC1, input);
+      // cv::Mat dst(image_height_, image_width_, CV_8UC1, output);
       DistanceTransform3x3(input, temp_, temp_inverse_, output, metrics_);
     }
 
@@ -37,9 +38,9 @@ namespace SemanticSLAM
     {
       const int kBoarder = 1;
       int i, j;
-      const int kHVDistCost = FLT_TO_FIX(metrics[0], kDistShift);
-      const int kDiagDistCost = FLT_TO_FIX(metrics[1], kDistShift);
-      const float kScale = 1.f / (1 << kDistShift);
+      const int kHVDistCost = FLT_TO_FIX(metrics[0], kDistShift);   // 62587
+      const int kDiagDistCost = FLT_TO_FIX(metrics[1], kDistShift); // 89738
+      const float kScale = 1.f / (1 << kDistShift);                 // 1/65536
 
       CV_Assert(_temp.rows == _temp_inverse.rows);
       CV_Assert(_temp.cols == _temp_inverse.cols);
@@ -51,13 +52,13 @@ namespace SemanticSLAM
       int step = (int)(_temp.step / sizeof(temp[0]));
       int dststep = image_width_;
       cv::Size size(image_width_, image_height_);
+
       // forward pass
       for (i = 0; i < size.height; i++)
       {
         const uchar *s = src + i * srcstep;
         int *tmp = (int *)(temp + (i + kBoarder) * step) + kBoarder;
-        int *tmp_inverse =
-            (int *)(temp_inverse + (i + kBoarder) * step) + kBoarder;
+        int *tmp_inverse = (int *)(temp_inverse + (i + kBoarder) * step) + kBoarder;
 
         for (j = 0; j < kBoarder; j++)
         {
@@ -75,9 +76,9 @@ namespace SemanticSLAM
             int t = tmp_inverse[j - step] + kHVDistCost;
             if (t0 > t)
               t0 = t;
-            //          t = tmp_inverse[j - step + 1] + kDiagDistCost;
-            //          if (t0 > t)
-            //            t0 = t;
+            // t = tmp_inverse[j - step + 1] + kDiagDistCost;
+            // if (t0 > t)
+            //   t0 = t;
             t = tmp_inverse[j - 1] + kHVDistCost;
             if (t0 > t)
               t0 = t;
@@ -85,15 +86,14 @@ namespace SemanticSLAM
           }
           else
           {
-
             tmp_inverse[j] = 0;
             int t0 = tmp[j - step - 1] + kDiagDistCost;
             int t = tmp[j - step] + kHVDistCost;
             if (t0 > t)
               t0 = t;
-            //          t = tmp[j - step + 1] + kDiagDistCost;
-            //          if (t0 > t)
-            //            t0 = t;
+            // t = tmp[j - step + 1] + kDiagDistCost;
+            // if (t0 > t)
+            //   t0 = t;
             t = tmp[j - 1] + kHVDistCost;
             if (t0 > t)
               t0 = t;
@@ -107,12 +107,10 @@ namespace SemanticSLAM
       {
         unsigned char *d = (unsigned char *)(dist + i * dststep);
         int *tmp = (int *)(temp + (i + kBoarder) * step) + kBoarder;
-        int *tmp_inverse =
-            (int *)(temp_inverse + (i + kBoarder) * step) + kBoarder;
+        int *tmp_inverse = (int *)(temp_inverse + (i + kBoarder) * step) + kBoarder;
 
         for (j = size.width - 1; j >= 0; j--)
         {
-
           // for tmp;
           int t0 = tmp[j];
           if (t0 > kHVDistCost)
@@ -123,15 +121,15 @@ namespace SemanticSLAM
             t = tmp[j + step] + kHVDistCost;
             if (t0 > t)
               t0 = t;
-            //          t = tmp[j + step - 1] + kDiagDistCost;
-            //          if (t0 > t)
-            //            t0 = t;
+            // t = tmp[j + step - 1] + kDiagDistCost;
+            // if (t0 > t)
+            //   t0 = t;
             t = tmp[j + 1] + kHVDistCost;
             if (t0 > t)
               t0 = t;
             tmp[j] = t0;
           }
-          //      d[j] = (float)(t0 * kScale);
+          // d[j] = (float)(t0 * kScale);
 
           // for tmp_inverse ;
           int t1 = tmp_inverse[j];
@@ -143,9 +141,9 @@ namespace SemanticSLAM
             t = tmp_inverse[j + step] + kHVDistCost;
             if (t1 > t)
               t1 = t;
-            //          t = tmp_inverse[j + step - 1] + kDiagDistCost;
-            //          if (t1 > t)
-            //            t1 = t;
+            // t = tmp_inverse[j + step - 1] + kDiagDistCost;
+            // if (t1 > t)
+            //   t1 = t;
             t = tmp_inverse[j + 1] + kHVDistCost;
             if (t1 > t)
               t1 = t;

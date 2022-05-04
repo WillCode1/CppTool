@@ -20,7 +20,7 @@ namespace SemanticSLAM
     static int next_id_;
 
   public:
-    float visual_loc_confidence_; // question
+    float visual_loc_confidence_;
     int id_;
     Vec3_t odometry_;
     Mat33_t trans_world2base_;
