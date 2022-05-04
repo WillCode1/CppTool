@@ -98,10 +98,6 @@ namespace SemanticSLAM
 
   bool TrajectorySmoother::ScaleOdometrySigma(double scale)
   {
-    //  odom_x_sigma_ = GlobalParam::GetPtr()->odom_x_sigma_ * scale;
-    //  odom_y_sigma_ = GlobalParam::GetPtr()->odom_x_sigma_ * scale;
-    //  odom_theta_sigma_ = GlobalParam::GetPtr()->odom_x_sigma_ * scale;
-
     NM_ERROR("NOT SUPPORT");
     return true;
   }
@@ -126,9 +122,9 @@ namespace SemanticSLAM
     //  prior_information << 1, 0, 0, 0, 1, 0, 0, 0, 20;
 
     Mat33_t prior_information;
-    prior_information << 0.005 * frame->visual_loc_confidence_, 0, 0, 0,
-        0.005 * frame->visual_loc_confidence_, 0, 0, 0,
-        0.1 * frame->visual_loc_confidence_;
+    prior_information << 0.005 * frame->visual_loc_confidence_, 0, 0,
+        0, 0.005 * frame->visual_loc_confidence_, 0,
+        0, 0, 0.1 * frame->visual_loc_confidence_;
 
     double x = frame->trans_world2base_(0, 2);
     double y = frame->trans_world2base_(1, 2);
@@ -165,8 +161,7 @@ namespace SemanticSLAM
     double y = odom_increment(1, 2);
     double theta = atan2(odom_increment(1, 0), odom_increment(0, 0));
 
-    //  // this happen when the vehicle move very slow and the wheel odometry is
-    //  wrong
+    // this happen when the vehicle move very slow and the wheel odometry is wrong
     //  if(fabs(x) < 1e-5 &&fabs(y) <1e-5  )
     //    return ;
 
@@ -241,7 +236,7 @@ namespace SemanticSLAM
     pose_vertex->setFixed(current_id_ == 0);
     optimizer_->addVertex(pose_vertex);
 
-    //  // prior edge
+    // prior edge
     //  Mat33_t prior_information;
     //  prior_information << 1, 0, 0, 0, 1, 0, 0, 0, 20;
     //  g2o::EdgeSE2PosePrior *edge = new g2o::EdgeSE2PosePrior;

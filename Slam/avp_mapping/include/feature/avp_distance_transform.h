@@ -8,7 +8,6 @@ namespace SemanticSLAM
   const int kInitDist0 = (INT_MAX >> 2);
   const int kDistShift = 16;
 
-  // question: 什么功能
   class AvpDistanceTransformer
   {
   public:
@@ -31,6 +30,7 @@ namespace SemanticSLAM
       DistanceTransform3x3(input, temp_, temp_inverse_, output, metrics_);
     }
 
+    // run: 使二值图边缘渐变、模糊
     void DistanceTransform3x3(const uchar *src, cv::Mat &_temp,
                               cv::Mat &_temp_inverse, uchar *dst,
                               const float *metrics)

@@ -371,7 +371,7 @@ namespace SemanticSLAM
       return;
     }
 
-    // 类似梯度矩阵
+    // 二值图边缘平滑过渡，类似梯度矩阵
     Timer timer("distance_tranform");
     avp_distance_transformer_->DistanceTransform(imgs[0], current_frame_.image_slot_.data);
     avp_distance_transformer_->DistanceTransform(imgs[1], current_frame_.image_dash_.data);
