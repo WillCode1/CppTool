@@ -12,16 +12,13 @@ bool EdgeSE2SemanticProject::IsWithinimage() {
   double inv_theta = -theta;
 
   Eigen::Matrix3d inv_pose;
-  inv_pose << cos(inv_theta), -sin(inv_theta), inv_x, sin(inv_theta),
-      cos(inv_theta), inv_y, 0, 0, 1;
+  inv_pose << cos(inv_theta), -sin(inv_theta), inv_x, sin(inv_theta), cos(inv_theta), inv_y, 0, 0, 1;
 
   Eigen::Vector3d point_vehicle = inv_pose * wp_;
-  Vector3D point_camera(-point_vehicle.y(), -point_vehicle.x() + baselink2cam_,
-                        cam_height_);
+  Vector3D point_camera(-point_vehicle.y(), -point_vehicle.x() + baselink2cam_, cam_height_);
   Vector2D uv = cam_->cam_map(point_camera);
 
-  if (uv.x() < 0 || uv.y() < 0 || uv.x() > image_->cols ||
-      uv.y() > image_->rows)
+  if (uv.x() < 0 || uv.y() < 0 || uv.x() > image_->cols || uv.y() > image_->rows)
     return false;
   return true;
 }
@@ -60,14 +57,11 @@ void EdgeSE2SemanticProject::linearizeOplus() {
   jacobian_proj(1, 2) = (si * px - ci * py - si * x + ci * y) * fy / h;
 
   double u = (si * px - ci * py - si * x + ci * y) / h * fx + cx;
-  double v =
-      (baselink2cam_ - ci * px - si * py + ci * x + si * y) / h * fy + cy;
+  double v = (baselink2cam_ - ci * px - si * py + ci * x + si * y) / h * fy + cy;
   Eigen::Matrix<double, 1, 2> jacobian_pixel_uv;
 
-  jacobian_pixel_uv(0, 0) =
-      (getPixelValue(u + 1, v) - getPixelValue(u - 1, v)) / 2;
-  jacobian_pixel_uv(0, 1) =
-      (getPixelValue(u, v + 1) - getPixelValue(u, v - 1)) / 2;
+  jacobian_pixel_uv(0, 0) = (getPixelValue(u + 1, v) - getPixelValue(u - 1, v)) / 2;
+  jacobian_pixel_uv(0, 1) = (getPixelValue(u, v + 1) - getPixelValue(u, v - 1)) / 2;
 
   if (jacobian_pixel_uv(0, 0) == 0 || jacobian_pixel_uv(0, 1) == 0)
     this->setLevel(1);

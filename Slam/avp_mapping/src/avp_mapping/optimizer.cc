@@ -28,8 +28,8 @@ namespace SemanticSLAM
       g2o::BlockSolverX *solver_ptr = new g2o::BlockSolverX(linearsolver);
       g2o::OptimizationAlgorithmLevenberg *solver = new g2o::OptimizationAlgorithmLevenberg(solver_ptr);
       instance->optimizer_->setAlgorithm(solver);
-      std::unordered_map<g2o::EdgeSE2SemanticProject *, bool> empty_list;
-      instance->edge_resources_ = empty_list;
+      // std::unordered_map<g2o::EdgeSE2SemanticProject *, bool> empty_list;
+      // instance->edge_resources_ = empty_list;
       instance->vse2_ = new g2o::VertexSE2();
       global_optimizer_mutex_.unlock();
     }
@@ -185,6 +185,7 @@ namespace SemanticSLAM
   {
     g2o::EdgeSE2PosePrior *edge_pose_prior = new g2o::EdgeSE2PosePrior();
 
+    // question: 为什么好像赋值了同一个变量
     edge_pose_prior->vertices()[0] = vse2_;
     double prior_x = trans_lc_vector(0);
     double prior_y = trans_lc_vector(1);
@@ -225,8 +226,7 @@ namespace SemanticSLAM
     if (!found)
     {
       e = new g2o::EdgeSE2SemanticProject();
-      edge_resources_.insert(
-          std::pair<g2o::EdgeSE2SemanticProject *, bool>(e, true));
+      edge_resources_.insert(std::pair<g2o::EdgeSE2SemanticProject *, bool>(e, true));
     }
     return e;
   }

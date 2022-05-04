@@ -56,6 +56,7 @@ cv::undistort
 (2)获得world坐标、uv坐标、内参K(和畸变参数)
 (3)solvePnP或solvePnPRansac
 (4)如何不用标定板来确定相机的外参矩阵: https://www.zhihu.com/question/53498780
+(5)其他方法：把uv坐标转到camera系，然后与world坐标做icp?
 
 ===================================
 1.相机外参标定流水线(camera_system_extrinsic_calibration)

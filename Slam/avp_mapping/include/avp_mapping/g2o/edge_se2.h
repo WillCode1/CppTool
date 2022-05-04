@@ -15,8 +15,7 @@ public:
   void computeError() {
     const VertexSE2 *v1 = static_cast<const VertexSE2 *>(_vertices[0]);
     const VertexSE2 *v2 = static_cast<const VertexSE2 *>(_vertices[1]);
-    SE2 delta =
-        _inverseMeasurement * (v1->estimate().inverse() * v2->estimate());
+    SE2 delta = _inverseMeasurement * (v1->estimate().inverse() * v2->estimate());
     _error = delta.toVector();
   }
   virtual bool read(std::istream &is);

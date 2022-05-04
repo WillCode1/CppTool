@@ -39,7 +39,7 @@ private:
 
 private:
   g2o::SparseOptimizer *optimizer_;
-  g2o::VertexSE2 *vse2_;
+  g2o::VertexSE2 *vse2_;  // 用于优化的位姿
   std::unordered_map<g2o::EdgeSE2SemanticProject *, bool> edge_resources_;
   static std::mutex global_optimizer_mutex_;
 };

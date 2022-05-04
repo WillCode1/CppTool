@@ -30,9 +30,9 @@ public:
   }
 
   // 存盘和读盘：留空
-  virtual bool read(istream &in) {}
+  virtual bool read(istream &in) { return false; }
 
-  virtual bool write(ostream &out) const {}
+  virtual bool write(ostream &out) const { return false; }
 };
 
 // 误差模型 模板参数：观测值维度，类型，连接顶点类型
@@ -46,7 +46,7 @@ public:
   virtual void computeError() override {
     const CurveFittingVertex *v = static_cast<const CurveFittingVertex *> (_vertices[0]);
     const Eigen::Vector3d abc = v->estimate();
-    _error(0, 0) = _measurement - std::exp(abc(0, 0) * _x * _x + abc(1, 0) * _x + abc(2, 0));
+    _error(0, 0) = _measurement - std::exp(abc(0, 0) * _x * _x + abc(1, 0) * _x + abc(2, 0));   // 观测值在前, -1 x jacobx
   }
 
   // 计算雅可比矩阵
@@ -59,9 +59,9 @@ public:
     _jacobianOplusXi[2] = -y;
   }
 
-  virtual bool read(istream &in) {}
+  virtual bool read(istream &in) { return false; }
 
-  virtual bool write(ostream &out) const {}
+  virtual bool write(ostream &out) const { return false; }
 
 public:
   double _x;  // x 值， y 值为 _measurement
@@ -87,9 +87,8 @@ int main(int argc, char **argv) {
   typedef g2o::LinearSolverDense<BlockSolverType::PoseMatrixType> LinearSolverType; // 线性求解器类型
 
   // 梯度下降方法，可以从GN, LMOptimization, DogLeg 中选
-  auto solver = new g2o::OptimizationAlgorithmGaussNewton(
-    g2o::make_unique<BlockSolverType>(g2o::make_unique<LinearSolverType>()));
-  g2o::SparseOptimizer optimizer;     // 图模型
+  auto solver = new g2o::OptimizationAlgorithmGaussNewton(g2o::make_unique<BlockSolverType>(g2o::make_unique<LinearSolverType>()));
+  g2o::SparseOptimizer optimizer;   // 图模型
   optimizer.setAlgorithm(solver);   // 设置求解器
   optimizer.setVerbose(true);       // 打开调试输出
 
