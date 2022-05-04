@@ -24,7 +24,6 @@ namespace SemanticSLAM
     void DistanceTransform(uchar *input, unsigned char *output)
     {
       int boarder = 1;
-      // question: 为什么不初始化左右两边?
       initTopBottom(temp_, boarder);
       initTopBottom(temp_inverse_, boarder);
       // cv::Mat image(image_height_, image_width_, CV_8UC1, input);
@@ -49,17 +48,18 @@ namespace SemanticSLAM
       int *temp_inverse = _temp_inverse.ptr<int>();
       uchar *dist = dst;
       int srcstep = image_width_;
-      int step = (int)(_temp.step / sizeof(temp[0]));
+      int step = (int)(_temp.step / sizeof(temp[0]));   // cv::Mat.step: Number of bytes each matrix row occupies.
       int dststep = image_width_;
       cv::Size size(image_width_, image_height_);
 
       // forward pass
       for (i = 0; i < size.height; i++)
       {
-        const uchar *s = src + i * srcstep;
+        const uchar *s = src + i * srcstep;   // s: 第i行开始位置
         int *tmp = (int *)(temp + (i + kBoarder) * step) + kBoarder;
-        int *tmp_inverse = (int *)(temp_inverse + (i + kBoarder) * step) + kBoarder;
+        int *tmp_inverse = (int *)(temp_inverse + (i + kBoarder) * step) + kBoarder;  // 空白行开始
 
+        // initLeftRight
         for (j = 0; j < kBoarder; j++)
         {
           tmp[-j - 1] = tmp[size.width + j] = kInitDist0;
