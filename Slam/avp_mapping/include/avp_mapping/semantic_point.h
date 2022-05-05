@@ -3,7 +3,7 @@ namespace SemanticSLAM
 {
   struct SemanticPoint
   {
-    int u; // question: 4个参数含义
+    int u;
     int v;
     float x;
     float y;

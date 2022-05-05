@@ -204,8 +204,6 @@ namespace SemanticSLAM
     fout.write((char *)&ty, sizeof(double));
     fout.write((char *)&theta, sizeof(double));
 
-    // question: arrow_points_这个不用保存?
-
     // save slot point
     int slot_point_num = kf->slot_point_num_;
     fout.write((char *)&slot_point_num, sizeof(int));
