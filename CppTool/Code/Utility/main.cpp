@@ -18,8 +18,8 @@ using namespace std;
 
 int main()
 {
-	Timer test(true);
-	test.StartTimer();
+	Timer test;
+	test.start();
 
 	TimeTool::ThreadDelayMs(1000);
 	//TestJson::JsonBase();
@@ -28,7 +28,7 @@ int main()
 	auto age = people.SayAge();
 	SinglePeople::ReleaseInstance();
 
-#if 0
+#if 1
 	for (int i = 0; i < 20; ++i)
 	{
 		cout << Random::RandInt(2, 5) << endl;
@@ -36,14 +36,8 @@ int main()
 	}
 #endif
 
-	test.ElapsedByStart();
-	test.ElapsedByLast();
-
-	test.TestFunctionCostTime(1000, [](int a, int b, int c) {
-		auto& people = SinglePeople::GetInstance(0, 24, "Will");
-		auto age = people.SayAge();
-		SinglePeople::ReleaseInstance();
-	}, 1,2,3);
+	test.elapsedByStart();
+	test.elapsedByLast();
 
 	log_print(error, "asd %d", 1);
 	
