@@ -63,6 +63,8 @@ laser畸变校正：一帧激光中，首尾点云位姿差值，通过角度比
 --->畸变过程: 点云做了(想对于当前帧起始时刻的)反向运动，去畸变点云增加正向运动
 --->deskewPoint = transStartInverse * transCur * skewPoint
 
+激光退化：求解的高斯牛顿方程J(x)J^T(x)△x = -J(x)f(x) <=> H△x = g, 中判断H的最小特征值大小
+
 非线性优化方法：https://zhuanlan.zhihu.com/p/101292765?utm_source=wechat_session
 --->一阶
 --->二阶牛顿法

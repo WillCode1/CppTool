@@ -100,7 +100,7 @@ namespace SemanticSLAM
     std::vector<g2o::EdgeSE2SemanticProject *> edges;
 
     // Add Pose Prior Edge
-
+    // vertices与观测赋值了同一个变量, 是为了使优化结果变化不大
     g2o::EdgeSE2PosePrior *edge_pose_prior = CreatePosePriorEdge(trans_lc_vector);
 
 #ifdef ENABLE_VIEWER
@@ -111,7 +111,7 @@ namespace SemanticSLAM
 
     for (auto &smt_point : last_keyframe->slot_points_)
     {
-      unsigned char measurement = smt_point.prob;
+      unsigned char measurement = smt_point.prob; // 边缘模糊后的像素值
       if (measurement == 0)
         continue;
 
@@ -185,7 +185,6 @@ namespace SemanticSLAM
   {
     g2o::EdgeSE2PosePrior *edge_pose_prior = new g2o::EdgeSE2PosePrior();
 
-    // question: 为什么好像赋值了同一个变量
     edge_pose_prior->vertices()[0] = vse2_;
     double prior_x = trans_lc_vector(0);
     double prior_y = trans_lc_vector(1);
@@ -195,6 +194,7 @@ namespace SemanticSLAM
     double odom_y_sigma = 10;
     double odom_theta_sigma = 0.001;
 
+    // covariance is related to fabs(increments).
     double x_sigma = std::max(odom_x_sigma * fabs(prior_x), 0.1);
     double y_sigma = std::max(odom_y_sigma * fabs(prior_y), 0.05);
     double theta_sigma = std::max(odom_theta_sigma * fabs(prior_theta), 0.0001);

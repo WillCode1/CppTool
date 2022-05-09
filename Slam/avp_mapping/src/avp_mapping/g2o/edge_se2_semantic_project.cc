@@ -2,6 +2,7 @@
 
 namespace g2o {
 
+// 判断当前是否还在，与车运行方向相反
 bool EdgeSE2SemanticProject::IsWithinimage() {
   const VertexSE2 *v = static_cast<const VertexSE2 *>(_vertices[0]);
 
@@ -48,20 +49,22 @@ void EdgeSE2SemanticProject::linearizeOplus() {
 
   double h = cam_height_;
   Eigen::Matrix<double, 2, 3> jacobian_proj;
-  jacobian_proj(0, 0) = -si * fx / h;
-  jacobian_proj(0, 1) = ci * fx / h;
-  jacobian_proj(0, 2) = (ci * px + si * py - ci * x - si * y) * fx / h;
+  jacobian_proj(0, 0) = -si * fx / h;                                   // du/dx
+  jacobian_proj(0, 1) = ci * fx / h;                                    // du/dy
+  jacobian_proj(0, 2) = (ci * px + si * py - ci * x - si * y) * fx / h; // du/d_theta
 
-  jacobian_proj(1, 0) = ci * fy / h;
-  jacobian_proj(1, 1) = si * fy / h;
-  jacobian_proj(1, 2) = (si * px - ci * py - si * x + ci * y) * fy / h;
+  jacobian_proj(1, 0) = ci * fy / h;                                    // dv/dx
+  jacobian_proj(1, 1) = si * fy / h;                                    // dv/dy
+  jacobian_proj(1, 2) = (si * px - ci * py - si * x + ci * y) * fy / h; // dv/d_theta
 
+  // u = x / h * fx + cx
+  // v = y / h * fy + cy
   double u = (si * px - ci * py - si * x + ci * y) / h * fx + cx;
   double v = (baselink2cam_ - ci * px - si * py + ci * x + si * y) / h * fy + cy;
   Eigen::Matrix<double, 1, 2> jacobian_pixel_uv;
 
-  jacobian_pixel_uv(0, 0) = (getPixelValue(u + 1, v) - getPixelValue(u - 1, v)) / 2;
-  jacobian_pixel_uv(0, 1) = (getPixelValue(u, v + 1) - getPixelValue(u, v - 1)) / 2;
+  jacobian_pixel_uv(0, 0) = (getPixelValue(u + 1, v) - getPixelValue(u - 1, v)) / 2;  // derror/du
+  jacobian_pixel_uv(0, 1) = (getPixelValue(u, v + 1) - getPixelValue(u, v - 1)) / 2;  // derror/dv
 
   if (jacobian_pixel_uv(0, 0) == 0 || jacobian_pixel_uv(0, 1) == 0)
     this->setLevel(1);

@@ -55,6 +55,7 @@ namespace g2o
       Vector3D point_camera(-point_vehicle.y(), -point_vehicle.x() + baselink2cam_, cam_height_);
       Vector2D uv = cam_->cam_map(point_camera);
 
+      // 去除边缘，最少可以是2个像素
       if (uv.x() - 4 < 0 || (uv.x() + 4) > image_->cols || (uv.y() - 4) < 0 || (uv.y() + 4) > image_->rows)
       {
         _error(0, 0) = 0.0;
@@ -109,6 +110,7 @@ namespace g2o
     }
 
   protected:
+    // 加权计算周围像素,求得uv像素实际值
     inline float getPixelValue(float x, float y)
     {
       uchar *data = &image_->data[int(y) * image_->step + int(x)];
