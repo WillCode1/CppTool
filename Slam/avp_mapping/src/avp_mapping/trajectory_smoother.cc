@@ -131,7 +131,7 @@ namespace SemanticSLAM
     double theta = atan2(frame->trans_world2base_(1, 0), frame->trans_world2base_(0, 0));
     g2o::EdgeSE2PosePrior *edge = new g2o::EdgeSE2PosePrior;
     edge->vertices()[0] = optimizer_->vertex(current_id_);
-    g2o::Vector3D measurement(x, y, theta);
+    g2o::Vector3D measurement(x, y, theta);   // 赋一样的值做为先验
 
     edge->setInformation(prior_information);
     edge->setMeasurement(measurement);

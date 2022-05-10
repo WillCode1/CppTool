@@ -42,6 +42,12 @@ cv::undistort
 --->图像去畸变
 --->cv::initUndistortRectifyMap + cv::remap
 
+https://www.cnblogs.com/xixixing/p/12335317.html
+seamlessClone():无缝融合
+colorChange():调试颜色
+illuminationChange():消除高亮
+textureFlattening():纹理扁平化
+
 ===================================
 相机标定：
 焦距f：光心到成像平面的距离
@@ -65,7 +71,7 @@ cv::undistort
 用标定板的自动标定是要纯视觉去标，但在线标定的话，可以考虑用上IMU、轮速计之类的信息
 
 双边滤波、直方图
-(0)初始位置
+(0)初始位置，保证有足够多行和列点，否则失败
 (1)亚像素调整
 (2)直方图调整
 (1)和(0)差太远，使用(2)
