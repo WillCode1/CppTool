@@ -50,7 +50,9 @@ namespace SemanticSLAM
     }
 
     InsertNewVertex(frame);
+    // 赋一样的值做为先验，固定当前位置，使变化不大
     InsertVisualLocPriorEdge(frame);
+    // 优化t-1的位姿
     InsertOdometryEdge(frame);
 
     if (vertex_queue_.size() < 4)
@@ -131,7 +133,7 @@ namespace SemanticSLAM
     double theta = atan2(frame->trans_world2base_(1, 0), frame->trans_world2base_(0, 0));
     g2o::EdgeSE2PosePrior *edge = new g2o::EdgeSE2PosePrior;
     edge->vertices()[0] = optimizer_->vertex(current_id_);
-    g2o::Vector3D measurement(x, y, theta);   // 赋一样的值做为先验
+    g2o::Vector3D measurement(x, y, theta);
 
     edge->setInformation(prior_information);
     edge->setMeasurement(measurement);
@@ -157,6 +159,7 @@ namespace SemanticSLAM
 
     Mat33_t odom_increment = last_odom_matrix.inverse() * current_odom_matrix;
 
+    // 此处应该用车体坐标系下增量代替世界坐标系下增量
     double x = odom_increment(0, 2);
     double y = odom_increment(1, 2);
     double theta = atan2(odom_increment(1, 0), odom_increment(0, 0));
@@ -171,6 +174,7 @@ namespace SemanticSLAM
     double y_sigma = std::max(odom_y_sigma_ * fabs(y), 0.005);
     double theta_sigma = std::max(odom_theta_sigma_ * fabs(theta), 0.0001);
 
+    // 使y的方差更小, 调整更小
     odom_sigma << x_sigma, 0, 0, 0, y_sigma * fabs(y), 0, 0, 0, theta_sigma;
     const int id_end = current_id_;
     const int id_start = id_end - 1;
@@ -261,9 +265,9 @@ namespace SemanticSLAM
 
     Mat33_t odom_sigma;
 
-    double x_sigma = std::max(odom_x_sigma_ * fabs(x), 0.01);
-    double y_sigma = std::max(odom_y_sigma_ * fabs(y), 0.005);
-    double theta_sigma = std::max(odom_theta_sigma_ * fabs(theta), 0.0001);
+    double x_sigma = std::max(odom_x_sigma_ * fabs(odom_increment_x), 0.01);
+    double y_sigma = std::max(odom_y_sigma_ * fabs(odom_increment_y), 0.005);
+    double theta_sigma = std::max(odom_theta_sigma_ * fabs(odom_increment_theta), 0.0001);
 
     odom_sigma << x_sigma, 0, 0, 0, y_sigma, 0, 0, 0, theta_sigma;
     const int id_end = current_id_;

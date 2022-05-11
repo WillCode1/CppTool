@@ -135,6 +135,7 @@ void DataLoader::SkipImageData(int start_index)
   }
 }
 
+// question: NextData
 bool DataLoader::NextFrame(DataFrame &dataframe, OdometryData &odometry_data)
 {
   if (!image_list_.empty() && !odom_list_.empty())

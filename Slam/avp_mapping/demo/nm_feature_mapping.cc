@@ -59,8 +59,8 @@ int main(int argc, char **argv)
   // loading config
   std::string str_config = std::string(argv[1]);
 
-  const size_t bar_index = str_config.find_last_of('/');
-  std::string config_path = str_config.substr(0, bar_index + 1);
+  // const size_t bar_index = str_config.find_last_of('/');
+  // std::string config_path = str_config.substr(0, bar_index + 1);
 
   cv::FileStorage fs(str_config, cv::FileStorage::READ);
 
@@ -182,7 +182,7 @@ int main(int argc, char **argv)
   const std::string traj_file = "trajectory.txt";
   if ((access("trajectory.txt", F_OK)) != -1)
   {
-    feature_mapper->AlignMaptoTrajectory("trajectory.txt");
+    feature_mapper->AlignMaptoTrajectory(traj_file);
   }
   else
   {
