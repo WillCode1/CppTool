@@ -63,21 +63,20 @@ public:
         //查找最大值用于归一化
         double maxVal = 0;
 
-        minMaxLoc(hist, NULL, &maxVal);
+        // minMaxLoc(hist, NULL, &maxVal);
 
         //绘制直方图的图像
         Mat histImg(histSize[0], histSize[0], CV_8U, Scalar(255));
 
         // 设置最高点为最大值的90%
-        double hpt = 0.9 * histSize[0];
+        // double hpt = 0.9 * histSize[0];
         //每个条目绘制一条垂直线
         for (int h = 0; h < histSize[0]; h++)
         {
             //直方图的元素类型为32位浮点数
             float binVal = hist.at<float>(h);
-            int intensity = static_cast<int>(binVal * hpt / maxVal);
-            line(histImg, Point(h, histSize[0]),
-                 Point(h, histSize[0] - intensity), Scalar::all(0));
+            // int intensity = static_cast<int>(binVal * hpt / maxVal);
+            line(histImg, Point(h, histSize[0]), Point(h, histSize[0] - binVal), Scalar::all(0));
         }
         return histImg;
     }
