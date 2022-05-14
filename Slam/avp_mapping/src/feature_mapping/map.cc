@@ -197,6 +197,7 @@ MapPoint *Map::ReadMapPoint(ifstream &f) {
   return mp;
 }
 
+// question: front_camera_mask??
 bool Map::Load(const std::string &filename, ORBVocabulary &voc,
                const std::string mask_path,
                std::vector<cv::Mat> cam_extrinsics) {

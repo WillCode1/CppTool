@@ -120,8 +120,7 @@ public:
   const int scale_levels_;
   const float scale_factor_;
   const float log_scale_factor_;
-  const std::vector<float>
-      scale_factors_; // 尺度因子，scale^n，scale=1.2，n为层数
+  const std::vector<float> scale_factors_; // 尺度因子，scale^n，scale=1.2，n为层数
   const std::vector<float> level_sigma2_; // 尺度因子的平方
   const std::vector<float> inv_level_sigma2_;
   // Image bounds and calibration

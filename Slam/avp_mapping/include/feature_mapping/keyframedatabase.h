@@ -38,9 +38,8 @@ protected:
   const ORBVocabulary *mpVoc; ///< 预先训练好的词典
 
   // Inverted file
-  std::vector<list<KeyFrame *>>
-      mvInvertedFile; ///< 倒排索引，mvInvertedFile[i]表示包含了第i个word
-                      /// id的所有关键帧
+  // 如何理解正逆索引: 正: keyframe->WordId, 逆: WordId->keyframe
+  std::vector<list<KeyFrame *>> mvInvertedFile; ///< 倒排索引，mvInvertedFile[i]表示包含了第i个word id的所有关键帧
   //  std::vector<list<MCKeyFrame*> >mvInvertedMCFile;
   //  std::set<MCKeyFrame* > mspMCKFs;
 

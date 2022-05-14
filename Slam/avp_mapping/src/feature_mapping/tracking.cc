@@ -127,15 +127,11 @@ Tracking::GrabImageMultiCam(const cv::Mat &imleft, const cv::Mat &imfront,
                              img_gray_left_.type());
 
   img_gray_left_.copyTo(img_gray_.colRange(0, img_gray_left_.cols));
-  img_gray_front_.copyTo(
-      img_gray_.colRange(img_gray_left_.cols, 2 * img_gray_left_.cols));
-  img_gray_right_.copyTo(
-      img_gray_.colRange(2 * img_gray_left_.cols, 3 * img_gray_left_.cols));
-  img_gray_back_.copyTo(
-      img_gray_.colRange(3 * img_gray_left_.cols, 4 * img_gray_left_.cols));
+  img_gray_front_.copyTo(img_gray_.colRange(img_gray_left_.cols, 2 * img_gray_left_.cols));
+  img_gray_right_.copyTo(img_gray_.colRange(2 * img_gray_left_.cols, 3 * img_gray_left_.cols));
+  img_gray_back_.copyTo(img_gray_.colRange(3 * img_gray_left_.cols, 4 * img_gray_left_.cols));
 
-  std::vector<cv::Mat> images{img_gray_left_, img_gray_front_, img_gray_right_,
-                              img_gray_back_};
+  std::vector<cv::Mat> images{img_gray_left_, img_gray_front_, img_gray_right_, img_gray_back_};
 
   if (state_ == NOT_INITIALIZED || state_ == NO_IMAGES_YET) {
     extractors_[FRONT_CAMERA] = init_orb_extrator_;

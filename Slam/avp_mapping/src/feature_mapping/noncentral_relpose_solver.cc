@@ -2,6 +2,7 @@
 
 namespace FeatureSLAM {
 
+// question: 什么作用
 NonCentralRelPoseSolver::NonCentralRelPoseSolver(
     KeyFrame *pKF1, KeyFrame *pKF2, const std::vector<MapPoint *> &vpMatched12,
     KeyFrame *pKF1_, KeyFrame *pKF2_,

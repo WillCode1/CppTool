@@ -169,6 +169,7 @@ cv::Mat System::TrackMultiCam(const cv::Mat &imleft, const cv::Mat &imfront,
                               const cv::Mat &imright, const cv::Mat &imback,
                               const SemanticSLAM::WheelOdometry &odometry) {
 
+  // question: timestamp=0? 区别
   double time_sec = 0.0;
   return tracker_->GrabImageMultiCam(imleft, imfront, imright, imback, time_sec,
                                      odometry);
@@ -193,6 +194,7 @@ void System::Shutdown() {
 }
 
 bool System::SaveMap(const std::string &filename, bool with_bow) {
+  // question: 这里本身是干什么的?
 
   //  std::cout << "System Saving to " << filename << endl;
 
@@ -216,6 +218,7 @@ bool System::SaveMap(const std::string &filename, bool with_bow) {
   //  //  const auto full_ba = FullBundleAdjuster(map_, 10, multicam);
   //  //  full_ba.Optimize();
 
+  // question: 2份?
   map_->Save(filename, with_bow);
   map_->Save(filename + ".bow", true);
   //  map_->SaveKeyFrameOdom("keyodom_pose_after_bundle_adjustment.txt");

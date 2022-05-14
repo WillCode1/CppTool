@@ -1,4 +1,3 @@
-// Have read
 #include "dataloader.h"
 #include "colordef.h"
 DataLoader::DataLoader(const DataLoader::Mode mode) : mode_(mode) {}
@@ -15,6 +14,7 @@ void DataLoader::SetOdometryFile(const std::string &odom_file)
     exit(0);
   }
 
+  // question: 差别
   if (mode_ == NOT_ALIGNED)
   {
     std::string line;

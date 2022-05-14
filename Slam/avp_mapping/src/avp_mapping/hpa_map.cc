@@ -1,4 +1,3 @@
-// Have read
 #include "hpa_map.h"
 #include "colordef.h"
 #include "log.h"

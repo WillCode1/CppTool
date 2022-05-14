@@ -148,7 +148,7 @@ protected:
 #endif
   // Map
   Map *map_;
-  int max_frame_thr_;
+  int max_frame_thr_;       // camera hz
   int num_matched_inliers_;
   int num_matched_inliers_total_;
   KeyFrame *last_keyfrm_;

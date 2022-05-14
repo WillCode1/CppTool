@@ -1,4 +1,3 @@
-// Have read
 #include "avp_mapper_system.h"
 
 namespace SemanticSLAM

@@ -1,4 +1,3 @@
-// Have read
 #include "avp_mapping_interface.h"
 #include "colordef.h"
 #include "dataloader.h"

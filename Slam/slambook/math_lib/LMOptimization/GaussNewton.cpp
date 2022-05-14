@@ -17,7 +17,7 @@ void jacobi(const Mat &est, const Mat &x, cv::Mat &jacobi)
 {
     for (int i = 0; i < x.rows; i++)
     {
-        // de/da = a
+        // de/da = x
         jacobi.at<float>(i, 0) = x.at<float>(i, 0);
         // de/dc = exp(bx + c)
         jacobi.at<float>(i, 2) = exp(est.at<float>(1, 0) * x.at<float>(i, 0) + est.at<float>(2, 0));

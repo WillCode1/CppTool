@@ -86,6 +86,7 @@ static void computeOrbDescriptor(const KeyPoint &kpt, const Mat &img,
 #undef GET_VALUE
 }
 
+// question: 这是什么作用，为什么是这个值
 static int bit_pattern_31_[256 * 4] = {
     8,   -3,  9,   5 /*mean (0), correlation (0)*/,
     4,   2,   7,   -12 /*mean (1.12461e-05), correlation (0.0437584)*/,
