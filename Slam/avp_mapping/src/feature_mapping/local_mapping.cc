@@ -125,6 +125,7 @@ namespace FeatureSLAM
     }
   }
 
+  // question: EnableStructBa?
   void LocalMapping::EnableStructBa() { use_struct_ba_ = true; }
 
   void LocalMapping::ProcessNewKeyFrame()

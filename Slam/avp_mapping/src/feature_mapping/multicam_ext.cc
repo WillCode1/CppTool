@@ -26,6 +26,7 @@ MultiCamExt &MultiCamExt::GetInstance() {
   return *instance;
 }
 
+// question: 3个转换关系
 cv::Mat MultiCamExt::BaselinkPose2Camera(cv::Mat &tw2baselink,
                                          int camera_index) {
   cv::Mat tcw = cam_ext_[camera_index] * front2wheel_ * tw2baselink.inv();
