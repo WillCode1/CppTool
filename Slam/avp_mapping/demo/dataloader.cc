@@ -14,7 +14,6 @@ void DataLoader::SetOdometryFile(const std::string &odom_file)
     exit(0);
   }
 
-  // question: 差别
   if (mode_ == NOT_ALIGNED)
   {
     std::string line;
@@ -135,7 +134,6 @@ void DataLoader::SkipImageData(int start_index)
   }
 }
 
-// question: NextData
 bool DataLoader::NextFrame(DataFrame &dataframe, OdometryData &odometry_data)
 {
   if (!image_list_.empty() && !odom_list_.empty())

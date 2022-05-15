@@ -60,6 +60,10 @@ textureFlattening():纹理扁平化
 (4)如何不用标定板来确定相机的外参矩阵: https://www.zhihu.com/question/53498780
 (5)其他方法：把uv坐标转到camera系，然后与world坐标做icp?
 
+相机外参：
+--->Twc: 外参, camera->world
+--->Tcw: world->camera
+
 ===================================
 DBoW2
 https://zhehangt.github.io/2018/04/11/SLAM/ORBSLAM/ORBSLAM2LoopClosing/
@@ -71,13 +75,14 @@ DBoW2::FeatureVector mFeatVec;
 --->DBoW2::BowVector mBowVec是从std::map<WordId, WordValue>继承的，这里的WordId的取值范围即为生成词袋模型时word的数目($k^n$)。
 这里存储的WordValue是 word 的 WordValue的累加值，当图像中的多个特征都与WordId对应的word相似，这里存储的WordValue是对 word 中的 WordValue的多次累加。
 --->DBoW2::FeatureVector mFeatVec是被称为 direct index 的东西，用来支持图像与图像之间特征匹配的速度。
-其从std::map<NodeId, std::vector<unsigned int>>继承，NodeId是词袋树中某一层的节点的id，在ORB_SLAM2中是倒数第四层，std::vector<unsigned int>保存的是与该节点下的 word 匹配的特征点的id。
+其从std::map<NodeId, std::vector<unsigned int>>继承，NodeId是词袋树中某一层的节点的id，在ORB_SLAM2中是倒数第四层，std::vector<unsigned int>保存的是与该节点下的 word 匹配的特征点的id(1对多)。
 
 
 *****一些相关流程的学习
 1.一些评估流程：精度、地图质量评估
 2.一些辅助工具：查看工具
 3.一些预处理流程：分割、提取
+4.词袋模型如何训练
 
 ===================================
 3.相机外参在线标定

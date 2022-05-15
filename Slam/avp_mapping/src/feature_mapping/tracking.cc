@@ -350,6 +350,7 @@ void Tracking::Sysinitialization() {
       // set coordinate orgin to first odom
       cv::Mat front2wheel = MultiCamExt::GetInstance().GetFront2Wheel();
 
+      // question: 这个过程怎么理解baselink->camera->frame?
       cv::Mat init2odom = MultiCamExt::GetInstance().BaselinkPose2Camera(
           Converter::toOdometryMatrix(initial_mc_frame_.odom_vector_),
           FRONT_CAMERA);

@@ -218,7 +218,6 @@ bool System::SaveMap(const std::string &filename, bool with_bow) {
   //  //  const auto full_ba = FullBundleAdjuster(map_, 10, multicam);
   //  //  full_ba.Optimize();
 
-  // question: 2份?
   map_->Save(filename, with_bow);
   map_->Save(filename + ".bow", true);
   //  map_->SaveKeyFrameOdom("keyodom_pose_after_bundle_adjustment.txt");
