@@ -126,6 +126,7 @@ Tracking::GrabImageMultiCam(const cv::Mat &imleft, const cv::Mat &imfront,
   img_gray_ = cv::Mat::zeros(img_gray_front_.rows, img_gray_front_.cols * 4,
                              img_gray_left_.type());
 
+  // 拼接到一起
   img_gray_left_.copyTo(img_gray_.colRange(0, img_gray_left_.cols));
   img_gray_front_.copyTo(img_gray_.colRange(img_gray_left_.cols, 2 * img_gray_left_.cols));
   img_gray_right_.copyTo(img_gray_.colRange(2 * img_gray_left_.cols, 3 * img_gray_left_.cols));
@@ -350,7 +351,7 @@ void Tracking::Sysinitialization() {
       // set coordinate orgin to first odom
       cv::Mat front2wheel = MultiCamExt::GetInstance().GetFront2Wheel();
 
-      // question: 这个过程怎么理解baselink->camera->frame?
+      // odom inc->twc inc
       cv::Mat init2odom = MultiCamExt::GetInstance().BaselinkPose2Camera(
           Converter::toOdometryMatrix(initial_mc_frame_.odom_vector_),
           FRONT_CAMERA);

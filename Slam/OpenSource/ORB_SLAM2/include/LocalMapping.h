@@ -40,7 +40,7 @@ class Map;
 class LocalMapping
 {
 public:
-    LocalMapping(Map* pMap, const float bMonocular);
+    LocalMapping(Map* pMap, bool bMonocular);
 
     void SetLoopCloser(LoopClosing* pLoopCloser);
 

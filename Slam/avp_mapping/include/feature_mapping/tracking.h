@@ -123,7 +123,7 @@ protected:
   // ORB
   ORBextractor *orb_extractor_left_, *orb_extractor_front_,
       *orb_extractor_right_, *orb_extractor_back_;
-  ORBextractor *init_orb_extrator_;   // question: 初始化成功前, 先多提取特征点
+  ORBextractor *init_orb_extrator_;   // 初始化成功前, 先多提取特征点
   std::vector<ORBextractor *> extractors_;
 
   // BoW

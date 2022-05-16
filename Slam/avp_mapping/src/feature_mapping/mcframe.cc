@@ -63,7 +63,7 @@ void MCFrame::ComputeBoW() {
     frames_[i].ComputeBoW();
   }
 }
-// question: Tcw和tcw_命名是不是应该改成其他
+// 这里的Tcw应该为odom增量转相机移动增量
 void MCFrame::UpdatePose() {
   if (tcw_.empty()) {
     cout << " fatal error  MCframe pose empty " << endl;

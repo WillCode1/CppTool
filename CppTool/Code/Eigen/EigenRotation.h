@@ -7,10 +7,8 @@
 #include <random>
 #include <ctime>
 #include <iostream>
-#include <Eigen/Dense>
-#include "Timer.hpp"
-
-using namespace Eigen;
+#include "Eigen/Dense"
+#include "Common.h"
 
 namespace Eigen_Tool {
     class EigenRotation {

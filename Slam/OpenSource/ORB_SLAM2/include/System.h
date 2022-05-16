@@ -166,8 +166,8 @@ private:
 
     // Change mode flags
     std::mutex mMutexMode;
-    bool mbActivateLocalizationMode;
-    bool mbDeactivateLocalizationMode;
+    bool mbActivateLocalizationMode;    // 激活纯定位
+    bool mbDeactivateLocalizationMode;  // 退出纯定位
 
     // Tracking state
     int mTrackingState;

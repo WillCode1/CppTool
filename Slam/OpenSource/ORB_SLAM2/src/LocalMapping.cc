@@ -31,7 +31,7 @@ namespace ORB_SLAM2
 // https://zhuanlan.zhihu.com/p/84904749
 // LocalMapping是管理局部地图的类，管理的内容包括关键帧和地图点，所谓管理就是增加、删除和修正位姿。
 
-LocalMapping::LocalMapping(Map *pMap, const float bMonocular):
+LocalMapping::LocalMapping(Map *pMap, bool bMonocular):
     mbMonocular(bMonocular), mbResetRequested(false), mbFinishRequested(false), mbFinished(true), mpMap(pMap),
     mbAbortBA(false), mbStopped(false), mbStopRequested(false), mbNotStop(false), mbAcceptKeyFrames(true)
 {
