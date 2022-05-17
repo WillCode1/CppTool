@@ -156,7 +156,7 @@ protected:
   unsigned int last_keyfrm_id_;
   unsigned int last_reloc_frm_id_;
   cv::Mat velocity_;
-  bool slam_mode_;    // 纯ododm/+视觉
+  bool slam_mode_;    // 纯ododm/+视觉, 纯定位?
   MultiCam *multi_cam_;
   list<MapPoint *> mlpTemporalPoints;
 };

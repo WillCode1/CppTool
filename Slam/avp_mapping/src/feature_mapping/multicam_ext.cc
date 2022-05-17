@@ -26,7 +26,7 @@ MultiCamExt &MultiCamExt::GetInstance() {
   return *instance;
 }
 
-// 此处相机外参cam_ext_, 表示的是Tcicf(当前相机相对于前置的转换)，不是一般意义的Tcfci(Twc)
+// 此处相机外参cam_ext_, 表示的是Tcicf(当前相机相对于前置的转换)，不是一般意义的Tcw
 // 此处front2wheel_应该是wheel2front_, 即Tcfb
 // △Tciw = Tcicf * Tcfb * △Tbw
 cv::Mat MultiCamExt::BaselinkPose2Camera(cv::Mat &tw2baselink,
