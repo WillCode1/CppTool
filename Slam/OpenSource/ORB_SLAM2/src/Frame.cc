@@ -33,6 +33,7 @@ float Frame::mnMinX, Frame::mnMinY, Frame::mnMaxX, Frame::mnMaxY;
 float Frame::mfGridElementWidthInv, Frame::mfGridElementHeightInv;
 
 /*
+    //https://zhuanlan.zhihu.com/p/84201110
     Frame是帧，也就是对应一帧图像，可以是单目、双目、RGBD，所以该类所包含的操作就是slam中以帧为单位进行的处理，主要包括以下方面：
     1）读写该帧对应的相机位姿
     2）处理帧和特征点之间的关系，包括判断特征点是否在视野内、获取该帧一定区域内的特征点、特征点校正等
@@ -63,8 +64,12 @@ Frame::Frame(const Frame &frame)
         SetPose(frame.mTcw);
 }
 
-//https://zhuanlan.zhihu.com/p/84201110
 /*
+    三个构造函数的主要功能类似，就是提取并校正特征，然后把特征点划分到网格中，这样做是为了让特征点在图像中分布得更均匀。
+    另外，还有深度问题，双目使用SAD去恢复深度，RGBD相机自身有深度值，而单目无法获得深度，所以相应变量直接赋值为-1，这些都在构造函数中完成。
+ */
+/*
+    双目相机构造:
     const cv::Mat &imLeft, //左目图像
     const cv::Mat &imRight, //右目图像
     const double &timeStamp, //时间戳
@@ -267,6 +272,7 @@ void Frame::AssignFeaturesToGrid()
     }
 }
 
+// 计算图像上的ORB特征和描述符
 void Frame::ExtractORB(int flag, const cv::Mat &im)
 {
     if(flag==0)

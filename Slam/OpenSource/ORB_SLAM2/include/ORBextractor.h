@@ -95,7 +95,7 @@ protected:
     std::vector<cv::Point> pattern;
 
     int nfeatures;
-    double scaleFactor;
+    double scaleFactor; // question
     int nlevels;
     int iniThFAST;
     int minThFAST;
@@ -104,6 +104,7 @@ protected:
 
     std::vector<int> umax;
 
+    // question
     std::vector<float> mvScaleFactor;
     std::vector<float> mvInvScaleFactor;    
     std::vector<float> mvLevelSigma2;
