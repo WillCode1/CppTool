@@ -1,0 +1,88 @@
+%YAML:1.0
+#--------------------------------------------------------------------------------------------
+#  Camera model
+#--------------------------------------------------------------------------------------------
+# FISHEYE_OCAM_MODEL = 0,
+# FISHEYE_OPENCV_MODEL = 1,
+# PINHOLE_MODEL = 2,
+Camera_model: 2
+
+#--------------------------------------------------------------------------------------------
+#  Camera parameter (pinhole)
+#--------------------------------------------------------------------------------------------
+Camera_fx: 2603.26067878544
+Camera_fy: 2606.61924602435
+Camera_cx: 1035.909202
+Camera_cy: 606.694984
+Camera_k1: -0.350306
+Camera_k2: -0.034470
+Camera_p1: 0.000360
+Camera_p2: -0.002344
+Camera_k3: 0
+
+#--------------------------------------------------------------------------------------------
+#  Camera parameter (pinhole-undistort)
+#--------------------------------------------------------------------------------------------
+Camera_undistort_fx: 2.6032607421875000e+03
+Camera_undistort_fy: 2.6066191406250000e+03
+Camera_undistort_cx: 1.0359091796875000e+03
+Camera_undistort_cy: 6.0669500732421875e+02
+
+#--------------------------------------------------------------------------------------------
+#  Camera parameter (Ocam)
+#--------------------------------------------------------------------------------------------
+# read from calib_results_fisheye.txt that in the same path with config.yaml
+
+#--------------------------------------------------------------------------------------------
+#  Image parameter
+#--------------------------------------------------------------------------------------------
+Image_width: 1920
+Image_height: 1208
+
+# Use in front_camera_extrinsic_calib
+# 50 100 150 200 
+Edge_threadhold: 100
+
+#--------------------------------------------------------------------------------------------
+#  Extrinsic parameter
+#--------------------------------------------------------------------------------------------
+# RPY (unit:deg)
+Angle_pitch: 5.8569837964296667e-01
+Angle_yaw: 7.8705294334432430e-01
+Angle_roll: 0.
+
+Camera_height: 1.260
+
+#--------------------------------------------------------------------------------------------
+#  ROI parameters
+#--------------------------------------------------------------------------------------------
+# Use in front_camera_extrinsic_calib
+# ROI's shape is isosceles trapezoid 
+Roi_width_top: 220
+Roi_width_bottom: 1920
+Roi_height_min: 650
+Roi_height_max: 1080
+
+# Use in front_camera_extrinsic_adjustment
+#ROI's shape is rectangle 
+Roi_uv_left: 300
+Roi_uv_right: 1600
+Roi_uv_top: 700
+Roi_uv_bottom: 1200
+
+#--------------------------------------------------------------------------------------------
+#  Data
+#--------------------------------------------------------------------------------------------
+# Use in front_camera_extrinsic_calib
+# The '*' symbol is the IMAGE_ID holder
+Calibration_Image_Paths: ../../data/mkz_0231/frame_vc1_*.jpg
+# Single image for front_camera_extrinsic_adjustment
+Adjustment_Image_Path: ../../data/mkz_0231/frame_vc1_6280.jpg
+#List of input image sequences
+Image_Sequences:
+  #[Begin, End]
+  - [6250, 6304]
+  - [7340, 7425]
+  - [21400, 21476]
+
+

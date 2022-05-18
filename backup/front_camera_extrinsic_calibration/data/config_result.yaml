@@ -1,0 +1,9 @@
+%YAML:1.0
+---
+Camera_undistort_fx: 2.6032607421875000e+03
+Camera_undistort_fy: 2.6066191406250000e+03
+Camera_undistort_cx: 1.0359091796875000e+03
+Camera_undistort_cy: 6.0669500732421875e+02
+Angle_pitch: 5.8569837964296667e-01
+Angle_yaw: 7.8705294334432430e-01
+Angle_roll: 0.
