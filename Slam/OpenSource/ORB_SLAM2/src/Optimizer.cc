@@ -125,7 +125,7 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
             nEdges++;
 
             //mvKeysUn中存放的是校正后的特征点
-            const cv::KeyPoint &kpUn = pKF->mvKeysUn[mit->second];
+            const cv::KeyPoint &kpUn = pKF->mvKeypointsUndistorted[mit->second];
             
             //mvuRight里面默认值为-1,在双目和RGBD相机时会被赋值
             //所以此处“<0”的判断条件代表只有左目观测，相反，则是双目均可观测，此处双目包括RGBD虚拟出的右目
@@ -324,7 +324,7 @@ int Optimizer::PoseOptimization(Frame *pFrame)
                 pFrame->mvbOutlier[i] = false;
 
                 Eigen::Matrix<double,2,1> obs;
-                const cv::KeyPoint &kpUn = pFrame->mvKeysUn[i];
+                const cv::KeyPoint &kpUn = pFrame->mvKeypointsUndistorted[i];
                 obs << kpUn.pt.x, kpUn.pt.y;
 
                 g2o::EdgeSE3ProjectXYZOnlyPose* e = new g2o::EdgeSE3ProjectXYZOnlyPose();
@@ -361,7 +361,7 @@ int Optimizer::PoseOptimization(Frame *pFrame)
 
                 //SET EDGE
                 Eigen::Matrix<double,3,1> obs;
-                const cv::KeyPoint &kpUn = pFrame->mvKeysUn[i];
+                const cv::KeyPoint &kpUn = pFrame->mvKeypointsUndistorted[i];
                 const float &kp_ur = pFrame->mvuRight[i];
                 obs << kpUn.pt.x, kpUn.pt.y, kp_ur;
 
@@ -648,7 +648,7 @@ void Optimizer::LocalBundleAdjustment(KeyFrame *pKF, bool* pbStopFlag, Map* pMap
 
             if(!pKFi->isBad())
             {                
-                const cv::KeyPoint &kpUn = pKFi->mvKeysUn[mit->second];
+                const cv::KeyPoint &kpUn = pKFi->mvKeypointsUndistorted[mit->second];
 
                 // Monocular observation
                 // 单目
@@ -1264,7 +1264,7 @@ int Optimizer::OptimizeSim3(KeyFrame *pKF1, KeyFrame *pKF2, vector<MapPoint *> &
         // Set edge x1 = S12*X2
         // 添加误差项边
         Eigen::Matrix<double,2,1> obs1;
-        const cv::KeyPoint &kpUn1 = pKF1->mvKeysUn[i];
+        const cv::KeyPoint &kpUn1 = pKF1->mvKeypointsUndistorted[i];
         obs1 << kpUn1.pt.x, kpUn1.pt.y;
 
         g2o::EdgeSim3ProjectXYZ* e12 = new g2o::EdgeSim3ProjectXYZ();
@@ -1283,7 +1283,7 @@ int Optimizer::OptimizeSim3(KeyFrame *pKF1, KeyFrame *pKF2, vector<MapPoint *> &
 
         // Set edge x2 = S21*X1
         Eigen::Matrix<double,2,1> obs2;
-        const cv::KeyPoint &kpUn2 = pKF2->mvKeysUn[i2];
+        const cv::KeyPoint &kpUn2 = pKF2->mvKeypointsUndistorted[i2];
         obs2 << kpUn2.pt.x, kpUn2.pt.y;
 
         //注意这个的边类型和上面不一样

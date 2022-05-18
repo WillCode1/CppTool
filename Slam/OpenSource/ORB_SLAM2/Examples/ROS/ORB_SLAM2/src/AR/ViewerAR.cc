@@ -242,7 +242,7 @@ void ViewerAR::SetImagePose(const cv::Mat &im, const cv::Mat &Tcw, const int &st
     mImage = im.clone();
     mTcw = Tcw.clone();
     mStatus = status;
-    mvKeys = vKeys;
+    mvKeypoints = vKeys;
     mvMPs = vMPs;
 }
 
@@ -252,7 +252,7 @@ void ViewerAR::GetImagePose(cv::Mat &im, cv::Mat &Tcw, int &status, std::vector<
     im = mImage.clone();
     Tcw = mTcw.clone();
     status = mStatus;
-    vKeys = mvKeys;
+    vKeys = mvKeypoints;
     vMPs = mvMPs;
 }
 

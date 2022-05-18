@@ -78,8 +78,8 @@ Sim3Solver::Sim3Solver(KeyFrame *pKF1, KeyFrame *pKF2, const vector<MapPoint *> 
             if(indexKF1<0 || indexKF2<0)
                 continue;
 
-            const cv::KeyPoint &kp1 = pKF1->mvKeysUn[indexKF1];
-            const cv::KeyPoint &kp2 = pKF2->mvKeysUn[indexKF2];
+            const cv::KeyPoint &kp1 = pKF1->mvKeypointsUndistorted[indexKF1];
+            const cv::KeyPoint &kp2 = pKF2->mvKeypointsUndistorted[indexKF2];
 
             const float sigmaSquare1 = pKF1->mvLevelSigma2[kp1.octave];
             const float sigmaSquare2 = pKF2->mvLevelSigma2[kp2.octave];

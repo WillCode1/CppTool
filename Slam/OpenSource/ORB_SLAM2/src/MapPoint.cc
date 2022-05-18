@@ -75,7 +75,7 @@ MapPoint::MapPoint(const cv::Mat &Pos, Map* pMap, Frame* pFrame, const int &idxF
     // 见UpdateNormalAndDepth
     cv::Mat PC = Pos - Ow;
     const float dist = cv::norm(PC);
-    const int level = pFrame->mvKeysUn[idxF].octave;
+    const int level = pFrame->mvKeypointsUndistorted[idxF].octave;
     const float levelScaleFactor = pFrame->mvScaleFactors[level];
     const int nLevels = pFrame->mnScaleLevels;
 
@@ -430,7 +430,7 @@ void MapPoint::UpdateNormalAndDepth()
 
     cv::Mat PC = Pos - pRefKF->GetCameraCenter();
     const float dist = cv::norm(PC);
-    const int level = pRefKF->mvKeysUn[observations[pRefKF]].octave;
+    const int level = pRefKF->mvKeypointsUndistorted[observations[pRefKF]].octave;
     const float levelScaleFactor =  pRefKF->mvScaleFactors[level];
     const int nLevels = pRefKF->mnScaleLevels;
 

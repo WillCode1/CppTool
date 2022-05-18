@@ -580,13 +580,13 @@ void Tracking::MonocularInitialization()
     if(!mpInitializer)
     {
         // Set Reference Frame
-        if(mCurrentFrame.mvKeys.size()>100)
+        if(mCurrentFrame.mvKeypoints.size()>100)
         {
             mInitialFrame = Frame(mCurrentFrame);
             mLastFrame = Frame(mCurrentFrame);
-            mvbPrevMatched.resize(mCurrentFrame.mvKeysUn.size());
-            for(size_t i=0; i<mCurrentFrame.mvKeysUn.size(); i++)
-                mvbPrevMatched[i]=mCurrentFrame.mvKeysUn[i].pt;
+            mvbPrevMatched.resize(mCurrentFrame.mvKeypointsUndistorted.size());
+            for(size_t i=0; i<mCurrentFrame.mvKeypointsUndistorted.size(); i++)
+                mvbPrevMatched[i]=mCurrentFrame.mvKeypointsUndistorted[i].pt;
 
             if(mpInitializer)
                 delete mpInitializer;
@@ -601,7 +601,7 @@ void Tracking::MonocularInitialization()
     else
     {
         // Try to initialize
-        if((int)mCurrentFrame.mvKeys.size()<=100)
+        if((int)mCurrentFrame.mvKeypoints.size()<=100)
         {
             delete mpInitializer;
             mpInitializer = static_cast<Initializer*>(NULL);

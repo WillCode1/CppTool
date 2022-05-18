@@ -106,7 +106,7 @@ private:
     cv::Mat mTcw;
     cv::Mat mImage;
     int mStatus;
-    std::vector<cv::KeyPoint> mvKeys;
+    std::vector<cv::KeyPoint> mvKeypoints;
     std::vector<MapPoint*> mvMPs;
 
 };

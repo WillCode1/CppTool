@@ -46,8 +46,8 @@ Frame::Frame()
 Frame::Frame(const Frame &frame)
     :mpORBvocabulary(frame.mpORBvocabulary), mpORBextractorLeft(frame.mpORBextractorLeft), mpORBextractorRight(frame.mpORBextractorRight),
      mTimeStamp(frame.mTimeStamp), mK(frame.mK.clone()), mDistCoef(frame.mDistCoef.clone()),
-     mbf(frame.mbf), mb(frame.mb), mThDepth(frame.mThDepth), N(frame.N), mvKeys(frame.mvKeys),
-     mvKeysRight(frame.mvKeysRight), mvKeysUn(frame.mvKeysUn),  mvuRight(frame.mvuRight),
+     mbf(frame.mbf), mb(frame.mb), mThDepth(frame.mThDepth), N(frame.N), mvKeypoints(frame.mvKeypoints),
+     mvKeypointsRight(frame.mvKeypointsRight), mvKeypointsUndistorted(frame.mvKeypointsUndistorted),  mvuRight(frame.mvuRight),
      mvDepth(frame.mvDepth), mBowVec(frame.mBowVec), mFeatVec(frame.mFeatVec),
      mDescriptors(frame.mDescriptors.clone()), mDescriptorsRight(frame.mDescriptorsRight.clone()),
      mvpMapPoints(frame.mvpMapPoints), mvbOutlier(frame.mvbOutlier), mnId(frame.mnId),
@@ -103,9 +103,9 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
     threadLeft.join();
     threadRight.join();
 
-    N = mvKeys.size();
+    N = mvKeypoints.size();
 
-    if(mvKeys.empty())
+    if(mvKeypoints.empty())
         return;
 
     // 对特征点进行畸变校正
@@ -162,9 +162,9 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeSt
     // ORB extraction
     ExtractORB(0,imGray);
 
-    N = mvKeys.size();
+    N = mvKeypoints.size();
 
-    if(mvKeys.empty())
+    if(mvKeypoints.empty())
         return;
 
     UndistortKeyPoints();
@@ -218,9 +218,9 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extra
     // ORB extraction
     ExtractORB(0,imGray);
 
-    N = mvKeys.size();
+    N = mvKeypoints.size();
 
-    if(mvKeys.empty())
+    if(mvKeypoints.empty())
         return;
 
     UndistortKeyPoints();
@@ -264,7 +264,7 @@ void Frame::AssignFeaturesToGrid()
 
     for(int i=0;i<N;i++)
     {
-        const cv::KeyPoint &kp = mvKeysUn[i];
+        const cv::KeyPoint &kp = mvKeypointsUndistorted[i];
 
         int nGridPosX, nGridPosY;
         if(PosInGrid(kp,nGridPosX,nGridPosY))
@@ -276,9 +276,9 @@ void Frame::AssignFeaturesToGrid()
 void Frame::ExtractORB(int flag, const cv::Mat &im)
 {
     if(flag==0)
-        (*mpORBextractorLeft)(im,cv::Mat(),mvKeys,mDescriptors);
+        (*mpORBextractorLeft)(im,cv::Mat(),mvKeypoints,mDescriptors);
     else
-        (*mpORBextractorRight)(im,cv::Mat(),mvKeysRight,mDescriptorsRight);
+        (*mpORBextractorRight)(im,cv::Mat(),mvKeypointsRight,mDescriptorsRight);
 }
 
 void Frame::SetPose(cv::Mat Tcw)
@@ -394,7 +394,7 @@ vector<size_t> Frame::GetFeaturesInArea(const float &x, const float  &y, const f
 
             for(size_t j=0, jend=vCell.size(); j<jend; j++)
             {
-                const cv::KeyPoint &kpUn = mvKeysUn[vCell[j]];
+                const cv::KeyPoint &kpUn = mvKeypointsUndistorted[vCell[j]];
                 if(bCheckLevels)
                 {
                     if(kpUn.octave<minLevel)
@@ -442,7 +442,7 @@ void Frame::UndistortKeyPoints()
 {
     if(mDistCoef.at<float>(0)==0.0)
     {
-        mvKeysUn=mvKeys;
+        mvKeypointsUndistorted=mvKeypoints;
         return;
     }
 
@@ -450,8 +450,8 @@ void Frame::UndistortKeyPoints()
     cv::Mat mat(N,2,CV_32F);
     for(int i=0; i<N; i++)
     {
-        mat.at<float>(i,0)=mvKeys[i].pt.x;
-        mat.at<float>(i,1)=mvKeys[i].pt.y;
+        mat.at<float>(i,0)=mvKeypoints[i].pt.x;
+        mat.at<float>(i,1)=mvKeypoints[i].pt.y;
     }
 
     // Undistort points
@@ -460,13 +460,13 @@ void Frame::UndistortKeyPoints()
     mat=mat.reshape(1);
 
     // Fill undistorted keypoint vector
-    mvKeysUn.resize(N);
+    mvKeypointsUndistorted.resize(N);
     for(int i=0; i<N; i++)
     {
-        cv::KeyPoint kp = mvKeys[i];
+        cv::KeyPoint kp = mvKeypoints[i];
         kp.pt.x=mat.at<float>(i,0);
         kp.pt.y=mat.at<float>(i,1);
-        mvKeysUn[i]=kp;
+        mvKeypointsUndistorted[i]=kp;
     }
 }
 
@@ -515,13 +515,13 @@ void Frame::ComputeStereoMatches()
     for(int i=0; i<nRows; i++)
         vRowIndices[i].reserve(200);
 
-    const int Nr = mvKeysRight.size();
+    const int Nr = mvKeypointsRight.size();
 
     for(int iR=0; iR<Nr; iR++)
     {
-        const cv::KeyPoint &kp = mvKeysRight[iR];
+        const cv::KeyPoint &kp = mvKeypointsRight[iR];
         const float &kpY = kp.pt.y;
-        const float r = 2.0f*mvScaleFactors[mvKeysRight[iR].octave];
+        const float r = 2.0f*mvScaleFactors[mvKeypointsRight[iR].octave];
         const int maxr = ceil(kpY+r);
         const int minr = floor(kpY-r);
 
@@ -540,7 +540,7 @@ void Frame::ComputeStereoMatches()
 
     for(int iL=0; iL<N; iL++)
     {
-        const cv::KeyPoint &kpL = mvKeys[iL];
+        const cv::KeyPoint &kpL = mvKeypoints[iL];
         const int &levelL = kpL.octave;
         const float &vL = kpL.pt.y;
         const float &uL = kpL.pt.x;
@@ -565,7 +565,7 @@ void Frame::ComputeStereoMatches()
         for(size_t iC=0; iC<vCandidates.size(); iC++)
         {
             const size_t iR = vCandidates[iC];
-            const cv::KeyPoint &kpR = mvKeysRight[iR];
+            const cv::KeyPoint &kpR = mvKeypointsRight[iR];
 
             if(kpR.octave<levelL-1 || kpR.octave>levelL+1)
                 continue;
@@ -589,7 +589,7 @@ void Frame::ComputeStereoMatches()
         if(bestDist<thOrbDist)
         {
             // coordinates in image pyramid at keypoint scale
-            const float uR0 = mvKeysRight[bestIdxR].pt.x;
+            const float uR0 = mvKeypointsRight[bestIdxR].pt.x;
             const float scaleFactor = mvInvScaleFactors[kpL.octave];
             const float scaleduL = round(kpL.pt.x*scaleFactor);
             const float scaledvL = round(kpL.pt.y*scaleFactor);
@@ -684,8 +684,8 @@ void Frame::ComputeStereoFromRGBD(const cv::Mat &imDepth)
 
     for(int i=0; i<N; i++)
     {
-        const cv::KeyPoint &kp = mvKeys[i];
-        const cv::KeyPoint &kpU = mvKeysUn[i];
+        const cv::KeyPoint &kp = mvKeypoints[i];
+        const cv::KeyPoint &kpU = mvKeypointsUndistorted[i];
 
         const float &v = kp.pt.y;
         const float &u = kp.pt.x;
@@ -706,8 +706,8 @@ cv::Mat Frame::UnprojectStereo(const int &i)
     const float z = mvDepth[i];
     if(z>0)
     {
-        const float u = mvKeysUn[i].pt.x;
-        const float v = mvKeysUn[i].pt.y;
+        const float u = mvKeypointsUndistorted[i].pt.x;
+        const float v = mvKeypointsUndistorted[i].pt.y;
         const float x = (u-cx)*z*invfx;
         const float y = (v-cy)*z*invfy;
         cv::Mat x3Dc = (cv::Mat_<float>(3,1) << x, y, z);
