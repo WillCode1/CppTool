@@ -29,6 +29,7 @@
 namespace ORB_SLAM2
 {
 
+// https://zhuanlan.zhihu.com/p/83735700
 System::System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor,
                const bool bUseViewer):mSensor(sensor), mpViewer(static_cast<Viewer*>(NULL)), mbReset(false),mbActivateLocalizationMode(false),
         mbDeactivateLocalizationMode(false)
