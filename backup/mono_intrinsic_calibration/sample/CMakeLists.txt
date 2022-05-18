@@ -1,0 +1,5 @@
+add_executable(mono_intrinsic_calibration mono_intrinsic_calibration.cpp)
+target_link_libraries(mono_intrinsic_calibration  mono_intrinsic_lib)
+
+add_executable(view_undistorted view_undistorted.cpp)
+target_link_libraries(view_undistorted  mono_intrinsic_lib)
