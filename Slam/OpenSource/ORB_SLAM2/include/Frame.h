@@ -151,7 +151,6 @@ public:
 
     // MapPoints associated to keypoints, NULL pointer if no association.
     std::vector<MapPoint*> mvpMapPoints;
-
     // Flag to identify outlier associations.
     std::vector<bool> mvbOutlier;
 

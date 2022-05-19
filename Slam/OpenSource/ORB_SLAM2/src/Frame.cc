@@ -65,6 +65,7 @@ Frame::Frame(const Frame &frame)
 }
 
 /*
+    三个构造差别就是计算深度不同.
     三个构造函数的主要功能类似，就是提取并校正特征，然后把特征点划分到网格中，这样做是为了让特征点在图像中分布得更均匀。
     另外，还有深度问题，双目使用SAD去恢复深度，RGBD相机自身有深度值，而单目无法获得深度，所以相应变量直接赋值为-1，这些都在构造函数中完成。
  */
@@ -98,16 +99,19 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
     mvInvLevelSigma2 = mpORBextractorLeft->GetInverseScaleSigmaSquares();
 
     // ORB extraction
+    // 同时对左右目提特征
     thread threadLeft(&Frame::ExtractORB,this,0,imLeft);
     thread threadRight(&Frame::ExtractORB,this,1,imRight);
     threadLeft.join();
     threadRight.join();
 
-    N = mvKeypoints.size();
+    N = mvKeys.size();
 
-    if(mvKeypoints.empty())
+    //mvKeys存放提取的特征点，如果没有特征点，则退出
+    if(mvKeys.empty())
         return;
 
+    // question: 先提取特征点后去畸变?
     // 对特征点进行畸变校正
     UndistortKeyPoints();
 
@@ -115,11 +119,12 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
     // 深度存放在mvuRight 和 mvDepth 中
     ComputeStereoMatches();
 
+    // 对应的mappoints
     mvpMapPoints = vector<MapPoint*>(N,static_cast<MapPoint*>(NULL));    
     mvbOutlier = vector<bool>(N,false);
 
-
     // This is done only for the first Frame (or after a change in the calibration)
+    //在第一次进入或者标定文件发生变化时调用该函数，重新计算相机相关参数
     if(mbInitialComputations)
     {
         ComputeImageBounds(imLeft);
@@ -143,6 +148,9 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
     AssignFeaturesToGrid();
 }
 
+/*
+    RGBD相机构造
+ */
 Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeStamp, ORBextractor* extractor,ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth)
     :mpORBvocabulary(voc),mpORBextractorLeft(extractor),mpORBextractorRight(static_cast<ORBextractor*>(NULL)),
      mTimeStamp(timeStamp), mK(K.clone()),mDistCoef(distCoef.clone()), mbf(bf), mThDepth(thDepth)
@@ -198,7 +206,9 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeSt
     AssignFeaturesToGrid();
 }
 
-
+/*
+    单目相机构造
+ */
 Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extractor,ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth)
     :mpORBvocabulary(voc),mpORBextractorLeft(extractor),mpORBextractorRight(static_cast<ORBextractor*>(NULL)),
      mTimeStamp(timeStamp), mK(K.clone()),mDistCoef(distCoef.clone()), mbf(bf), mThDepth(thDepth)
@@ -226,6 +236,7 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extra
     UndistortKeyPoints();
 
     // Set no stereo information
+    // 没有右目，所以全都赋值为-1
     mvuRight = vector<float>(N,-1);
     mvDepth = vector<float>(N,-1);
 
@@ -250,11 +261,12 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extra
         mbInitialComputations=false;
     }
 
-    mb = mbf/fx;
+    mb = mbf/fx;    // quewtion: 单目、RGBD也有基线?
 
     AssignFeaturesToGrid();
 }
 
+// 把特征点划分到网格中，这种的好处是可以设置网格内特征点上限，从而使特征点分布更均匀
 void Frame::AssignFeaturesToGrid()
 {
     int nReserve = 0.5f*N/(FRAME_GRID_COLS*FRAME_GRID_ROWS);
@@ -474,6 +486,7 @@ void Frame::ComputeImageBounds(const cv::Mat &imLeft)
 {
     if(mDistCoef.at<float>(0)!=0.0)
     {
+        // lefttop, righttop, leftbottom, rightbottom
         cv::Mat mat(4,2,CV_32F);
         mat.at<float>(0,0)=0.0; mat.at<float>(0,1)=0.0;
         mat.at<float>(1,0)=imLeft.cols; mat.at<float>(1,1)=0.0;
