@@ -12,7 +12,7 @@ namespace FeatureSLAM {
 
 struct MultiCam {
   std::vector<cv::Mat> cam_extrinsic_;
-  std::vector<Eigen::Matrix<double, 6, 6>> se3_cam_extrinsic_adj_;
+  std::vector<Eigen::Matrix<double, 6, 6>> se3_cam_extrinsic_adj_;  // question: 为什么是6d
   std::vector<g2o::SE3Quat> se3quat_cam_extrinsic_;
   MultiCam() {}
   MultiCam(std::vector<cv::Mat> vmTcamExt) {

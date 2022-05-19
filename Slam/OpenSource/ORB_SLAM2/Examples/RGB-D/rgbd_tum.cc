@@ -34,6 +34,15 @@ using namespace std;
 void LoadImages(const string &strAssociationFilename, vector<string> &vstrImageFilenamesRGB,
                 vector<string> &vstrImageFilenamesD, vector<double> &vTimestamps);
 
+/*
+    How to run?
+    
+    ./Examples/RGB-D/rgbd_tum
+    Vocabulary/ORBvoc.txt   // 词袋文件
+    Examples/RGB-D/TUM2.yaml    // 配置文件
+    /home/ttwang/ORB_SLAM2/rgbd_dataset_freiburg2_pioneer_360   // 图片所在目录
+    /home/ttwang/ORB_SLAM2/rgbd_dataset_freiburg2_pioneer_360/associations.txt  // 深度图与rgb的关联文件
+ */
 int main(int argc, char **argv)
 {
     if(argc != 5)

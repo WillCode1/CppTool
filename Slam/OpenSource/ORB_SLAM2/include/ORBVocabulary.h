@@ -28,6 +28,7 @@
 namespace ORB_SLAM2
 {
 
+// question: 为什么是这个词袋模型, TDescriptor?? DBoW2::FORB?? 词袋模型的使用训练??参考视觉SLAM十四讲
 typedef DBoW2::TemplatedVocabulary<DBoW2::FORB::TDescriptor, DBoW2::FORB>
   ORBVocabulary;
 

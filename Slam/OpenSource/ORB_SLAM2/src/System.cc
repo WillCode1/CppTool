@@ -29,6 +29,7 @@
 namespace ORB_SLAM2
 {
 
+// https://zhuanlan.zhihu.com/p/83735700
 System::System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor,
                const bool bUseViewer):mSensor(sensor), mpViewer(static_cast<Viewer*>(NULL)), mbReset(false),mbActivateLocalizationMode(false),
         mbDeactivateLocalizationMode(false)
@@ -78,8 +79,8 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     mpMap = new Map();
 
     //Create Drawers. These are used by the Viewer
-    mpFrameDrawer = new FrameDrawer(mpMap);
-    mpMapDrawer = new MapDrawer(mpMap, strSettingsFile);
+    mpFrameDrawer = new FrameDrawer(mpMap);                 // 画关键帧
+    mpMapDrawer = new MapDrawer(mpMap, strSettingsFile);    // 画地图
 
     //Initialize the Tracking thread
     //(it will live in the main thread of execution, the one that called this constructor)
@@ -113,6 +114,11 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     mpLoopCloser->SetLocalMapper(mpLocalMapper);
 }
 
+/*
+    1) 判断是否需要进入或者退出纯定位模式，如果需要则执行
+    2) 判断是否需要重启tracking，如果需要则执行
+    3) 执行双目的跟踪程序。GrabImageStereo共有三个参数，分别是左目、右目和时间戳
+ */
 cv::Mat System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timestamp)
 {
     if(mSensor!=STEREO)

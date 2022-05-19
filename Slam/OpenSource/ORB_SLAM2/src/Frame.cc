@@ -32,6 +32,12 @@ float Frame::cx, Frame::cy, Frame::fx, Frame::fy, Frame::invfx, Frame::invfy;
 float Frame::mnMinX, Frame::mnMinY, Frame::mnMaxX, Frame::mnMaxY;
 float Frame::mfGridElementWidthInv, Frame::mfGridElementHeightInv;
 
+/*
+    Frame是帧，也就是对应一帧图像，可以是单目、双目、RGBD，所以该类所包含的操作就是slam中以帧为单位进行的处理，主要包括以下方面：
+    1）读写该帧对应的相机位姿
+    2）处理帧和特征点之间的关系，包括判断特征点是否在视野内、获取该帧一定区域内的特征点、特征点校正等
+    3）恢复深度，如果有RGBD就直接读取深度值，如果有双目，就用SAD进行深度恢复
+ */
 Frame::Frame()
 {}
 

@@ -59,6 +59,7 @@ bool Initializer::Initialize(
 
     cv::Mat trans_ref_w = MultiCamExt::GetInstance().GetTargetCamPose(
         ref_front_pose, FRONT_CAMERA, cam_index);
+    // inc?
     cv::Mat trans_cur_w = MultiCamExt::GetInstance().GetTargetCamPose(
         T21, FRONT_CAMERA, cam_index);
 

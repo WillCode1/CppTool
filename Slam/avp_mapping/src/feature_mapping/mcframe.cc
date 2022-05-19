@@ -63,6 +63,7 @@ void MCFrame::ComputeBoW() {
     frames_[i].ComputeBoW();
   }
 }
+// 这里的Tcw应该为odom增量转相机移动增量
 void MCFrame::UpdatePose() {
   if (tcw_.empty()) {
     cout << " fatal error  MCframe pose empty " << endl;

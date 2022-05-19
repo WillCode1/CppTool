@@ -106,7 +106,7 @@ public:
     long unsigned int mnLoopPointForKF;
     long unsigned int mnCorrectedByKF;
     long unsigned int mnCorrectedReference;    
-    cv::Mat mPosGBA;
+    cv::Mat mPosGBA;    // optimized by Global BA
     long unsigned int mnBAGlobalForKF;
 
 
@@ -124,7 +124,7 @@ protected:
      cv::Mat mNormalVector;
 
      // Best descriptor to fast matching
-     cv::Mat mDescriptor;
+     cv::Mat mDescriptor;   // 选择距离其他描述子中值距离最小的描述子作为地图点的描述子，基本上类似于取了个均值
 
      // Reference KeyFrame
      KeyFrame* mpRefKF;

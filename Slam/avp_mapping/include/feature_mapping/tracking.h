@@ -76,7 +76,7 @@ public:
       cam_extrinsic_; // Extrinsic parameters  (camera extrinsic pose
                       // relative to front camera )
 
-  std::vector<std::vector<int>> init_matches_;
+  std::vector<std::vector<int>> init_matches_;  // question: 这三个什么?
 
   std::vector<std::vector<cv::Point2f>> prematched_points_;
   std::vector<std::vector<cv::Point3f>> init_mappoints_;
@@ -123,7 +123,7 @@ protected:
   // ORB
   ORBextractor *orb_extractor_left_, *orb_extractor_front_,
       *orb_extractor_right_, *orb_extractor_back_;
-  ORBextractor *init_orb_extrator_;
+  ORBextractor *init_orb_extrator_;   // 初始化成功前, 先多提取特征点
   std::vector<ORBextractor *> extractors_;
 
   // BoW
@@ -156,7 +156,7 @@ protected:
   unsigned int last_keyfrm_id_;
   unsigned int last_reloc_frm_id_;
   cv::Mat velocity_;
-  bool slam_mode_;
+  bool slam_mode_;    // 纯ododm/+视觉, 纯定位?
   MultiCam *multi_cam_;
   list<MapPoint *> mlpTemporalPoints;
 };
