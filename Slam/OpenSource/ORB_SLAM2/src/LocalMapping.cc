@@ -312,7 +312,7 @@ void LocalMapping::CreateNewMapPoints()
         {
             // 如果是立体相机，关键帧间距太小时不生成3D点
             if(baseline<pKF2->mb)
-            continue;
+                continue;
         }
         else
         {

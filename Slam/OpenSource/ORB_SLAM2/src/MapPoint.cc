@@ -454,7 +454,6 @@ float MapPoint::GetMinDistanceInvariance()
     return 0.8f*mfMinDistance;
 }
 
-// 预测该地图点在什么范围内能够被观测到
 float MapPoint::GetMaxDistanceInvariance()
 {
     unique_lock<mutex> lock(mMutexPos);
@@ -479,6 +478,8 @@ float MapPoint::GetMaxDistanceInvariance()
     注意金字塔ScaleFactor和距离的关系：
     当特征点对应ScaleFactor为1.2的意思是：图片分辨率下降1.2倍后，可以提取出该特征点(分辨率更高的时候，肯定也可以提出，这里取金字塔中能够提取出该特征点最高层级作为该特征点的层级)，
     同时，由当前特征点的距离，推测所在的层级。
+
+    currentDist: 特征点到光心的距离
  */
 int MapPoint::PredictScale(const float &currentDist, KeyFrame* pKF)
 {

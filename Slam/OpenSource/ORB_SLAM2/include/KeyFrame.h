@@ -154,7 +154,7 @@ public:
     long unsigned int mnBAGlobalForKF;
 
     // Calibration parameters
-    const float fx, fy, cx, cy, invfx, invfy, mbf, mb, mThDepth;
+    const float fx, fy, cx, cy, invfx, invfy, mbf, mb, mThDepth;    // mThDepth用于区分远点和近点
 
     // Number of KeyPoints
     const int N;

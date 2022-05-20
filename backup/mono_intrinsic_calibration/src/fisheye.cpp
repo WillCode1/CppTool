@@ -115,6 +115,7 @@ bool Fisheye::ReadIntrinsics(const std::string &intrinsic_file) {
 
 cv::Mat Fisheye::Undistort(const cv::Mat &distorted_img) {
   cv::Mat undistorted_img, newCamMat;
+  // 使用指定fx/fy 或 指定FOV微调CamMat
   if (undistort_remap_.first.empty() || undistort_remap_.second.empty()) {
     newCamMat = cv::Mat::eye(3, 3, CV_64F);
     newCamMat.at<double>(0, 2) = config_.img_size.width / 2;

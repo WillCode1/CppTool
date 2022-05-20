@@ -126,7 +126,7 @@ public:
 
     // Threshold close/far points. Close points are inserted from 1 view.
     // Far points are inserted as in the monocular case from 2 views.
-    float mThDepth;
+    float mThDepth; // 用于区分远点和近点
 
     // Number of KeyPoints.
     int N;

@@ -89,12 +89,12 @@ public:
     int nObs;   //记录被观测的次数
 
     // Variables used by the tracking
-    float mTrackProjX;
-    float mTrackProjY;
-    float mTrackProjXR;
-    bool mbTrackInView;
-    int mnTrackScaleLevel;
-    float mTrackViewCos;
+    float mTrackProjX;  // u
+    float mTrackProjY;  // v
+    float mTrackProjXR; // 该3D点投影到双目右侧相机上的横坐标
+    bool mbTrackInView; // 是否在视野中
+    int mnTrackScaleLevel;  // 金字塔层级
+    float mTrackViewCos;    // FOV of mappoint
     long unsigned int mnTrackReferenceForFrame;
     long unsigned int mnLastFrameSeen;
 
