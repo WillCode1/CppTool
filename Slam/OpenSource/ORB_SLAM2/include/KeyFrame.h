@@ -197,7 +197,7 @@ protected:
     cv::Mat Twc;
     cv::Mat Ow;
 
-    cv::Mat Cw; // Stereo middel point. Only for visualization
+    cv::Mat Cw; // Stereo middle point. Only for visualization
 
     // MapPoints associated to keypoints
     std::vector<MapPoint*> mvpMapPoints;
@@ -210,17 +210,22 @@ protected:
     std::vector< std::vector <std::vector<size_t> > > mGrid;
 
     std::map<KeyFrame*,int> mConnectedKeyFrameWeights;
+    // KeyFrames按权重排序
     std::vector<KeyFrame*> mvpOrderedConnectedKeyFrames;
     std::vector<int> mvOrderedWeights;
 
     // Spanning Tree and Loop Edges
+    /*
+        Essential Graph就是Covisibility Graph的一种简化版，它通过“生成树（Spanning tree）”来管理各关键帧之间的关系，每个帧都有一个父节点和子节点，节点为其他关键帧，
+        在构建优化模型时，只有具有父子关系的关键帧之间才建立边，换言之，Essential Graph就是Covisibility Graph的子集，这样就大大减少了边的数量，从而起到减小计算量的作用
+     */
     bool mbFirstConnection;
     KeyFrame* mpParent;
     std::set<KeyFrame*> mspChildrens;
-    std::set<KeyFrame*> mspLoopEdges;
+    std::set<KeyFrame*> mspLoopEdges;   // 闭环关系
 
     // Bad flags
-    bool mbNotErase;
+    bool mbNotErase;    // 如果有闭环关系，则不删除
     bool mbToBeErased;
     bool mbBad;    
 

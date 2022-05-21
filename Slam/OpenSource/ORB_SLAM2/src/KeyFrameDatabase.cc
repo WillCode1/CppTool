@@ -28,6 +28,7 @@
 using namespace std;
 
 /*
+    // https://zhuanlan.zhihu.com/p/84388773
     该类的主要作用就是利用词袋数据，在已有的关键帧中查找和当前帧最接近的帧。
     这个功能有两个作用，
     一是重定位时候，通过检测当前帧和哪个关键帧最接近，来确定相机当前的位置和姿态，对应的检测函数是DetectRelocalizationCandidates。
@@ -37,7 +38,6 @@ using namespace std;
 namespace ORB_SLAM2
 {
 
-// https://zhuanlan.zhihu.com/p/84388773
 KeyFrameDatabase::KeyFrameDatabase (const ORBVocabulary &voc):
     mpVoc(&voc)
 {

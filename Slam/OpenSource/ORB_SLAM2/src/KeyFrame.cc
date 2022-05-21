@@ -28,7 +28,20 @@ namespace ORB_SLAM2
 
 long unsigned int KeyFrame::nNextId=0;
 
-// https://zhuanlan.zhihu.com/p/84293190
+/*
+    question: Covisbility Graph， Essential，Spanning Tree关系?
+
+    https://zhuanlan.zhihu.com/p/84293190
+
+    KeyFrame为关键帧，关键帧之所以存在是因为优化需要，所以KeyFrame的几乎所有内容都是为优化服务的。该类中的函数较多，我们需要归类梳理一下，明白其功能原理，才能真正弄懂它的内容。
+
+    图优化需要构建节点和边，节点很好理解，就是关键帧的位姿，所以需要有读写位姿的功能，边分为两种，
+    第一种边是和MapPoint之间的，所以需要有管理和MapPoint之间关系的函数，第二种边是和其他关键帧之间的，他们之间需要通过MapPoint产生联系，两帧能够共同观测到一定数量的MapPoint时则可以在他俩之间建立边，
+    这种关系叫共视，所以需要有管理共视关系的函数，这种通过共视关系构建的优化模型叫做Covisibility Graph，
+    但是，当需要优化较大范围的数据时，就会需要很大的计算量，因此需要简化，而ORB SLAM2中的Essential Graph就是Covisibility Graph的一种简化版，它通过“生成树（Spanning tree）”来管理各关键帧之间的关系，
+    每个帧都有一个父节点和子节点，节点为其他关键帧，在构建优化模型时，只有具有父子关系的关键帧之间才建立边，换言之，Essential Graph就是Covisibility Graph的子集，这样就大大减少了边的数量，从而起到减小计算量的作用，
+    因此，该类还需要有管理“生成树（Spanning tree）”的函数。
+ */
 KeyFrame::KeyFrame(Frame &F, Map *pMap, KeyFrameDatabase *pKFDB):
     mnFrameId(F.mnId),  mTimeStamp(F.mTimeStamp), mnGridCols(FRAME_GRID_COLS), mnGridRows(FRAME_GRID_ROWS),
     mfGridElementWidthInv(F.mfGridElementWidthInv), mfGridElementHeightInv(F.mfGridElementHeightInv),
@@ -130,13 +143,17 @@ cv::Mat KeyFrame::GetTranslation()
 }
 
 // Covisibility graph相关
+/*
+    KeyFrame *pKF: 需要关联的关键帧
+    const int &weight: 权重，即该关键帧与pKF共同观测到的3d点数量
+ */
 void KeyFrame::AddConnection(KeyFrame *pKF, const int &weight)
 {
     {
         unique_lock<mutex> lock(mMutexConnections);
-        
         // std::map::count函数只可能返回0或1两种情况
-        // 此处0表示之前没有连接，1表示有连接
+        // 此处0表示之前没有过连接，1表示有过连接
+
         //之前没有连接时，要用权重赋值，即添加连接
         if (!mConnectedKeyFrameWeights.count(pKF)) 
             mConnectedKeyFrameWeights[pKF] = weight;
@@ -152,7 +169,8 @@ void KeyFrame::AddConnection(KeyFrame *pKF, const int &weight)
 }
 
 /*
-    每一个关键帧都有一个容器，其中记录了与其他关键帧之间的weight，
+    按照weight排序: mConnectedKeyFrameWeights, mvOrderedWeights
+    每一个关键帧都有一个容器，其中记录了与其他关键帧之间的连接weight，
     每次当关键帧添加连接、删除连接或者连接权重发生变化时，都需要根据weight对容器内内容重新排序。
     该函数的主要作用便是按照weight对连接的关键帧进行排序，
     更新后的变量存储在mvpOrderedConnectedKeyFrames 和 mvOrderedWeights中。
@@ -205,7 +223,6 @@ vector<KeyFrame*> KeyFrame::GetBestCovisibilityKeyFrames(const int &N)
         return mvpOrderedConnectedKeyFrames;
     else
         return vector<KeyFrame*>(mvpOrderedConnectedKeyFrames.begin(),mvpOrderedConnectedKeyFrames.begin()+N);
-
 }
 
 vector<KeyFrame*> KeyFrame::GetCovisiblesByWeight(const int &w)
@@ -537,7 +554,7 @@ void KeyFrame::SetBadFlag()
             return;
         else if(mbNotErase)
         {
-            mbToBeErased = true;
+            mbToBeErased = true;    // should be false?, 但是是否删除取决于mbNotErase
             return;
         }
     }
@@ -647,6 +664,7 @@ void KeyFrame::EraseConnection(KeyFrame* pKF)
         UpdateBestCovisibles();
 }
 
+//其作用是找到在 以x, y为中心,边长为2r的方形内且在[minLevel, maxLevel]的特征点
 vector<size_t> KeyFrame::GetFeaturesInArea(const float &x, const float &y, const float &r) const
 {
     vector<size_t> vIndices;
@@ -693,6 +711,7 @@ bool KeyFrame::IsInImage(const float &x, const float &y) const
     return (x>=mnMinX && x<mnMaxX && y>=mnMinY && y<mnMaxY);
 }
 
+// uv->world
 cv::Mat KeyFrame::UnprojectStereo(int i)
 {
     const float z = mvDepth[i];
