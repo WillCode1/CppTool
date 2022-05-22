@@ -59,7 +59,7 @@ public:
 
     void clear();
 
-    vector<KeyFrame*> mvpKeyFrameOrigins;
+    vector<KeyFrame*> mvpKeyFrameOrigins;   // question
 
     std::mutex mMutexMapUpdate;
 
@@ -70,12 +70,12 @@ protected:
     std::set<MapPoint*> mspMapPoints;
     std::set<KeyFrame*> mspKeyFrames;
 
-    std::vector<MapPoint*> mvpReferenceMapPoints;
+    std::vector<MapPoint*> mvpReferenceMapPoints;   // question
 
     long unsigned int mnMaxKFid;
 
     // Index related to a big change in the map (loop closure, global BA)
-    int mnBigChangeIdx;
+    int mnBigChangeIdx; // question
 
     std::mutex mMutexMap;
 };

@@ -25,6 +25,7 @@
 namespace ORB_SLAM2
 {
 
+/* Map类比较简单，主要功能就是增删关键帧和地图点 */
 Map::Map():mnMaxKFid(0),mnBigChangeIdx(0)
 {
 }
@@ -61,6 +62,7 @@ void Map::EraseKeyFrame(KeyFrame *pKF)
     // Delete the MapPoint
 }
 
+//设置参考地图点
 void Map::SetReferenceMapPoints(const vector<MapPoint *> &vpMPs)
 {
     unique_lock<mutex> lock(mMutexMap);
@@ -103,18 +105,21 @@ long unsigned int Map::KeyFramesInMap()
     return mspKeyFrames.size();
 }
 
+//获取参考地图点
 vector<MapPoint*> Map::GetReferenceMapPoints()
 {
     unique_lock<mutex> lock(mMutexMap);
     return mvpReferenceMapPoints;
 }
 
+//获取最大帧索引值
 long unsigned int Map::GetMaxKFid()
 {
     unique_lock<mutex> lock(mMutexMap);
     return mnMaxKFid;
 }
 
+//清空地图
 void Map::clear()
 {
     for(set<MapPoint*>::iterator sit=mspMapPoints.begin(), send=mspMapPoints.end(); sit!=send; sit++)

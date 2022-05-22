@@ -62,7 +62,9 @@ protected:
   const ORBVocabulary* mpVoc;
 
   // Inverted file
-  std::vector<list<KeyFrame*> > mvInvertedFile;
+  // 如何理解正逆索引: 正: keyframe->WordId, 逆: WordId->keyframe
+  // mvInvertedFile[i]表示包含了第i个word id的所有关键帧
+  std::vector<list<KeyFrame *>> mvInvertedFile;
 
   // Mutex
   std::mutex mMutex;

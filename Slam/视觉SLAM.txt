@@ -64,17 +64,6 @@ textureFlattening():纹理扁平化
 --->相机的位姿有Tcw​和Twc​两种表示方式，其中Tcw​又称为相机的外参数。
 
 ===================================
-DBoW2
-https://zhehangt.github.io/2018/04/11/SLAM/ORBSLAM/ORBSLAM2LoopClosing/
-https://zhuanlan.zhihu.com/p/354616831
-DBoW2::BowVector mBowVec;
-DBoW2::FeatureVector mFeatVec;
---->如何理解正逆索引: 正: keyframe->WordId, 逆: WordId->keyframe
---->正逆索引作用?
---->DBoW2::BowVector mBowVec是从std::map<WordId, WordValue>继承的，这里的WordId的取值范围即为生成词袋模型时word的数目($k^n$)。
-这里存储的WordValue是 word 的 WordValue的累加值，当图像中的多个特征都与WordId对应的word相似，这里存储的WordValue是对 word 中的 WordValue的多次累加。
---->DBoW2::FeatureVector mFeatVec是被称为 direct index 的东西，用来支持图像与图像之间特征匹配的速度。
-其从std::map<NodeId, std::vector<unsigned int>>继承，NodeId是词袋树中某一层的节点的id，在ORB_SLAM2中是倒数第四层，std::vector<unsigned int>保存的是与该节点下的 word 匹配的特征点的id(1对多)。
 
 
 *****一些相关流程的学习
@@ -120,3 +109,6 @@ DBoW2::FeatureVector mFeatVec;
 单木相机尺度初始化ORB-SLAM2
 阅读环视图像拼接代码
 相机标定代码拷贝
+
+车库应该是有很多动态障碍物的，怎么处理
+

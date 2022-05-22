@@ -30,6 +30,9 @@ long unsigned int KeyFrame::nNextId=0;
 
 /*
     question: Covisbility Graph， Essential，Spanning Tree关系?
+    Covisibility Graph: 具有一定共视点的关键帧的连接
+    Essential Graph: 是根据spanning tree建立的图模型，它是是简版的covisibility graph
+    Spanning Tree: parent, 共视程度最高的那个关键帧, child, this
 
     https://zhuanlan.zhihu.com/p/84293190
 
@@ -343,7 +346,7 @@ void KeyFrame::UpdateConnections()
     // 在没有执行这个函数前，关键帧只和MapPoints之间有连接关系，这个函数可以更新关键帧之间的连接关系
 
     //===============对应a部分内容==================================
-    map<KeyFrame *, int> KFcounter;
+    map<KeyFrame *, int> KFcounter; // (帧, 共视的3d点数量)
 
     vector<MapPoint *> vpMP;
 
@@ -422,7 +425,7 @@ void KeyFrame::UpdateConnections()
         pKFmax->AddConnection(this, nmax);
     }
 
-    // vPairs里存的都是相互共视程度比较高的关键帧和共视权重，由大到小
+    // lKFs, lWs里存的都是相互共视程度比较高的关键帧和共视权重，由大到小
     sort(vPairs.begin(), vPairs.end());
     list<KeyFrame *> lKFs;
     list<int> lWs;

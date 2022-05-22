@@ -141,11 +141,11 @@ public:
     long unsigned int mnBAFixedForKF;
 
     // Variables used by the keyframe database
-    long unsigned int mnLoopQuery;
-    int mnLoopWords;
+    long unsigned int mnLoopQuery;  // 闭环查询 
+    int mnLoopWords;                // 表示和此F有多少共同的单词
     float mLoopScore;
-    long unsigned int mnRelocQuery;
-    int mnRelocWords;
+    long unsigned int mnRelocQuery; // 重定位查询
+    int mnRelocWords;               // 表示和此KF有多少共同的单词
     float mRelocScore;
 
     // Variables used by loop closing
@@ -209,8 +209,9 @@ protected:
     // Grid over the image to speed up feature matching
     std::vector< std::vector <std::vector<size_t> > > mGrid;
 
+    // 具有一定共视点的关键帧的连接
     std::map<KeyFrame*,int> mConnectedKeyFrameWeights;
-    // KeyFrames按权重排序
+    // KeyFrames按Connected权重排序
     std::vector<KeyFrame*> mvpOrderedConnectedKeyFrames;
     std::vector<int> mvOrderedWeights;
 
@@ -219,7 +220,7 @@ protected:
         Essential Graph就是Covisibility Graph的一种简化版，它通过“生成树（Spanning tree）”来管理各关键帧之间的关系，每个帧都有一个父节点和子节点，节点为其他关键帧，
         在构建优化模型时，只有具有父子关系的关键帧之间才建立边，换言之，Essential Graph就是Covisibility Graph的子集，这样就大大减少了边的数量，从而起到减小计算量的作用
      */
-    bool mbFirstConnection;
+    bool mbFirstConnection;     // 表示是否连接过Spanning Tree
     KeyFrame* mpParent;
     std::set<KeyFrame*> mspChildrens;
     std::set<KeyFrame*> mspLoopEdges;   // 闭环关系

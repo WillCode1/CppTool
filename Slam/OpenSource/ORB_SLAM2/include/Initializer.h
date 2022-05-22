@@ -79,8 +79,8 @@ private:
     vector<cv::KeyPoint> mvKeys2;
 
     // Current Matches from Reference to Current
-    vector<Match> mvMatches12;
-    vector<bool> mvbMatched1;
+    vector<Match> mvMatches12;  // 储存着匹配点对在参考帧F1和当前帧F2中的序号
+    vector<bool> mvbMatched1;   // 记录每个特征点是否有匹配的特征点
 
     // Calibration
     cv::Mat mK;

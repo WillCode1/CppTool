@@ -28,9 +28,22 @@
 using namespace std;
 
 /*
-    // https://zhuanlan.zhihu.com/p/84388773
+    https://zhuanlan.zhihu.com/p/84388773
+    https://zhuanlan.zhihu.com/p/354616831
+    https://zhehangt.github.io/2018/04/11/SLAM/ORBSLAM/ORBSLAM2LoopClosing/
+
+    如何理解正逆索引: 正: keyframe->WordId, 逆: WordId->keyframe
+    正向索引加速两帧2d-2d匹配
+    逆向索引加速查找匹配帧，通常应用于闭环检测。
+    
+    DBoW2::BowVector mBowVec是从std::map<WordId, WordValue>继承的，这里的WordId的取值范围即为生成词袋模型时word的数目($k^n$)。
+    这里存储的WordValue是 word 的 WordValue的累加值，当图像中的多个特征都与WordId对应的word相似，这里存储的WordValue是对 word 中的 WordValue的多次累加。
+    
+    DBoW2::FeatureVector mFeatVec是被称为 direct index 的东西，用来支持图像与图像之间特征匹配的速度。
+    其从std::map<NodeId, std::vector<unsigned int>>继承，NodeId是词袋树中某一层的节点的id，在ORB_SLAM2中是倒数第四层，std::vector<unsigned int>保存的是与该节点下的 word 匹配的特征点的id(1对多)。
+
     该类的主要作用就是利用词袋数据，在已有的关键帧中查找和当前帧最接近的帧。
-    这个功能有两个作用，
+    这个功能有两个作用:
     一是重定位时候，通过检测当前帧和哪个关键帧最接近，来确定相机当前的位置和姿态，对应的检测函数是DetectRelocalizationCandidates。
     二是在闭环检测时，通过检测来确定当前关键帧需要和哪些关键帧建立闭环修正的边，对应的检测函数是DetectLoopCandidates。
     二者的区别不大，唯一的区别是闭环检测时不需要遍历和自己在闭环检测之前就已经有共视关系的关键帧。
@@ -45,6 +58,7 @@ KeyFrameDatabase::KeyFrameDatabase (const ORBVocabulary &voc):
 }
 
 
+// 给关键帧添加倒排索引
 void KeyFrameDatabase::add(KeyFrame *pKF)
 {
     unique_lock<mutex> lock(mMutex);
@@ -53,6 +67,7 @@ void KeyFrameDatabase::add(KeyFrame *pKF)
         mvInvertedFile[vit->first].push_back(pKF);
 }
 
+// 删除关键帧对应倒排索引
 void KeyFrameDatabase::erase(KeyFrame* pKF)
 {
     unique_lock<mutex> lock(mMutex);
@@ -61,7 +76,7 @@ void KeyFrameDatabase::erase(KeyFrame* pKF)
     for(DBoW2::BowVector::const_iterator vit=pKF->mBowVec.begin(), vend=pKF->mBowVec.end(); vit!=vend; vit++)
     {
         // List of keyframes that share the word
-        list<KeyFrame*> &lKFs =   mvInvertedFile[vit->first];
+        list<KeyFrame *> &lKFs = mvInvertedFile[vit->first];
 
         for(list<KeyFrame*>::iterator lit=lKFs.begin(), lend= lKFs.end(); lit!=lend; lit++)
         {
@@ -82,6 +97,8 @@ void KeyFrameDatabase::clear()
 
 
 /*
+    这个函数的流程和DetectRelocalizationCandidates唯一的区别是忽略和自己已有共视关系的关键帧
+
     检测的主要步骤如下：
     1）找出与当前帧pKF有公共单词的所有关键帧pKFi，不包括与当前帧相连的关键帧。
     2）统计所有闭环候选帧中与pKF具有共同单词最多的单词数，只考虑共有单词数大于0.8*maxCommonWords以及匹配得分大于给定的minScore的关键帧，存入lScoreAndMatch。
@@ -99,7 +116,7 @@ vector<KeyFrame*> KeyFrameDatabase::DetectLoopCandidates(KeyFrame* pKF, float mi
 
         for(DBoW2::BowVector::const_iterator vit=pKF->mBowVec.begin(), vend=pKF->mBowVec.end(); vit != vend; vit++)
         {
-            list<KeyFrame*> &lKFs =   mvInvertedFile[vit->first];
+            list<KeyFrame *> &lKFs = mvInvertedFile[vit->first];
 
             for(list<KeyFrame*>::iterator lit=lKFs.begin(), lend= lKFs.end(); lit!=lend; lit++)
             {
@@ -107,6 +124,7 @@ vector<KeyFrame*> KeyFrameDatabase::DetectLoopCandidates(KeyFrame* pKF, float mi
                 if(pKFi->mnLoopQuery!=pKF->mnId)
                 {
                     pKFi->mnLoopWords=0;
+                    // (与DetectRelocalizationCandidates唯一的区别)
                     // 此处如果if条件成立，代表没有共视关系，此时才会进入执行语句
                     // 换言之，如果有共视关系，就直接忽略了，这是它和DetectRelocalizationCandidates唯一的区别
                     if(!spConnectedKeyFrames.count(pKFi))
@@ -212,6 +230,12 @@ vector<KeyFrame*> KeyFrameDatabase::DetectLoopCandidates(KeyFrame* pKF, float mi
     return vpLoopCandidates;
 }
 
+/*
+    检测的主要步骤如下：
+    1）找出与当前帧pKF有公共单词的所有关键帧pKFi，不包括与当前帧相连的关键帧。
+    2）统计所有闭环候选帧中与pKF具有共同单词最多的单词数，只考虑共有单词数大于0.8*maxCommonWords以及匹配得分大于给定的minScore的关键帧，存入lScoreAndMatch。
+    3）对于第二步中筛选出来的pKFi，每一个都要抽取出自身的共视（共享地图点最多的前10帧）关键帧分为一组，计算该组整体得分（与pKF比较的），记为bestAccScore。所有组得分大于0.75*bestAccScore的，均当作闭环候选帧。
+ */
 vector<KeyFrame*> KeyFrameDatabase::DetectRelocalizationCandidates(Frame *F)
 {
     list<KeyFrame*> lKFsSharingWords;
@@ -242,6 +266,7 @@ vector<KeyFrame*> KeyFrameDatabase::DetectRelocalizationCandidates(Frame *F)
     if(lKFsSharingWords.empty())
         return vector<KeyFrame*>();
 
+    //====================================================
     // Only compare against those keyframes that share enough words
     //在lKFsSharingWords中，寻找mnRelocWords的最大值存入maxCommonWords
     int maxCommonWords=0;
@@ -275,6 +300,7 @@ vector<KeyFrame*> KeyFrameDatabase::DetectRelocalizationCandidates(Frame *F)
     if(lScoreAndMatch.empty())
         return vector<KeyFrame*>();
 
+    //====================================================
     list<pair<float,KeyFrame*> > lAccScoreAndMatch;
     float bestAccScore = 0;
 
