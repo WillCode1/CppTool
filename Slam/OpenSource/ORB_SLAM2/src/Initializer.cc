@@ -334,7 +334,8 @@ cv::Mat Initializer::ComputeH21(const vector<cv::Point2f> &vP1, const vector<cv:
 
     cv::Mat u,w,vt;
 
-    // question: 形式和书上不一样, 是不是做了转换?增广矩阵?
+    // DLT求解: x' X Hx = 0, Ah = 0, 参考吴博ppt14页
+    // 一般情况下，我们基于大量观测值求最小二乘解：矢量h是方阵ATA最小特征值对应的特征向量
     cv::SVDecomp(A,w,u,vt,cv::SVD::MODIFY_A | cv::SVD::FULL_UV);
 
     return vt.row(8).reshape(0, 3);
@@ -567,7 +568,7 @@ float Initializer::CheckFundamental(const cv::Mat &F21, vector<bool> &vbMatchesI
 }
 
 bool Initializer::ReconstructF(vector<bool> &vbMatchesInliers, cv::Mat &F21, cv::Mat &K,
-                            cv::Mat &R21, cv::Mat &t21, vector<cv::Point3f> &vP3D, vector<bool> &vbTriangulated, float minParallax, int minTriangulated)
+                               cv::Mat &R21, cv::Mat &t21, vector<cv::Point3f> &vP3D, vector<bool> &vbTriangulated, float minParallax, int minTriangulated)
 {
     int N=0;
     for(size_t i=0, iend = vbMatchesInliers.size() ; i<iend; i++)
@@ -669,7 +670,7 @@ bool Initializer::ReconstructF(vector<bool> &vbMatchesInliers, cv::Mat &F21, cv:
 }
 
 bool Initializer::ReconstructH(vector<bool> &vbMatchesInliers, cv::Mat &H21, cv::Mat &K,
-                      cv::Mat &R21, cv::Mat &t21, vector<cv::Point3f> &vP3D, vector<bool> &vbTriangulated, float minParallax, int minTriangulated)
+                               cv::Mat &R21, cv::Mat &t21, vector<cv::Point3f> &vP3D, vector<bool> &vbTriangulated, float minParallax, int minTriangulated)
 {
     int N=0;
     for(size_t i=0, iend = vbMatchesInliers.size() ; i<iend; i++)
@@ -872,6 +873,7 @@ void Initializer::Normalize(const vector<cv::KeyPoint> &vKeys, vector<cv::Point2
     float meanDevX = 0;
     float meanDevY = 0;
 
+    // 将所有vKeys点减去中心坐标，使x坐标和y坐标均值分别为0
     for(int i=0; i<N; i++)
     {
         vNormalizedPoints[i].x = vKeys[i].pt.x - meanX;
@@ -888,6 +890,7 @@ void Initializer::Normalize(const vector<cv::KeyPoint> &vKeys, vector<cv::Point2
     float sY = 1.0/meanDevY;
 
     // question: 这是什么归一化方法
+    // 将x坐标和y坐标分别进行缩放，使得x坐标和y坐标的一阶绝对矩分别为1
     for(int i=0; i<N; i++)
     {
         vNormalizedPoints[i].x = vNormalizedPoints[i].x * sX;
@@ -901,7 +904,20 @@ void Initializer::Normalize(const vector<cv::KeyPoint> &vKeys, vector<cv::Point2
     T.at<float>(1,2) = -meanY*sY;
 }
 
-
+/*
+    CheckRT：计算三角化重投影成功的数量
+    const cv::Mat &R, //旋转矩阵
+    const cv::Mat &t, //平移矩阵
+    const vector<cv::KeyPoint> &vKeys1, //帧1的特征点
+    const vector<cv::KeyPoint> &vKeys2, //帧2的特征点
+    const vector<Match> &vMatches12, //orbmatcher计算的初匹配
+    vector<bool> &vbMatchesInliers,//匹配点中哪些可以通过H或者F重投影成功
+    const cv::Mat &K, //相机内参
+    vector<cv::Point3f> &vP3D, //三角化重投影成功的匹配点的3d点在相机1下的坐标
+    float th2, //根据三角化重投影误差判断匹配点是否重投影成功的阈值
+    vector<bool> &vbGood, //特征点哪些三角化重投影成功
+    float &parallax)//三角化重投影成功匹配点的视差角
+ */
 int Initializer::CheckRT(const cv::Mat &R, const cv::Mat &t, const vector<cv::KeyPoint> &vKeys1, const vector<cv::KeyPoint> &vKeys2,
                        const vector<Match> &vMatches12, vector<bool> &vbMatchesInliers,
                        const cv::Mat &K, vector<cv::Point3f> &vP3D, float th2, vector<bool> &vbGood, float &parallax)
@@ -919,32 +935,42 @@ int Initializer::CheckRT(const cv::Mat &R, const cv::Mat &t, const vector<cv::Ke
     vCosParallax.reserve(vKeys1.size());
 
     // Camera 1 Projection Matrix K[I|0]
+    //相机1的投影矩阵K[I|0]，世界坐标系和相机1坐标系相同
     cv::Mat P1(3,4,CV_32F,cv::Scalar(0));
     K.copyTo(P1.rowRange(0,3).colRange(0,3));
 
+    // 相机1的光心在世界坐标系坐标
     cv::Mat O1 = cv::Mat::zeros(3,1,CV_32F);
 
     // Camera 2 Projection Matrix K[R|t]
+    //相机2的投影矩阵
     cv::Mat P2(3,4,CV_32F);
     R.copyTo(P2.rowRange(0,3).colRange(0,3));
     t.copyTo(P2.rowRange(0,3).col(3));
     P2 = K*P2;
-
+    // 相机2的光心在世界坐标系坐标
     cv::Mat O2 = -R.t()*t;
 
     int nGood=0;
 
+    //遍历所有的匹配点
     for(size_t i=0, iend=vMatches12.size();i<iend;i++)
     {
+        //如果在
         if(!vbMatchesInliers[i])
             continue;
 
+        // kp1和kp2是匹配特征点
         const cv::KeyPoint &kp1 = vKeys1[vMatches12[i].first];
         const cv::KeyPoint &kp2 = vKeys2[vMatches12[i].second];
+        //3d点在相机1和世界坐标系下的坐标
         cv::Mat p3dC1;
 
+        //输出的p3dC1是综合考虑了P1,P2的kp1,kp2匹配点在世界坐标系中的齐次坐标
+	    //由于世界坐标系和相机1坐标系重合，所以p3dC1同时也是匹配点对应的空间点在相机1坐标系中的坐标
         Triangulate(kp1,kp2,P1,P2,p3dC1);
-
+        //isfinite()判断一个浮点数是否是一个有限值
+	    //相当于是确定p3dC1前三位数值正常
         if(!isfinite(p3dC1.at<float>(0)) || !isfinite(p3dC1.at<float>(1)) || !isfinite(p3dC1.at<float>(2)))
         {
             vbGood[vMatches12[i].first]=false;
@@ -952,25 +978,32 @@ int Initializer::CheckRT(const cv::Mat &R, const cv::Mat &t, const vector<cv::Ke
         }
 
         // Check parallax
+        //normal1是相机1到3d点的向量
         cv::Mat normal1 = p3dC1 - O1;
         float dist1 = cv::norm(normal1);
 
+        //normal2是相机2到3d点的向量
         cv::Mat normal2 = p3dC1 - O2;
         float dist2 = cv::norm(normal2);
 
+        //cosParallax为视差角的余弦，也就是normal1与normal2的余弦
         float cosParallax = normal1.dot(normal2)/(dist1*dist2);
 
         // Check depth in front of first camera (only if enough parallax, as "infinite" points can easily go to negative depth)
+        // 判断3D点是否在两个摄像头前方
+        //p3dC1.at<float>(2)<=0说明3d点在光心后面，深度为负
+	    //p3dC1视差角较大，且深度为负则淘汰
         if(p3dC1.at<float>(2)<=0 && cosParallax<0.99998)
             continue;
 
         // Check depth in front of second camera (only if enough parallax, as "infinite" points can easily go to negative depth)
         cv::Mat p3dC2 = R*p3dC1+t;
-
+        //p3dC2视差角较大，且深度为负则淘汰
         if(p3dC2.at<float>(2)<=0 && cosParallax<0.99998)
             continue;
 
         // Check reprojection error in first image
+        // 计算3D点在第一个图像上的投影误差
         float im1x, im1y;
         float invZ1 = 1.0/p3dC1.at<float>(2);
         im1x = fx*p3dC1.at<float>(0)*invZ1+cx;
@@ -989,22 +1022,29 @@ int Initializer::CheckRT(const cv::Mat &R, const cv::Mat &t, const vector<cv::Ke
 
         float squareError2 = (im2x-kp2.pt.x)*(im2x-kp2.pt.x)+(im2y-kp2.pt.y)*(im2y-kp2.pt.y);
 
+        // 重投影误差太大，淘汰
         if(squareError2>th2)
             continue;
 
+        // 统计经过检验的3D点个数，记录3D点视差角
+        // 到这里说明这对匹配点三角化重投影成功了
         vCosParallax.push_back(cosParallax);
         vP3D[vMatches12[i].first] = cv::Point3f(p3dC1.at<float>(0),p3dC1.at<float>(1),p3dC1.at<float>(2));
         nGood++;
 
+        //确认视差角最够大
         if(cosParallax<0.99998)
             vbGood[vMatches12[i].first]=true;
     }
 
+    // 得到3D点中较大的视差角
     if(nGood>0)
     {
+        //将视差角余弦有小到大排序
         sort(vCosParallax.begin(),vCosParallax.end());
-
+        //取出第50个，或者最后那个也就是最大那个
         size_t idx = min(50,int(vCosParallax.size()-1));
+        //计算出视差角
         parallax = acos(vCosParallax[idx])*180/CV_PI;
     }
     else
