@@ -226,26 +226,9 @@ cv::Mat Sim3Solver::find(vector<bool> &vbInliers12, int &nInliers)
     return iterate(mRansacMaxIts,bFlag,vbInliers12,nInliers);
 }
 
-//计算质心
+//计算质心及相对坐标
 void Sim3Solver::ComputeCentroid(cv::Mat &P, cv::Mat &Pr, cv::Mat &C)
 {
-    /**
-     * void cv::reduce 	( 	InputArray  	src,
-		OutputArray  	dst,
-		int  	dim,
-		int  	rtype,
-		int  	dtype = -1 
-	) 	
-    Reduces a matrix to a vector. 
-     * Parameters
-     * src	input 2D matrix.
-     * dst	output vector. Its size and type is defined by dim and dtype parameters.
-     * dim	dimension index along which the matrix is reduced. 0 means that the matrix is reduced to a single row. 1 means that the matrix is reduced to a single column.
-     * rtype	reduction operation that could be one of ReduceTypes
-     * dtype	when negative, the output vector will have the same type as the input matrix, otherwise, its type will be CV_MAKE_TYPE(CV_MAT_DEPTH(dtype), src.channels()). 
-     * 
-     * ref:https://docs.opencv.org/master/d2/de8/group__core__array.html#ga4b78072a303f29d9031d56e5638da78e
-     * */
     //将MAT转换成vector,对P矩阵的每一行求和,变成一列
     cv::reduce(P,C,1,cv::REDUCE_SUM);
     //求平均值
@@ -259,7 +242,7 @@ void Sim3Solver::ComputeCentroid(cv::Mat &P, cv::Mat &Pr, cv::Mat &C)
 
 /*
     https://www.jianshu.com/p/c3e164765164
-    
+
     根据两组匹配的3D点,计算之间的Sim3变换
     三对匹配点,每个点的坐标都是列向量形式,三个点组成了3x3的矩阵,三对点组成了两个3x3矩阵P1,P2，由于Sim3是用于回环中的，所以P1和P2分布代表当前帧和回环候选帧，
     这里需要计算的是两个坐标系之间的相似变换 相似变换比欧式变换多了一个尺度因子，所以相似变换需要求三个部分：旋转、平移、尺度因子。
@@ -367,7 +350,6 @@ void Sim3Solver::ComputeSim3(cv::Mat &P1, cv::Mat &P2)
     mt12i.copyTo(mT12i.rowRange(0,3).col(3));
 
     // Step 8.2 T21
-
     mT21i = cv::Mat::eye(4,4,P1.type());
 
     cv::Mat sRinv = (1.0/ms12i)*mR12i.t();
@@ -389,7 +371,7 @@ void Sim3Solver::CheckInliers()
 
     mnInliersi=0;
 
-    //遍历特征点,计算重投影误差
+    //遍历特征点,计算重投影误差, error = KF2c->KF1uv - KF1uv
     for(size_t i=0; i<mvP1im1.size(); i++)
     {
         cv::Mat dist1 = mvP1im1[i]-vP2im1[i];
@@ -424,7 +406,7 @@ float Sim3Solver::GetEstimatedScale()
     return mBestScale;
 }
 
-/**将vP3Dc中的3D点从世界坐标系转换到图像坐标系并存入vP2D*/
+// world -> uv
 void Sim3Solver::Project(const vector<cv::Mat> &vP3Dw, vector<cv::Mat> &vP2D, cv::Mat Tcw, cv::Mat K)
 {
     cv::Mat Rcw = Tcw.rowRange(0,3).colRange(0,3);
@@ -448,7 +430,7 @@ void Sim3Solver::Project(const vector<cv::Mat> &vP3Dw, vector<cv::Mat> &vP2D, cv
     }
 }
 
-/**将vP3Dc中的3D点从相机坐标系转换到图像坐标系并存入vP2D*/
+// camera -> uv
 void Sim3Solver::FromCameraToImage(const vector<cv::Mat> &vP3Dc, vector<cv::Mat> &vP2D, cv::Mat K)
 {
     const float &fx = K.at<float>(0,0);
