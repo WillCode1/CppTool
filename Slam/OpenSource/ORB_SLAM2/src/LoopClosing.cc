@@ -348,7 +348,7 @@ bool LoopClosing::ComputeSim3()
 
             // 对有较好的匹配的关键帧求取Sim3变换
             Sim3Solver* pSolver = vpSim3Solvers[i];
-            cv::Mat Scm  = pSolver->iterate(5,bNoMore,vbInliers,nInliers);
+            cv::Mat Scm = pSolver->iterate(5, bNoMore, vbInliers, nInliers);
 
             // If Ransac reachs max. iterations discard keyframe
             // 总迭代次数达到最大限制还没有求出合格的Sim3变换，该候选帧剔除
