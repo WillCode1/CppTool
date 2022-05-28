@@ -95,19 +95,18 @@ protected:
     std::vector<cv::Point> pattern;
 
     int nfeatures;
-    double scaleFactor; // question
-    int nlevels;
-    int iniThFAST;
-    int minThFAST;
+    double scaleFactor; // 高斯金字塔的放大系数
+    int nlevels;        // 高斯金字塔的层数
+    int iniThFAST;      // 初始的FAST关键点提取时计算像素值差值的阈值
+    int minThFAST;      // 如果用上面那个阈值提取不到足够数量的fast点，则使用这个阈值
 
-    std::vector<int> mnFeaturesPerLevel;
+    std::vector<int> mnFeaturesPerLevel;    // 每层金字塔的特征点数量
 
-    std::vector<int> umax;
+    std::vector<int> umax;      // 特征点周围圆盘patch的每行边界
 
-    // question
-    std::vector<float> mvScaleFactor;
+    std::vector<float> mvScaleFactor;       // 每层金字塔的放大系数
     std::vector<float> mvInvScaleFactor;    
-    std::vector<float> mvLevelSigma2;
+    std::vector<float> mvLevelSigma2;       // 方差等于放大系数平方
     std::vector<float> mvInvLevelSigma2;
 };
 

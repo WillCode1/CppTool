@@ -29,7 +29,6 @@ namespace ORB_SLAM2
 long unsigned int KeyFrame::nNextId=0;
 
 /*
-    question: Covisbility Graph， Essential，Spanning Tree关系?
     Covisibility Graph: 具有一定共视点的关键帧的连接
     Essential Graph: 是根据spanning tree建立的图模型，它是是简版的covisibility graph
     Spanning Tree: parent, 共视程度最高的那个关键帧, child, this

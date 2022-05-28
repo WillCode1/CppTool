@@ -51,17 +51,17 @@ Sim3Solver::Sim3Solver(KeyFrame *pKF1, KeyFrame *pKF2, const vector<MapPoint *> 
 
     mvpMapPoints1.reserve(mN1);
     mvpMapPoints2.reserve(mN1);
-    mvpMatches12 = vpMatched12;
-    mvnIndices1.reserve(mN1);
-    mvX3Dc1.reserve(mN1);
-    mvX3Dc2.reserve(mN1);
+    mvpMatches12 = vpMatched12;     // not used
+    mvnIndices1.reserve(mN1);       // 有效索引有空当
+    mvX3Dc1.reserve(mN1);           // KF1中点在camera1坐标系
+    mvX3Dc2.reserve(mN1);           // KF2中点在camera2坐标系
 
     cv::Mat Rcw1 = pKF1->GetRotation();
     cv::Mat tcw1 = pKF1->GetTranslation();
     cv::Mat Rcw2 = pKF2->GetRotation();
     cv::Mat tcw2 = pKF2->GetTranslation();
 
-    mvAllIndices.reserve(mN1);
+    mvAllIndices.reserve(mN1);  // 有效索引无空当
 
     size_t idx=0;
     for(int i1=0; i1<mN1; i1++)
@@ -87,6 +87,7 @@ Sim3Solver::Sim3Solver(KeyFrame *pKF1, KeyFrame *pKF2, const vector<MapPoint *> 
             const cv::KeyPoint &kp1 = pKF1->mvKeypointsUndistorted[indexKF1];
             const cv::KeyPoint &kp2 = pKF2->mvKeypointsUndistorted[indexKF2];
 
+            // mvLevelSigma2 = mvScaleFactor*mvScaleFactor
             const float sigmaSquare1 = pKF1->mvLevelSigma2[kp1.octave];
             const float sigmaSquare2 = pKF2->mvLevelSigma2[kp2.octave];
 
@@ -152,6 +153,7 @@ cv::Mat Sim3Solver::iterate(int nIterations, bool &bNoMore, vector<bool> &vbInli
 
     if(N<mRansacMinInliers)
     {
+        // remove this KF
         bNoMore = true;
         return cv::Mat();
     }
@@ -214,19 +216,21 @@ cv::Mat Sim3Solver::iterate(int nIterations, bool &bNoMore, vector<bool> &vbInli
         }
     }
 
+    // 总迭代次数达到最大限制还没有求出合格的Sim3变换，该候选帧剔除
     if(mnIterations>=mRansacMaxIts)
         bNoMore=true;
 
     return cv::Mat();
 }
 
+// not used
 cv::Mat Sim3Solver::find(vector<bool> &vbInliers12, int &nInliers)
 {
     bool bFlag;
     return iterate(mRansacMaxIts,bFlag,vbInliers12,nInliers);
 }
 
-//计算质心及相对坐标
+//计算质心及相对质心offset
 void Sim3Solver::ComputeCentroid(cv::Mat &P, cv::Mat &Pr, cv::Mat &C)
 {
     //将MAT转换成vector,对P矩阵的每一行求和,变成一列
@@ -242,10 +246,14 @@ void Sim3Solver::ComputeCentroid(cv::Mat &P, cv::Mat &Pr, cv::Mat &C)
 
 /*
     https://www.jianshu.com/p/c3e164765164
+    https://note.youdao.com/ynoteshare/index.html?id=76a1d9452a3b6371464dd9b2745f5a2a&type=note&_time=1653397729283
 
     根据两组匹配的3D点,计算之间的Sim3变换
     三对匹配点,每个点的坐标都是列向量形式,三个点组成了3x3的矩阵,三对点组成了两个3x3矩阵P1,P2，由于Sim3是用于回环中的，所以P1和P2分布代表当前帧和回环候选帧，
     这里需要计算的是两个坐标系之间的相似变换 相似变换比欧式变换多了一个尺度因子，所以相似变换需要求三个部分：旋转、平移、尺度因子。
+
+    question: 推导? error​=x1​−sRx2−t​, 三个点求最小二乘
+    三个已知点提供了九个约束，确定7个未知量：https://blog.csdn.net/weixin_44456692/article/details/107298134
  */
 void Sim3Solver::ComputeSim3(cv::Mat &P1, cv::Mat &P2)
 {
@@ -263,13 +271,10 @@ void Sim3Solver::ComputeSim3(cv::Mat &P1, cv::Mat &P2)
     ComputeCentroid(P2,Pr2,O2);
 
     // Step 2: Compute M matrix
-
     cv::Mat M = Pr2*Pr1.t();
 
     // Step 3: Compute N matrix
-
     double N11, N12, N13, N14, N22, N23, N24, N33, N34, N44;
-
     cv::Mat N(4,4,P1.type());
 
     N11 = M.at<float>(0,0)+M.at<float>(1,1)+M.at<float>(2,2);
