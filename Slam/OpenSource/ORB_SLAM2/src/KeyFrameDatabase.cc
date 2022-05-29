@@ -33,7 +33,7 @@ using namespace std;
     https://zhehangt.github.io/2018/04/11/SLAM/ORBSLAM/ORBSLAM2LoopClosing/
 
     如何理解正逆索引: 正: keyframe->WordId, 逆: WordId->keyframe
-    正向索引加速两帧2d-2d匹配
+    正向索引加速两帧2d-2d匹配，快速跳过不相同的NodeId
     逆向索引加速查找匹配帧，通常应用于闭环检测。
     
     DBoW2::BowVector mBowVec是从std::map<WordId, WordValue>继承的，这里的WordId的取值范围即为生成词袋模型时word的数目($k^n$)。
