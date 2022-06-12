@@ -292,6 +292,7 @@ void Initializer::FindFundamental(vector<bool> &vbMatchesInliers, float &score, 
     }
 }
 
+// https://blog.csdn.net/xiaoxiaowenqiang/article/details/80659785
 /*
     ComputeH21：计算单应性矩阵
     const vector<cv::Point2f> &vP1, //帧1中的特征点
@@ -299,6 +300,34 @@ void Initializer::FindFundamental(vector<bool> &vbMatchesInliers, float &score, 
  */
 cv::Mat Initializer::ComputeH21(const vector<cv::Point2f> &vP1, const vector<cv::Point2f> &vP2)
 {
+    /*
+        p2   =  H12 * p1  4对点   A*h = 0 奇异值分解 A 得到 单元矩阵 H ，  T =  K 逆 * H21*K 
+        展开成矩阵形式：
+        u2         h1  h2  h3        u1
+        v2  =      h4  h5  h6    *   v1
+        1          h7  h8  h9        1   
+        按矩阵乘法展开：
+        u2 = (h1*u1 + h2*v1 + h3) /( h7*u1 + h8*v1 + h9)
+        v2 = (h4*u1 + h5*v1 + h6) /( h7*u1 + h8*v1 + h9)   
+        整理：
+        h1*u1 + h2*v1 + h3 - (h7*u1*u2 + h8*v1*u2 + h9*u2)=0
+        h4*u1 + h5*v1 + h6 - (h7*u1*v2 + h8*v1*v2 + h9*v2)=0
+        写成关于 H的矩阵形式：
+        0   0   0  -u1  -v1  -1    u1*v2   v1*v2   v2
+        u1  v1  1   0    0    0   -u1*u2  -v1*u2  -u2  * (h1 h2 h3 h4 h5 h6 h7 h8 h9)转置  = 0
+        h1~h9 9个变量一个尺度因子，相当于8个自由变量
+        一对点 2个约束
+        4对点  8个约束 求解8个变量
+        A*h = 0 奇异值分解 A 得到 单应矩阵 H
+
+        cv::SVDecomp(A,w,u,vt,cv::SVD::MODIFY_A | cv::SVD::FULL_UV);// 奇异值分解
+        H = vt.row(8).reshape(0, 3);// v的最后一列
+
+        单应矩阵恢复  旋转矩阵 R 和平移向量t
+         p2 =  H21 * p1   = H21 * KP
+         p2 = K( RP + t)  = KTP = H21 * KP
+         T =  K 逆 * H21*K
+     */
     const int N = vP1.size();
 
     cv::Mat A(2*N,9,CV_32F);    // 16 * 9
@@ -310,7 +339,6 @@ cv::Mat Initializer::ComputeH21(const vector<cv::Point2f> &vP1, const vector<cv:
         const float u2 = vP2[i].x;
         const float v2 = vP2[i].y;
 
-        // 都乘以的-1
         A.at<float>(2*i,0) = 0.0;
         A.at<float>(2*i,1) = 0.0;
         A.at<float>(2*i,2) = 0.0;
@@ -329,14 +357,12 @@ cv::Mat Initializer::ComputeH21(const vector<cv::Point2f> &vP1, const vector<cv:
         A.at<float>(2*i+1,5) = 0.0;
         A.at<float>(2*i+1,6) = -u2*u1;
         A.at<float>(2*i+1,7) = -u2*v1;
-        A.at<float>(2*i+1,8) = -u2;     // 这里怎么是-u2
-
+        A.at<float>(2*i+1,8) = -u2;
     }
 
     cv::Mat u,w,vt;
 
-    // DLT求解: x' X Hx = 0, Ah = 0, 参考吴博ppt14页
-    // 一般情况下，我们基于大量观测值求最小二乘解：矢量h是方阵ATA最小特征值对应的特征向量
+    // 为什么Ax=0的解是V的最后一列：齐次线性方程组的最小二乘解，《计算机视觉中的多视图几何》P412-P413
     cv::SVDecomp(A,w,u,vt,cv::SVD::MODIFY_A | cv::SVD::FULL_UV);
 
     return vt.row(8).reshape(0, 3);
@@ -373,16 +399,16 @@ cv::Mat Initializer::ComputeF21(const vector<cv::Point2f> &vP1,const vector<cv::
 
     cv::Mat u,w,vt;
 
-    // question
-    cv::SVDecomp(A,w,u,vt,cv::SVD::MODIFY_A | cv::SVD::FULL_UV);
+    // Af=0, 同上
+    cv::SVDecomp(A,w,u,vt,cv::SVD::MODIFY_A | cv::SVD::FULL_UV);    // A = u * w * vt
 
     cv::Mat Fpre = vt.row(8).reshape(0, 3);
 
     cv::SVDecomp(Fpre,w,u,vt,cv::SVD::MODIFY_A | cv::SVD::FULL_UV);
 
-    w.at<float>(2)=0;
+    w.at<float>(2)=0;   // 基础矩阵的秩为2，重要的约束条件
 
-    return  u*cv::Mat::diag(w)*vt;
+    return  u*cv::Mat::diag(w)*vt;  // F 基础矩阵的秩为2 需要在分解 后 取对角矩阵 秩为2 在合成F
 }
 
 /*
@@ -832,8 +858,11 @@ bool Initializer::ReconstructH(vector<bool> &vbMatchesInliers, cv::Mat &H21, cv:
     return false;
 }
 
+// P1 = K
+// P2 = K*[R|t]
 void Initializer::Triangulate(const cv::KeyPoint &kp1, const cv::KeyPoint &kp2, const cv::Mat &P1, const cv::Mat &P2, cv::Mat &x3D)
 {
+    // 《计算机视觉中的多视图几何》P217~218
     cv::Mat A(4,4,CV_32F);
 
     A.row(0) = kp1.pt.x*P1.row(2)-P1.row(0);
