@@ -310,6 +310,7 @@ cv::Mat Initializer::ComputeH21(const vector<cv::Point2f> &vP1, const vector<cv:
         const float u2 = vP2[i].x;
         const float v2 = vP2[i].y;
 
+        // 都乘以的-1
         A.at<float>(2*i,0) = 0.0;
         A.at<float>(2*i,1) = 0.0;
         A.at<float>(2*i,2) = 0.0;
@@ -328,7 +329,7 @@ cv::Mat Initializer::ComputeH21(const vector<cv::Point2f> &vP1, const vector<cv:
         A.at<float>(2*i+1,5) = 0.0;
         A.at<float>(2*i+1,6) = -u2*u1;
         A.at<float>(2*i+1,7) = -u2*v1;
-        A.at<float>(2*i+1,8) = -u2;
+        A.at<float>(2*i+1,8) = -u2;     // 这里怎么是-u2
 
     }
 
